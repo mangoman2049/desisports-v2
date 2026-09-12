@@ -80,9 +80,10 @@ model Match {
   potmPlayerId Int?
   potmPlayer   Player?            @relation("PotmPlayer", fields: [potmPlayerId], references: [id])
   status       String             @default("COMPLETED") // YET_TO_PLAY, COMPLETED
-  umpire       String?
-  scorecardUrl String?
-  innings      Innings[]
+  umpire           String?
+  scorecardUrl     String?
+  tacticalAnalysis String?            // JSON: MatchTacticalAnalysis
+  innings          Innings[]
   playerStats  PlayerMatchStat[]
   uploads      ScorecardUpload[]
   createdAt    DateTime           @default(now())
@@ -164,6 +165,7 @@ model ScorecardUpload {
   rawExtraction      String?              // JSON
   reconciledData     String?              // JSON
   validationScore    Float                @default(0.0) // 0-100% confidence
+  tacticalAnalysis   String?              // JSON: MatchTacticalAnalysis
   createdAt          DateTime             @default(now())
   revisions          ExtractionRevision[]
 }

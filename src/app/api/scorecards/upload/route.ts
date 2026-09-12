@@ -4,6 +4,7 @@ import { evaluateQualityGate } from "@/lib/quality-gate";
 import { getSampleScorecardExtraction, extractScorecardWithLiteLLM } from "@/lib/extractor-service";
 import { checkForDuplicateScorecard } from "@/lib/duplicate-detector";
 import { resolveAllScorecardPlayers } from "@/lib/name-resolver";
+import { generateAndSaveMatchAnalysis } from "@/lib/match-analyzer";
 import fs from "fs/promises";
 import path from "path";
 
@@ -85,6 +86,12 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Run Match Tactical Analysis once immediately upon upload and save to DB
+    const tacticalAnalysis = await generateAndSaveMatchAnalysis({
+      uploadId: upload.id,
+      parsedScorecard: reconciledScorecard,
+    });
+
     return NextResponse.json({
       success: true,
       uploadId: upload.id,
@@ -97,6 +104,7 @@ export async function POST(req: NextRequest) {
         unreconciledCount,
         total: matchedCount + unreconciledCount,
       },
+      tacticalAnalysis,
     });
   } catch (err: any) {
     console.error("Scorecard upload error:", err);

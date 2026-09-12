@@ -30,7 +30,7 @@ export async function POST(
     });
 
     // Update ScorecardUpload status
-    await prisma.scorecardUpload.update({
+    const updatedUpload = await prisma.scorecardUpload.update({
       where: { id: uploadId },
       data: {
         status: "APPROVED",
@@ -38,6 +38,19 @@ export async function POST(
         reconciledData: JSON.stringify(parsed),
       },
     });
+
+    if (updatedUpload.matchId && updatedUpload.tacticalAnalysis) {
+      try {
+        await prisma.match.update({
+          where: { id: updatedUpload.matchId },
+          data: {
+            tacticalAnalysis: updatedUpload.tacticalAnalysis,
+          },
+        });
+      } catch (e) {
+        console.error("Could not sync tacticalAnalysis to Match:", e);
+      }
+    }
 
     // Ensure teams exist
     const homeTeam = await prisma.team.upsert({

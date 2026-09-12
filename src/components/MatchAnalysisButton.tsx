@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { Sparkles } from "lucide-react";
-import { MATCH_ANALYSES } from "@/lib/match-analyses";
+import { MatchTacticalAnalysis, MATCH_ANALYSES } from "@/lib/match-analyses";
 import MatchAnalysisModal from "@/components/MatchAnalysisModal";
 
 interface Props {
   matchId: string | number;
+  analysis?: MatchTacticalAnalysis;
   className?: string;
   variant?: "primary" | "outline" | "subtle";
   label?: string;
@@ -14,12 +15,13 @@ interface Props {
 
 export default function MatchAnalysisButton({
   matchId,
+  analysis: propAnalysis,
   className = "",
   variant = "subtle",
   label = "Match Analysis",
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-  const analysis = MATCH_ANALYSES[String(matchId)];
+  const analysis = propAnalysis || MATCH_ANALYSES[String(matchId)];
 
   if (!analysis) return null;
 
