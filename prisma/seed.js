@@ -157,9 +157,9 @@ async function main() {
     });
   }
 
-  // Also seed Yash and Deepak for practice matches
-  await prisma.player.create({
-    data: {
+  // Seed all unique practice match players who are not in tournament 1 squads
+  const practicePlayersToSeed = [
+    {
       id: 101,
       canonicalName: "Yash",
       battingHand: "Right Hand",
@@ -168,10 +168,7 @@ async function main() {
       captainTags: JSON.stringify(["POTM Specialist", "Boundary Striker"]),
       fuzzyVariants: JSON.stringify(["Yash", "Yaash", "Yash P"]),
     },
-  });
-
-  await prisma.player.create({
-    data: {
+    {
       id: 102,
       canonicalName: "Deepak",
       battingHand: "Right Hand",
@@ -180,7 +177,101 @@ async function main() {
       captainTags: JSON.stringify(["Anchor", "Economy Bowler"]),
       fuzzyVariants: JSON.stringify(["Deepak", "Dipak", "Deepak P"]),
     },
-  });
+    {
+      id: 103,
+      canonicalName: "Akshay",
+      battingHand: "Right Hand",
+      bowlingStyle: "Right Arm Medium",
+      fieldingPosition: "Mid Off",
+      captainTags: JSON.stringify(["Bowler"]),
+      fuzzyVariants: JSON.stringify(["Akshay", "Akshay K"]),
+    },
+    {
+      id: 104,
+      canonicalName: "Jigar",
+      battingHand: "Right Hand",
+      bowlingStyle: "Right Arm Medium",
+      fieldingPosition: "Square Leg",
+      captainTags: JSON.stringify(["Batter"]),
+      fuzzyVariants: JSON.stringify(["Jigar", "Jeegar"]),
+    },
+    {
+      id: 105,
+      canonicalName: "Arif",
+      battingHand: "Right Hand",
+      bowlingStyle: "Right Arm Medium",
+      fieldingPosition: "Cover",
+      captainTags: JSON.stringify(["Strike Bowler", "Economy Specialist"]),
+      fuzzyVariants: JSON.stringify(["Arif", "Aareef"]),
+    },
+    {
+      id: 106,
+      canonicalName: "Sahil A",
+      battingHand: "Right Hand",
+      bowlingStyle: "Right Arm Medium",
+      fieldingPosition: "Point",
+      captainTags: JSON.stringify(["Batter"]),
+      fuzzyVariants: JSON.stringify(["Sahil A"]),
+    },
+    {
+      id: 108,
+      canonicalName: "Shubham",
+      battingHand: "Right Hand",
+      bowlingStyle: "Right Arm Fast",
+      fieldingPosition: "Mid On",
+      captainTags: JSON.stringify(["Boundary Hunter"]),
+      fuzzyVariants: JSON.stringify(["Shubham", "Subham"]),
+    },
+    {
+      id: 109,
+      canonicalName: "Narendra",
+      battingHand: "Right Hand",
+      bowlingStyle: "Right Arm Medium Fast",
+      fieldingPosition: "Gully",
+      captainTags: JSON.stringify(["All-Rounder", "Economy Bowler"]),
+      fuzzyVariants: JSON.stringify(["Narendra", "Narender"]),
+    },
+    {
+      id: 110,
+      canonicalName: "Viral",
+      battingHand: "Right Hand",
+      bowlingStyle: "Right Arm Medium",
+      fieldingPosition: "Mid Wicket",
+      captainTags: JSON.stringify(["Batter"]),
+      fuzzyVariants: JSON.stringify(["Viral"]),
+    },
+    {
+      id: 111,
+      canonicalName: "Sunny",
+      battingHand: "Right Hand",
+      bowlingStyle: "Right Arm Medium",
+      fieldingPosition: "Deep Cover",
+      captainTags: JSON.stringify(["Batter"]),
+      fuzzyVariants: JSON.stringify(["Sunny"]),
+    },
+    {
+      id: 112,
+      canonicalName: "Sahil",
+      battingHand: "Right Hand",
+      bowlingStyle: "Right Arm Off Spin",
+      fieldingPosition: "Slip",
+      captainTags: JSON.stringify(["Economy Bowler", "Spin Specialist"]),
+      fuzzyVariants: JSON.stringify(["Sahil"]),
+    },
+    {
+      id: 113,
+      canonicalName: "Gagan",
+      battingHand: "Right Hand",
+      bowlingStyle: "Right Arm Medium Fast",
+      fieldingPosition: "Wicket Keeper",
+      captainTags: JSON.stringify(["All-Rounder", "Boundary Striker"]),
+      fuzzyVariants: JSON.stringify(["Gagan"]),
+    },
+  ];
+
+  for (const p of practicePlayersToSeed) {
+    await prisma.player.create({ data: p });
+  }
 
   // Seed All 6 Tournament Matches from tournament_1_data.json
   const tournamentMatchesData = [
@@ -368,25 +459,57 @@ async function main() {
   await addStat(5, 20, desiDabanggs.id, 4, 2.0, 1, 3, 0.5, 3, false, "⚡ 3 wickets", 1);
   await addStat(6, 20, desiDabanggs.id, 14, 2.0, -8, 4, -4.0, 22, true, "★ Player of the match!", 0);
 
-  // 12. Yash (ID 101) — Practice Match POTM: RS 18, RC -1, WKTS 3, ECON -0.5, C 19!
-  await prisma.playerMatchStat.create({
-    data: {
-      matchId: 7,
-      playerId: 101,
-      teamId: awayTeam.id,
-      runsScored: 18,
-      timesOut: 0,
-      oversBowled: 2.0,
-      runsConceded: -1,
-      wickets: 3,
-      economy: -0.5,
-      contribution: 19,
-      isPotm: true,
-      performanceNote: "★ Player of the match (+19 contribution)",
-    },
-  });
+  // --- MATCH 7 (PRACTICE MATCH - 09 Sep 2026) FULL 16-PLAYER ROSTER ---
+  // Away Team (120 runs, 4 skins won, 8 wickets conceded)
+  await addStat(7, 101, awayTeam.id, 18, 2.0, -1, 3, -0.5, 19, true, "★ Player of the match (+19 contribution)", 0); // Yash (POTM)
+  await addStat(7, 102, awayTeam.id, 16, 2.0, 5, 2, 2.5, 11, false, "⚡ 2 wickets & 16 runs", 1); // Deepak
+  await addStat(7, 109, awayTeam.id, 13, 2.0, 3, 3, 1.5, 10, false, "⚡ 3 wickets with 1.5 economy", 1); // Narendra
+  await addStat(7, 113, awayTeam.id, 16, 2.0, 7, 3, 3.5, 9, false, "⚡ 3 wickets & 16 runs", 1); // Gagan
+  await addStat(7, 112, awayTeam.id, 3, 2.0, -4, 3, -2.0, 7, false, "⚡ -2.0 economy & 3 wickets", 1); // Sahil
+  await addStat(7, 110, awayTeam.id, 18, 2.0, 12, 2, 6.0, 6, false, "18 runs scored", 1); // Viral
+  // Note: Manish Pandey (ID 35) already added above for Match 7: 20 RS, 2 OB, 14 RC, 1 WKT, +6 C
+  await addStat(7, 111, awayTeam.id, 16, 2.0, 27, 0, 13.5, -11, false, null, 1); // Sunny
 
-  console.log("Database seeded successfully with all 48 tournament players, exact IDs, and grounded stats!");
+  // Home Team (63 runs, 0 skins won, 17 wickets conceded)
+  await addStat(7, 36, homeTeam.id, 29, 2.0, 13, 1, 6.5, 16, false, "⭐ Top scorer of the match (29 RS)", 1); // Manthan Shah
+  await addStat(7, 105, homeTeam.id, 14, 2.0, 3, 3, 1.5, 11, false, "⚡ 3 wickets with 1.5 economy", 0); // Arif
+  await addStat(7, 45, homeTeam.id, -1, 2.0, 1, 3, 0.5, -2, false, "⚡ 3 wickets with 0.5 economy", 3); // Prateek Nahar
+  await addStat(7, 106, homeTeam.id, 11, 2.0, 21, 0, 10.5, -10, false, null, 2); // Sahil A
+  await addStat(7, 23, homeTeam.id, 0, 2.0, 12, 1, 6.0, -12, false, null, 2); // Hardik Desai
+  await addStat(7, 108, homeTeam.id, 13, 2.0, 29, 0, 14.5, -16, false, null, 2); // Shubham
+  await addStat(7, 103, homeTeam.id, 2, 2.0, 21, 0, 10.5, -19, false, null, 3); // Akshay
+  await addStat(7, 104, homeTeam.id, -5, 2.0, 20, 0, 10.0, -25, false, null, 4); // Jigar
+
+  // Seed Canonical Aliases for OCR resolution (e.g. MANEESH -> Manish Pandey)
+  const aliasesToSeed = [
+    { alias: "MANEESH", playerId: 35 },
+    { alias: "MANISH", playerId: 35 },
+    { alias: "GAGAN", playerId: 113 },
+    { alias: "MANTHAN", playerId: 36 },
+    { alias: "PRATEEK", playerId: 45 },
+    { alias: "HARDIK", playerId: 23 },
+    { alias: "DEEPAK", playerId: 102 },
+    { alias: "YASH", playerId: 101 },
+    { alias: "ARIF", playerId: 105 },
+    { alias: "SAHIL A", playerId: 106 },
+    { alias: "SHUBHAM", playerId: 108 },
+    { alias: "AKSHAY", playerId: 103 },
+    { alias: "JIGAR", playerId: 104 },
+    { alias: "NARENDRA", playerId: 109 },
+    { alias: "VIRAL", playerId: 110 },
+    { alias: "SUNNY", playerId: 111 },
+    { alias: "SAHIL", playerId: 112 },
+  ];
+
+  for (const a of aliasesToSeed) {
+    await prisma.playerAlias.upsert({
+      where: { alias: a.alias },
+      update: { playerId: a.playerId },
+      create: { alias: a.alias, playerId: a.playerId, confidence: 1.0, status: "APPROVED", approvedBy: "SeedSystem" },
+    });
+  }
+
+  console.log("Database seeded successfully with all 48 tournament players + 16 practice match players, exact IDs, and grounded stats!");
 }
 
 main()

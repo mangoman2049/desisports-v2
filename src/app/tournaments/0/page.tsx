@@ -11,7 +11,7 @@ import {
   Flame,
   Award,
 } from "lucide-react";
-import MatchAnalysisButton from "@/components/MatchAnalysisButton";
+import { prisma } from "@/lib/prisma";
 import MatchCard from "@/components/MatchCard";
 import PracticePointsTable, { PracticePlayerStat } from "./PracticePointsTable";
 
@@ -21,40 +21,85 @@ export const metadata = {
     "Official tracking for weekly net sessions, practice matches & friendly indoor cricket games.",
 };
 
-export default function TournamentZeroPage() {
+// Ground truth 16-player list from the 09-Sep-2026 scorecard (reconciled Spawtz sheet)
+const DEFAULT_PRACTICE_STANDINGS: PracticePlayerStat[] = [
+  { id: 101, name: "Yash", matchesPlayed: 1, runsScored: 18, oversBowled: 2.0, runsConceded: -1, wickets: 3, economy: -0.5, contribution: 19, potmCount: 1, role: "All-Rounder" },
+  { id: 36, name: "Manthan Shah", matchesPlayed: 1, runsScored: 29, oversBowled: 2.0, runsConceded: 13, wickets: 1, economy: 6.5, contribution: 16, potmCount: 0, role: "Batter" },
+  { id: 105, name: "Arif", matchesPlayed: 1, runsScored: 14, oversBowled: 2.0, runsConceded: 3, wickets: 3, economy: 1.5, contribution: 11, potmCount: 0, role: "All-Rounder" },
+  { id: 102, name: "Deepak", matchesPlayed: 1, runsScored: 16, oversBowled: 2.0, runsConceded: 5, wickets: 2, economy: 2.5, contribution: 11, potmCount: 0, role: "All-Rounder" },
+  { id: 109, name: "Narendra", matchesPlayed: 1, runsScored: 13, oversBowled: 2.0, runsConceded: 3, wickets: 3, economy: 1.5, contribution: 10, potmCount: 0, role: "All-Rounder" },
+  { id: 113, name: "Gagan", matchesPlayed: 1, runsScored: 16, oversBowled: 2.0, runsConceded: 7, wickets: 3, economy: 3.5, contribution: 9, potmCount: 0, role: "All-Rounder" },
+  { id: 112, name: "Sahil", matchesPlayed: 1, runsScored: 3, oversBowled: 2.0, runsConceded: -4, wickets: 3, economy: -2.0, contribution: 7, potmCount: 0, role: "Bowler" },
+  { id: 35, name: "Manish Pandey", matchesPlayed: 1, runsScored: 20, oversBowled: 2.0, runsConceded: 14, wickets: 1, economy: 7.0, contribution: 6, potmCount: 0, role: "Batter" },
+  { id: 110, name: "Viral", matchesPlayed: 1, runsScored: 18, oversBowled: 2.0, runsConceded: 12, wickets: 2, economy: 6.0, contribution: 6, potmCount: 0, role: "Batter" },
+  { id: 45, name: "Prateek Nahar", matchesPlayed: 1, runsScored: -1, oversBowled: 2.0, runsConceded: 1, wickets: 3, economy: 0.5, contribution: -2, potmCount: 0, role: "All-Rounder" },
+  { id: 106, name: "Sahil A", matchesPlayed: 1, runsScored: 11, oversBowled: 2.0, runsConceded: 21, wickets: 0, economy: 10.5, contribution: -10, potmCount: 0, role: "Batter" },
+  { id: 111, name: "Sunny", matchesPlayed: 1, runsScored: 16, oversBowled: 2.0, runsConceded: 27, wickets: 0, economy: 13.5, contribution: -11, potmCount: 0, role: "Batter" },
+  { id: 23, name: "Hardik Desai", matchesPlayed: 1, runsScored: 0, oversBowled: 2.0, runsConceded: 12, wickets: 1, economy: 6.0, contribution: -12, potmCount: 0, role: "All-Rounder" },
+  { id: 108, name: "Shubham", matchesPlayed: 1, runsScored: 13, oversBowled: 2.0, runsConceded: 29, wickets: 0, economy: 14.5, contribution: -16, potmCount: 0, role: "Batter" },
+  { id: 103, name: "Akshay", matchesPlayed: 1, runsScored: 2, oversBowled: 2.0, runsConceded: 21, wickets: 0, economy: 10.5, contribution: -19, potmCount: 0, role: "Bowler" },
+  { id: 104, name: "Jigar", matchesPlayed: 1, runsScored: -5, oversBowled: 2.0, runsConceded: 20, wickets: 0, economy: 10.0, contribution: -25, potmCount: 0, role: "Batter" },
+];
+
+export default async function TournamentZeroPage() {
+  let practiceStandingsData: PracticePlayerStat[] = DEFAULT_PRACTICE_STANDINGS;
+
+  try {
+    const dbStats = await prisma.playerMatchStat.findMany({
+      where: {
+        matchId: 7,
+      },
+      include: {
+        player: true,
+      },
+      orderBy: {
+        contribution: "desc",
+      },
+    });
+
+    if (dbStats && dbStats.length >= 10) {
+      practiceStandingsData = dbStats.map((s) => ({
+        id: s.playerId,
+        name: s.player.canonicalName,
+        matchesPlayed: 1,
+        runsScored: s.runsScored,
+        oversBowled: s.oversBowled,
+        runsConceded: s.runsConceded,
+        wickets: s.wickets,
+        economy: s.economy,
+        contribution: s.contribution,
+        potmCount: s.isPotm ? 1 : 0,
+        role: s.player.fieldingPosition || (s.wickets >= 2 && s.runsScored >= 10 ? "All-Rounder" : s.wickets >= 2 ? "Bowler" : "Batter"),
+      }));
+    }
+  } catch (err) {
+    console.warn("Could not query DB for practice stats, using grounded defaults:", err);
+  }
+
+  // Top 4 impact performers from the practice match
+  const topPracticePerformers = practiceStandingsData.slice(0, 4).map((p) => ({
+    id: p.id,
+    name: p.name,
+    runs: p.runsScored,
+    wickets: p.wickets,
+    contribution: p.contribution > 0 ? `+${p.contribution}` : `${p.contribution}`,
+    potm: p.potmCount > 0 ? "1 Award" : "0",
+  }));
+
   const practiceFixtures = [
     {
-      id: "practice-1",
+      id: "7",
       date: "09 Sep 2026",
       time: "20:17",
-      venue: "Insportz Club, Dubai (Court 2)",
+      venue: "Insportz Club, Dubai (Court 1)",
       team1: "Home Team",
       score1: 63,
       team2: "Away Team",
       score2: 120,
       potm: "Yash (+19 contribution)",
       status: "Completed",
-      scorecardUrl: "/admin/scorecards/1/review",
+      scorecardUrl: "/matches/7",
     },
-  ];
-
-  const topPracticePerformers = [
-    { name: "Yash", runs: 18, wickets: 3, contribution: "+19", potm: "1 Award", avatar: null, id: 65 },
-    { name: "Himanshu Kalyani", runs: 24, wickets: 2, contribution: "+12", potm: "0", avatar: null, id: 27 },
-    { name: "Sahil", runs: 14, wickets: 2, contribution: "+10", potm: "0", avatar: null, id: 102 },
-    { name: "Deepak", runs: 16, wickets: 2, contribution: "+8", potm: "0", avatar: null, id: 101 },
-  ];
-
-  const practiceStandingsData: PracticePlayerStat[] = [
-    { id: 65, name: "Yash", matchesPlayed: 1, runsScored: 18, oversBowled: 2.0, runsConceded: -1, wickets: 3, economy: -0.5, contribution: 19, potmCount: 1, role: "All-Rounder" },
-    { id: 27, name: "Himanshu Kalyani", matchesPlayed: 1, runsScored: 24, oversBowled: 2.0, runsConceded: 12, wickets: 2, economy: 6.0, contribution: 12, potmCount: 0, role: "All-Rounder" },
-    { id: 102, name: "Sahil", matchesPlayed: 1, runsScored: 14, oversBowled: 2.0, runsConceded: 4, wickets: 2, economy: 2.0, contribution: 10, potmCount: 0, role: "All-Rounder" },
-    { id: 101, name: "Deepak", matchesPlayed: 1, runsScored: 16, oversBowled: 2.0, runsConceded: 8, wickets: 2, economy: 4.0, contribution: 8, potmCount: 0, role: "Batter" },
-    { id: 36, name: "Manthan Shah", matchesPlayed: 1, runsScored: 16, oversBowled: 2.0, runsConceded: 10, wickets: 1, economy: 5.0, contribution: 6, potmCount: 0, role: "Batter" },
-    { id: 5, name: "Ankush Goel", matchesPlayed: 1, runsScored: 12, oversBowled: 2.0, runsConceded: 9, wickets: 1, economy: 4.5, contribution: 3, potmCount: 0, role: "Bowler" },
-    { id: 60, name: "Tejas Shah", matchesPlayed: 1, runsScored: 10, oversBowled: 2.0, runsConceded: 12, wickets: 0, economy: 6.0, contribution: -2, potmCount: 0, role: "Batter" },
-    { id: 103, name: "Akshay", matchesPlayed: 1, runsScored: 8, oversBowled: 2.0, runsConceded: 18, wickets: 0, economy: 9.0, contribution: -10, potmCount: 0, role: "Bowler" },
-    { id: 104, name: "Jigar", matchesPlayed: 1, runsScored: 6, oversBowled: 2.0, runsConceded: 20, wickets: 0, economy: 10.0, contribution: -14, potmCount: 0, role: "Batter" },
   ];
 
   return (
@@ -100,7 +145,7 @@ export default function TournamentZeroPage() {
         {/* Practice Notice */}
         <div className="mt-6 pt-6 border-t border-slate-800/80 text-xs text-slate-400 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <span>
-            ℹ️ Regular practice sessions do not utilize locked squad cards. All registered players can participate freely.
+            ℹ️ Regular practice sessions do not utilize locked squad cards. All 16 players from the 09-Sept match are recorded with verified Spawtz reconciliations.
           </span>
           <Link
             href="/players"
@@ -122,7 +167,7 @@ export default function TournamentZeroPage() {
             </h2>
           </div>
           <span className="text-xs text-slate-500 font-mono">
-            {practiceFixtures.length} Match Recorded
+            {practiceFixtures.length} Match Recorded • 16 Players Participated
           </span>
         </div>
 
@@ -210,17 +255,17 @@ export default function TournamentZeroPage() {
         </div>
       </section>
 
-      {/* SECTION 3: PRACTICE PERFORMERS POINTS TABLE */}
+      {/* SECTION 3: PRACTICE PERFORMERS POINTS TABLE (ALL 16 PLAYERS) */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Trophy className="w-5 h-5 text-emerald-600" />
             <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-              Practice Performers Points Table
+              Practice Performers Points Table ({practiceStandingsData.length} Players)
             </h2>
           </div>
           <span className="text-xs text-slate-500 font-mono">
-            All Practice Players • Ranked by Net Contribution
+            All 16 Players from 09-Sept • Ranked by Net Contribution
           </span>
         </div>
 
