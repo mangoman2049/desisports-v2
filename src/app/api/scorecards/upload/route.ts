@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { evaluateQualityGate } from "@/lib/quality-gate";
 import { getSampleScorecardExtraction, extractScorecardWithLiteLLM } from "@/lib/extractor-service";
+import { checkForDuplicateScorecard } from "@/lib/duplicate-detector";
 import fs from "fs/promises";
 import path from "path";
 
@@ -10,6 +11,7 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
     const forceSample = formData.get("forceSample") === "true";
+    const forceDuplicate = formData.get("forceDuplicate") === "true";
 
     let imageUrl = "/uploads/scorecards/sample-scorecard.jpg";
     let width = 1600;
@@ -37,6 +39,27 @@ export async function POST(req: NextRequest) {
     const parsed = base64Image
       ? await extractScorecardWithLiteLLM(base64Image)
       : getSampleScorecardExtraction();
+
+    // DUPLICATE SCORECARD CHECK
+    if (!forceDuplicate) {
+      const duplicateCheck = await checkForDuplicateScorecard(
+        parsed.matchInfo.dateTime,
+        parsed.homeInnings.teamName,
+        parsed.awayInnings.teamName
+      );
+
+      if (duplicateCheck.isDuplicate) {
+        return NextResponse.json(
+          {
+            success: false,
+            isDuplicate: true,
+            duplicateInfo: duplicateCheck,
+            message: duplicateCheck.reason,
+          },
+          { status: 409 } // 409 Conflict
+        );
+      }
+    }
 
     // Create ScorecardUpload record in database
     const upload = await prisma.scorecardUpload.create({

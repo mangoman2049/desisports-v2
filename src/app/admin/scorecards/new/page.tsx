@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Camera,
   Upload,
@@ -12,10 +13,11 @@ import {
   FileCheck,
   Zap,
   ArrowRight,
+  ShieldAlert,
+  ExternalLink,
 } from "lucide-react";
 import { analyzeBrowserImage } from "@/lib/quality-gate";
 import { QualityDiagnostics } from "@/types/cricket";
-import Image from "next/image";
 
 export default function NewScorecardPage() {
   const router = useRouter();
@@ -28,6 +30,11 @@ export default function NewScorecardPage() {
   const [qualityDiagnostics, setQualityDiagnostics] = useState<QualityDiagnostics | null>(null);
   const [extracting, setExtracting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [duplicateAlert, setDuplicateAlert] = useState<{
+    message: string;
+    existingMatchId?: number;
+    existingUploadId?: string;
+  } | null>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -37,6 +44,7 @@ export default function NewScorecardPage() {
     const objectUrl = URL.createObjectURL(file);
     setPreviewUrl(objectUrl);
     setErrorMessage(null);
+    setDuplicateAlert(null);
     setAnalyzingQuality(true);
 
     try {
@@ -53,9 +61,9 @@ export default function NewScorecardPage() {
     setPreviewUrl("/uploads/scorecards/sample-scorecard.jpg");
     setAnalyzingQuality(true);
     setErrorMessage(null);
+    setDuplicateAlert(null);
 
     try {
-      // Fetch sample to inspect
       const response = await fetch("/uploads/scorecards/sample-scorecard.jpg");
       const blob = await response.blob();
       const file = new File([blob], "sample-scorecard.jpg", { type: "image/jpeg" });
@@ -64,7 +72,6 @@ export default function NewScorecardPage() {
       const result = await analyzeBrowserImage(file);
       setQualityDiagnostics(result.diagnostics);
     } catch {
-      // Mock quality stats if canvas fetch is restricted
       setQualityDiagnostics({
         overallPass: true,
         score: 96,
@@ -82,7 +89,7 @@ export default function NewScorecardPage() {
     }
   };
 
-  const handleProceedToExtraction = async () => {
+  const handleProceedToExtraction = async (forceDuplicate = false) => {
     setExtracting(true);
     setErrorMessage(null);
 
@@ -93,6 +100,9 @@ export default function NewScorecardPage() {
       } else {
         formData.append("forceSample", "true");
       }
+      if (forceDuplicate) {
+        formData.append("forceDuplicate", "true");
+      }
 
       const res = await fetch("/api/scorecards/upload", {
         method: "POST",
@@ -100,6 +110,17 @@ export default function NewScorecardPage() {
       });
 
       const data = await res.json();
+
+      if (res.status === 409 && data.isDuplicate) {
+        setDuplicateAlert({
+          message: data.message,
+          existingMatchId: data.duplicateInfo?.existingMatchId,
+          existingUploadId: data.duplicateInfo?.existingUploadId,
+        });
+        setExtracting(false);
+        return;
+      }
+
       if (!res.ok || !data.success) {
         throw new Error(data.error || "Failed to process scorecard");
       }
@@ -124,7 +145,7 @@ export default function NewScorecardPage() {
             <span className="text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/20">
               Admin Intake Flow
             </span>
-            <span className="text-xs font-mono text-slate-500">Spawtz 16-Over Template</span>
+            <span className="text-xs font-mono text-slate-500">Duplicate Check & Quality Gate Active</span>
           </div>
           <h1 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
             Scan & Reconcile Scorecard
@@ -142,6 +163,47 @@ export default function NewScorecardPage() {
           <span>Load 09 Sep Sample Sheet</span>
         </button>
       </div>
+
+      {/* Duplicate Alert Banner */}
+      {duplicateAlert && (
+        <div className="p-4 rounded-xl border border-amber-500/40 bg-amber-50/80 dark:bg-amber-950/30 text-amber-900 dark:text-amber-200 space-y-3">
+          <div className="flex items-start gap-2.5">
+            <ShieldAlert className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <h3 className="text-sm font-bold">Duplicate Match Scorecard Detected</h3>
+              <p className="text-xs text-amber-800 dark:text-amber-300">
+                {duplicateAlert.message}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2.5 pt-1 pl-7 text-xs font-semibold">
+            {duplicateAlert.existingMatchId && (
+              <Link
+                href="/matches"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200 hover:bg-amber-100 transition"
+              >
+                <span>View Existing Match #{duplicateAlert.existingMatchId}</span>
+                <ExternalLink className="h-3 w-3" />
+              </Link>
+            )}
+
+            <button
+              onClick={() => handleProceedToExtraction(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white transition"
+            >
+              <span>Overwrite / Ingest New Revision</span>
+            </button>
+
+            <button
+              onClick={() => setDuplicateAlert(null)}
+              className="px-3 py-1.5 text-slate-600 dark:text-slate-400 hover:underline"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Upload & Camera Buttons */}
       {!previewUrl && (
@@ -223,6 +285,7 @@ export default function NewScorecardPage() {
                   setPreviewUrl(null);
                   setSelectedFile(null);
                   setQualityDiagnostics(null);
+                  setDuplicateAlert(null);
                 }}
                 className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-medium text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-lg transition"
               >
@@ -315,7 +378,7 @@ export default function NewScorecardPage() {
 
                 <button
                   disabled={analyzingQuality || extracting}
-                  onClick={handleProceedToExtraction}
+                  onClick={() => handleProceedToExtraction(false)}
                   className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-sm transition shrink-0"
                 >
                   {extracting ? (

@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   Clock,
 } from "lucide-react";
+import PurgeControls from "./PurgeControls";
 
 export default async function AdminDashboardPage() {
   const uploads = await prisma.scorecardUpload.findMany({
@@ -30,7 +31,7 @@ export default async function AdminDashboardPage() {
             <span className="text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 px-2 py-0.5 rounded border border-blue-500/20">
               Admin Workspace
             </span>
-            <span className="text-xs font-mono text-slate-500">Maker-Checker Engine</span>
+            <span className="text-xs font-mono text-slate-500">Maker-Checker & Duplicate Guard</span>
           </div>
           <h1 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
             Scorecard Intake & Data Management
@@ -105,6 +106,9 @@ export default async function AdminDashboardPage() {
           </p>
         </div>
       </div>
+
+      {/* Admin Testing Sandbox & Purge Controls */}
+      <PurgeControls />
 
       {/* Recent Scorecard Ingestion Grid */}
       <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
