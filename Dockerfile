@@ -26,6 +26,7 @@ RUN npx prisma db push
 RUN node prisma/seed.js
 RUN npx tsx scripts/rerun-match-analyses.ts
 RUN npm run build
+RUN cp prisma/dev.db ./dev.db || true
 
 # Step 3: Production runner
 FROM base AS runner
@@ -40,9 +41,11 @@ ENV DATABASE_URL "file:./dev.db"
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
+RUN mkdir -p /app/public/uploads/scorecards && chown -R nextjs:nodejs /app/public
+
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
-COPY --from=builder --chown=nextjs:nodejs /app/dev.db ./dev.db
+COPY --from=builder --chown=nextjs:nodejs /app/prisma/dev.db ./dev.db
 
 # Automatically leverage output traces to reduce image size
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
