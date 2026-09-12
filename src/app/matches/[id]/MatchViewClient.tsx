@@ -18,6 +18,12 @@ import {
   AlertTriangle,
   ClipboardList,
   Sparkles,
+  ZoomIn,
+  ZoomOut,
+  Download,
+  ExternalLink,
+  FileDown,
+  RotateCcw,
 } from "lucide-react";
 import { MatchTacticalAnalysis } from "@/lib/match-analyses";
 
@@ -31,6 +37,7 @@ interface Props {
   awayTeam: { name: string; score: number; skins: number };
   analysis: MatchTacticalAnalysis;
   scorecardData?: any;
+  scorecardUrl?: string;
 }
 
 export default function MatchViewClient({
@@ -43,9 +50,13 @@ export default function MatchViewClient({
   awayTeam,
   analysis,
   scorecardData,
+  scorecardUrl,
 }: Props) {
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<"analysis" | "scorecard">("analysis");
+  const [scorecardZoom, setScorecardZoom] = useState(1);
+
+  const resolvedImageUrl = scorecardUrl || `/api/scorecards/${matchId}/image`;
 
   const handleShare = async () => {
     const url = typeof window !== "undefined" ? window.location.href : "";
@@ -131,8 +142,8 @@ export default function MatchViewClient({
           </span>
         </div>
 
-        {/* Action Buttons: Share, Print PDF, Auditable JSON */}
-        <div className="flex items-center gap-2">
+        {/* Action Buttons: Share, Print PDF, Download WebP, Auditable JSON */}
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={handleShare}
             className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 shadow-xs transition cursor-pointer"
@@ -161,13 +172,22 @@ export default function MatchViewClient({
           </button>
 
           <a
+            href={`/api/scorecards/${matchId}/image?format=webp&download=true`}
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-400 shadow-xs transition"
+            title="Download Official Scorecard Image in WebP format"
+          >
+            <Download className="w-4 h-4 text-emerald-600" />
+            <span>Download WebP</span>
+          </a>
+
+          <a
             href={`/api/scorecards/${matchId}/json?download=true`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-400 shadow-xs transition"
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 shadow-xs transition"
             title="Download Auditable Scorecard JSON"
           >
-            <FileJson className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <FileDown className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             <span>Auditable JSON</span>
           </a>
         </div>
@@ -243,19 +263,17 @@ export default function MatchViewClient({
           <ClipboardList className="w-3.5 h-3.5" />
           <span>Post-Match Tactical Analysis (11 Sections)</span>
         </button>
-        {scorecardData && (
-          <button
-            onClick={() => setActiveTab("scorecard")}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
-              activeTab === "scorecard"
-                ? "bg-emerald-600 text-white shadow-xs"
-                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
-            }`}
-          >
-            <Layers className="w-3.5 h-3.5" />
-            <span>Official Scorecard & Player Stats</span>
-          </button>
-        )}
+        <button
+          onClick={() => setActiveTab("scorecard")}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+            activeTab === "scorecard"
+              ? "bg-emerald-600 text-white shadow-xs"
+              : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
+          }`}
+        >
+          <Layers className="w-3.5 h-3.5" />
+          <span>Official Scorecard & Player Stats</span>
+        </button>
       </div>
 
       {/* Main Content Area */}
@@ -498,61 +516,181 @@ export default function MatchViewClient({
           )}
         </div>
       ) : (
-        /* SCORECARD TAB */
+        /* SCORECARD SHEET & PLAYER PERFORMANCE TAB */
         <div className="space-y-6">
-          <div className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-            <h3 className="text-base font-bold text-slate-900 dark:text-white mb-4">
-              Individual Player Performance Summary
-            </h3>
-            <p className="text-xs text-slate-500 mb-4">
-              Spawtz indoor cricket contribution metric: $C = RS - RC$. Econ = $RC / OB$.
-            </p>
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs text-left">
-                <thead>
-                  <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-400 font-mono text-[10px] uppercase">
-                    <th className="py-2.5 px-3">Player</th>
-                    <th className="py-2.5 px-3 text-right">Runs Scored (RS)</th>
-                    <th className="py-2.5 px-3 text-right">Overs Bowled (OB)</th>
-                    <th className="py-2.5 px-3 text-right">Runs Conceded (RC)</th>
-                    <th className="py-2.5 px-3 text-right">Wickets (W)</th>
-                    <th className="py-2.5 px-3 text-right">Net Contribution (C)</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                  {scorecardData?.playerStats?.map((ps: any, idx: number) => (
-                    <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-850">
-                      <td className="py-2.5 px-3 font-semibold">
-                        <Link
-                          href={`/player/${ps.playerId}`}
-                          className="text-emerald-700 dark:text-emerald-400 hover:underline"
-                        >
-                          {ps.playerName}
-                        </Link>
-                      </td>
-                      <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900 dark:text-white">
-                        {ps.runsScored}
-                      </td>
-                      <td className="py-2.5 px-3 text-right font-mono text-slate-600 dark:text-slate-300">
-                        {ps.oversBowled}
-                      </td>
-                      <td className="py-2.5 px-3 text-right font-mono text-slate-600 dark:text-slate-300">
-                        {ps.runsConceded}
-                      </td>
-                      <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-600">
-                        {ps.wickets}
-                      </td>
-                      <td className={`py-2.5 px-3 text-right font-mono font-bold ${
-                        ps.netContribution >= 0 ? "text-emerald-600" : "text-rose-600"
-                      }`}>
-                        {ps.netContribution > 0 ? `+${ps.netContribution}` : ps.netContribution}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {/* Section 1: Official Scorecard Sheet Image Viewer */}
+          <div className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+              <div>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-emerald-600" />
+                  <span>Official Spawtz Scorecard Sheet</span>
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  16-Over Indoor Cricket Standard · Zoom or inspect handwriting tokens, dismissals, and skin totals.
+                </p>
+              </div>
+
+              {/* Viewer Controls: Zoom, WebP Download & Auditable JSON */}
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-xl p-1 border border-slate-200 dark:border-slate-700 text-xs">
+                  <button
+                    onClick={() => setScorecardZoom((z) => Math.max(0.5, z - 0.2))}
+                    className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition cursor-pointer"
+                    title="Zoom Out"
+                  >
+                    <ZoomOut className="w-3.5 h-3.5" />
+                  </button>
+                  <span className="w-12 text-center font-mono font-bold text-slate-600 dark:text-slate-300">
+                    {Math.round(scorecardZoom * 100)}%
+                  </span>
+                  <button
+                    onClick={() => setScorecardZoom((z) => Math.min(2.5, z + 0.2))}
+                    className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition cursor-pointer"
+                    title="Zoom In"
+                  >
+                    <ZoomIn className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={() => setScorecardZoom(1)}
+                    className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition cursor-pointer ml-1"
+                    title="Reset Zoom"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+                <a
+                  href={`/api/scorecards/${matchId}/image?format=webp&download=true`}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/70 text-xs font-bold transition shadow-2xs"
+                  title="Download WebP compressed scorecard image"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Download WebP</span>
+                </a>
+
+                <a
+                  href={`/api/scorecards/${matchId}/json?download=true`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold transition shadow-2xs"
+                  title="Download Auditable JSON"
+                >
+                  <FileDown className="w-3.5 h-3.5" />
+                  <span>Download JSON</span>
+                </a>
+
+                <a
+                  href={resolvedImageUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+                  title="Open Raw Image in New Tab"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </div>
+
+            {/* Scorecard Image Display */}
+            <div className="relative overflow-auto rounded-2xl bg-slate-950 border border-slate-800 p-4 flex items-center justify-center min-h-[500px] max-h-[82vh] shadow-2xl">
+              <div
+                style={{ transform: `scale(${scorecardZoom})`, transformOrigin: "top center" }}
+                className="transition-transform duration-150 ease-out max-w-full flex justify-center py-2"
+              >
+                <img
+                  src={resolvedImageUrl}
+                  alt={`Official Scorecard for ${matchTitle}`}
+                  className="rounded-lg shadow-2xl max-h-[75vh] w-auto max-w-full object-contain mx-auto border border-slate-800"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-2 pt-2 text-[11px] text-slate-400">
+              <span>Optimized with Sharp WebP Q75 compression · 1800px max bounding box</span>
+              <div className="flex items-center gap-3">
+                <a
+                  href={`/api/scorecards/${matchId}/json`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-emerald-600 hover:underline font-mono"
+                >
+                  View Auditable JSON API ↗
+                </a>
+                <span>•</span>
+                <a
+                  href={resolvedImageUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-slate-500 hover:underline"
+                >
+                  View Full Resolution ↗
+                </a>
+              </div>
             </div>
           </div>
+
+          {/* Section 2: Player Stats Summary Table (if data available) */}
+          {scorecardData?.playerStats && scorecardData.playerStats.length > 0 && (
+            <div className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm space-y-4">
+              <div>
+                <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white">
+                  Audited Player Performance Breakdown
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  Extracted from bottom summary row. Contribution: $C = RS - RC$. Econ = $RC / OB$.
+                </p>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs text-left">
+                  <thead>
+                    <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-400 font-mono text-[10px] uppercase">
+                      <th className="py-2.5 px-3">Player</th>
+                      <th className="py-2.5 px-3 text-right">Runs Scored (RS)</th>
+                      <th className="py-2.5 px-3 text-right">Overs Bowled (OB)</th>
+                      <th className="py-2.5 px-3 text-right">Runs Conceded (RC)</th>
+                      <th className="py-2.5 px-3 text-right">Wickets (W)</th>
+                      <th className="py-2.5 px-3 text-right">Net Contribution (C)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                    {scorecardData.playerStats.map((ps: any, idx: number) => (
+                      <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-850">
+                        <td className="py-2.5 px-3 font-semibold">
+                          <Link
+                            href={`/player/${ps.playerId}`}
+                            className="text-emerald-700 dark:text-emerald-400 hover:underline"
+                          >
+                            {ps.playerName}
+                          </Link>
+                        </td>
+                        <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900 dark:text-white">
+                          {ps.runsScored}
+                        </td>
+                        <td className="py-2.5 px-3 text-right font-mono text-slate-600 dark:text-slate-300">
+                          {ps.oversBowled}
+                        </td>
+                        <td className="py-2.5 px-3 text-right font-mono text-slate-600 dark:text-slate-300">
+                          {ps.runsConceded}
+                        </td>
+                        <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-600">
+                          {ps.wickets}
+                        </td>
+                        <td
+                          className={`py-2.5 px-3 text-right font-mono font-bold ${
+                            ps.netContribution >= 0 ? "text-emerald-600" : "text-rose-600"
+                          }`}
+                        >
+                          {ps.netContribution > 0 ? `+${ps.netContribution}` : ps.netContribution}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

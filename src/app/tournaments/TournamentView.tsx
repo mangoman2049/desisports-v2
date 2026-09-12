@@ -16,6 +16,8 @@ import {
   CheckCircle2,
   Shield,
   Layers,
+  Download,
+  FileDown,
 } from "lucide-react";
 import MatchAnalysisButton from "@/components/MatchAnalysisButton";
 
@@ -769,11 +771,29 @@ export default function TournamentView({ data }: { data: TournamentData }) {
                   <ZoomIn className="w-4 h-4" />
                 </button>
                 <a
+                  href={`/api/scorecards/${selectedScorecard.id}/image?format=webp&download=true`}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition ml-1"
+                  title="Download Scorecard in WebP format"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">WebP</span>
+                </a>
+                <a
+                  href={`/api/scorecards/${selectedScorecard.id}/json?download=true`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition"
+                  title="Download Auditable JSON"
+                >
+                  <FileDown className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">JSON</span>
+                </a>
+                <a
                   href={selectedScorecard.scorecardUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition"
-                  title="Open Raw Image"
+                  title="Open Raw Image in New Tab"
                 >
                   <ExternalLink className="w-4 h-4" />
                 </a>

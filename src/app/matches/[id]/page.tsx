@@ -157,6 +157,21 @@ export default async function MatchDetailPage({ params }: Props) {
       }
     : undefined;
 
+  const MATCH_SCORECARDS: Record<string, string> = {
+    "1": "https://desisports.milanchheda.com/storage/scorecards/iVA2RZBZK6iu9zaGBGZKItLdkqaL4D7uGPGTpKUg.jpg",
+    "2": "https://desisports.milanchheda.com/storage/scorecards/ahMNeOGe8h6R3xV5sq5P0Xv7OwneTh1iEySuZ4QG.jpg",
+    "3": "https://desisports.milanchheda.com/storage/scorecards/OSxCBhl68FJzczLG5nBPIxsPMKNouscmLC936huM.jpg",
+    "4": "https://desisports.milanchheda.com/storage/scorecards/wzkviHxARCTmAmyOnHxyBj86n866Nw2u2wjM7DMT.jpg",
+    "5": "https://desisports.milanchheda.com/storage/scorecards/JJ4WJyjlzrzj4wUxrNPRifw8lnqx9RHVFIHOqZh1.jpg",
+    "6": "https://desisports.milanchheda.com/storage/scorecards/S9vHrbIiDufP0ER2db9P9KNMAA0KELPojHx15lot.jpg",
+    "7": "/uploads/scorecards/sample-scorecard.jpg",
+  };
+
+  let scorecardUrl = MATCH_SCORECARDS[String(id)] || dbMatch?.scorecardUrl;
+  if (!scorecardUrl || scorecardUrl.includes("/review")) {
+    scorecardUrl = MATCH_SCORECARDS[String(id)] || `/api/scorecards/${id}/image`;
+  }
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <MatchViewClient
@@ -169,6 +184,7 @@ export default async function MatchDetailPage({ params }: Props) {
         awayTeam={awayTeam}
         analysis={analysis}
         scorecardData={scorecardData}
+        scorecardUrl={scorecardUrl}
       />
     </div>
   );

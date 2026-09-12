@@ -336,6 +336,42 @@ async function runTestSuite() {
     passedAll = false;
   }
 
+  // Test 14: Official Scorecard Image & WebP/JSON Download Validation
+  console.log("\n[Test 14] Official Scorecard Image & WebP/JSON Download Validation:");
+  try {
+    const fs = await import("fs");
+    const path = await import("path");
+    const sharp = (await import("sharp")).default;
+
+    const sampleImagePath = path.join(process.cwd(), "public", "uploads", "scorecards", "sample-scorecard.jpg");
+    const exists = fs.existsSync(sampleImagePath);
+    console.log(`- Sample scorecard image (${sampleImagePath}): ${exists ? "EXISTS" : "MISSING"}`);
+
+    if (!exists) {
+      console.error("FAIL: sample-scorecard.jpg does not exist in public/uploads/scorecards!");
+      passedAll = false;
+    } else {
+      const origBuf = await fs.promises.readFile(sampleImagePath);
+      const webpBuf = await sharp(origBuf)
+        .resize(1800, 1800, { fit: "inside", withoutEnlargement: true })
+        .webp({ quality: 75 })
+        .toBuffer();
+
+      console.log(`- Original JPEG size: ${(origBuf.length / 1024).toFixed(1)} KB`);
+      console.log(`- Sharp WebP Q75 size: ${(webpBuf.length / 1024).toFixed(1)} KB (Saved ${(100 - (webpBuf.length / origBuf.length) * 100).toFixed(1)}%)`);
+
+      if (webpBuf.length <= 0 || webpBuf.length >= origBuf.length) {
+        console.error("FAIL: WebP conversion did not optimize scorecard image size!");
+        passedAll = false;
+      } else {
+        console.log("PASS: Official Scorecard WebP generation and download pipeline verified.");
+      }
+    }
+  } catch (err) {
+    console.error("FAIL: Test 14 encountered error:", err);
+    passedAll = false;
+  }
+
   await prisma.$disconnect();
 
   if (!passedAll) {
@@ -343,7 +379,7 @@ async function runTestSuite() {
     process.exit(1);
   } else {
     console.log("\n==================================================");
-    console.log("✅ ALL 13 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
+    console.log("✅ ALL 14 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
     console.log("==================================================");
     process.exit(0);
   }

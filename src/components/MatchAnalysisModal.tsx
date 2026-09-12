@@ -19,6 +19,11 @@ import {
   Printer,
   ExternalLink,
   Check,
+  ZoomIn,
+  ZoomOut,
+  Download,
+  FileDown,
+  RotateCcw,
 } from "lucide-react";
 import { MatchTacticalAnalysis } from "@/lib/match-analyses";
 
@@ -28,8 +33,9 @@ interface Props {
 }
 
 export default function MatchAnalysisModal({ analysis, onClose }: Props) {
-  const [activeTab, setActiveTab] = useState<"coach" | "summary">("coach");
+  const [activeTab, setActiveTab] = useState<"coach" | "summary" | "scorecard">("coach");
   const [copied, setCopied] = useState(false);
+  const [scorecardZoom, setScorecardZoom] = useState(1);
 
   const verdict =
     analysis.matchVerdict?.verdict ||
@@ -177,6 +183,26 @@ export default function MatchAnalysisModal({ analysis, onClose }: Props) {
               </button>
 
               <a
+                href={`/api/scorecards/${analysis.matchId}/image?format=webp&download=true`}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-xs font-bold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 transition"
+                title="Download WebP Scorecard"
+              >
+                <Download className="w-3.5 h-3.5 text-emerald-600" />
+                <span className="hidden sm:inline">WebP</span>
+              </a>
+
+              <a
+                href={`/api/scorecards/${analysis.matchId}/json?download=true`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+                title="Download Auditable JSON"
+              >
+                <FileDown className="w-3.5 h-3.5 text-emerald-600" />
+                <span className="hidden sm:inline">JSON</span>
+              </a>
+
+              <a
                 href={`/matches/${analysis.matchId}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -222,6 +248,18 @@ export default function MatchAnalysisModal({ analysis, onClose }: Props) {
             >
               <Sparkles className="w-3.5 h-3.5" />
               <span>Executive Review</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("scorecard")}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+                activeTab === "scorecard"
+                  ? "bg-emerald-600 text-white shadow-sm shadow-emerald-700/20"
+                  : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>Official Scorecard Sheet</span>
             </button>
           </div>
         </div>
@@ -888,6 +926,108 @@ export default function MatchAnalysisModal({ analysis, onClose }: Props) {
                 </div>
               </div>
 
+            </div>
+          )}
+
+          {/* TAB 3: OFFICIAL SCORECARD SHEET */}
+          {activeTab === "scorecard" && (
+            <div className="space-y-4">
+              <div className="p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2">
+                    <Layers className="w-4 h-4 text-emerald-600" />
+                    <span>Official Scorecard Sheet</span>
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                    Original handwritten sheet with 16 overs, 4 skins, runs conceded, and net contribution.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex items-center bg-white dark:bg-slate-900 rounded-xl p-1 border border-slate-200 dark:border-slate-700 text-xs">
+                    <button
+                      onClick={() => setScorecardZoom((z) => Math.max(0.5, z - 0.2))}
+                      className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition cursor-pointer"
+                      title="Zoom Out"
+                    >
+                      <ZoomOut className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="w-12 text-center font-mono font-bold text-slate-600 dark:text-slate-300 text-[11px]">
+                      {Math.round(scorecardZoom * 100)}%
+                    </span>
+                    <button
+                      onClick={() => setScorecardZoom((z) => Math.min(2.5, z + 0.2))}
+                      className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition cursor-pointer"
+                      title="Zoom In"
+                    >
+                      <ZoomIn className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => setScorecardZoom(1)}
+                      className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition cursor-pointer ml-1"
+                      title="Reset Zoom"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
+                  <a
+                    href={`/api/scorecards/${analysis.matchId}/image?format=webp&download=true`}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition shadow-2xs"
+                    title="Download WebP compressed scorecard"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>Download WebP</span>
+                  </a>
+
+                  <a
+                    href={`/api/scorecards/${analysis.matchId}/json?download=true`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold transition"
+                    title="Download Auditable JSON"
+                  >
+                    <FileDown className="w-3.5 h-3.5" />
+                    <span>Download JSON</span>
+                  </a>
+
+                  <a
+                    href={`/api/scorecards/${analysis.matchId}/image`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                    title="Open in Full Size"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              </div>
+
+              {/* Image Box */}
+              <div className="relative overflow-auto rounded-2xl bg-slate-950 border border-slate-800 p-4 flex items-center justify-center min-h-[480px] max-h-[70vh] shadow-xl">
+                <div
+                  style={{ transform: `scale(${scorecardZoom})`, transformOrigin: "top center" }}
+                  className="transition-transform duration-150 ease-out max-w-full flex justify-center py-2"
+                >
+                  <img
+                    src={`/api/scorecards/${analysis.matchId}/image`}
+                    alt={`Scorecard for ${analysis.matchTitle}`}
+                    className="rounded-lg shadow-2xl max-h-[65vh] w-auto max-w-full object-contain mx-auto border border-slate-800"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-[11px] text-slate-400 px-1">
+                <span>Compressed to WebP Q75 (max 1800px)</span>
+                <a
+                  href={`/api/scorecards/${analysis.matchId}/json`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-emerald-600 hover:underline font-mono"
+                >
+                  Inspect Auditable JSON API ↗
+                </a>
+              </div>
             </div>
           )}
 
