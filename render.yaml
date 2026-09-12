@@ -2,9 +2,9 @@ services:
   - type: web
     name: desisports-v2
     env: node
-    plan: starter
+    plan: free
     region: oregon
-    buildCommand: npm install && npx prisma generate && npx prisma db push && node prisma/seed.js && npm run build
+    buildCommand: npm install && npx prisma generate && npx prisma db push && node prisma/seed.js && npx tsx scripts/rerun-match-analyses.ts && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
@@ -17,5 +17,4 @@ services:
         sync: false
       - key: VISION_MODEL
         value: gpt-4o-mini
-      - key: NEXT_PUBLIC_APP_URL
-        value: https://desisports-v2.onrender.com
+

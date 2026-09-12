@@ -10,7 +10,7 @@
     "test": "tsx scripts/test-rules.ts",
     "prepush": "npm test && npm run build",
     "db:push": "prisma db push",
-    "db:seed": "node prisma/seed.js",
+    "db:seed": "node prisma/seed.js && tsx scripts/rerun-match-analyses.ts",
     "db:studio": "prisma studio"
   },
   "dependencies": {
