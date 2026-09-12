@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Trophy, Calendar, Users, ArrowRight, Shield, Sparkles } from "lucide-react";
-import ShareButton from "@/components/ShareButton";
 
 export const metadata = {
   title: "Tournaments",
@@ -63,18 +62,13 @@ export default function TournamentsDirectoryPage() {
   return (
     <div className="space-y-8 pb-12">
       {/* Header section matching media_1789209157520.png */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 pb-6">
-        <div>
-          <h1 className="text-3xl font-black tracking-tight text-slate-900">
-            Tournaments
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Browse active leagues, upcoming competitions, and regular practice matches.
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <ShareButton />
-        </div>
+      <div className="border-b border-slate-200 pb-6">
+        <h1 className="text-3xl font-black tracking-tight text-slate-900">
+          Tournaments
+        </h1>
+        <p className="text-sm text-slate-500 mt-1">
+          Browse active leagues, upcoming competitions, and regular practice matches.
+        </p>
       </div>
 
       {/* Tournaments Grid */}

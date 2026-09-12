@@ -17,7 +17,7 @@ import {
   Shield,
   Layers,
 } from "lucide-react";
-import ShareButton from "@/components/ShareButton";
+import MatchAnalysisButton from "@/components/MatchAnalysisButton";
 
 interface TeamStanding {
   pos: number;
@@ -146,14 +146,6 @@ export default function TournamentView({ data }: { data: TournamentData }) {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <ShareButton />
-            <Link
-              href="/captain"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold tracking-wide transition shadow-lg shadow-purple-900/30 hover:shadow-purple-900/50"
-            >
-              <Shield className="w-4 h-4" />
-              <span>Captain Tactical Intel</span>
-            </Link>
             <Link
               href="/admin/scorecards/new"
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold tracking-wide transition border border-white/10"
@@ -591,7 +583,7 @@ export default function TournamentView({ data }: { data: TournamentData }) {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {data.fixtures.map((fixture) => (
+          {[...data.fixtures].sort((a, b) => b.id - a.id).map((fixture) => (
             <div
               key={fixture.id}
               className={`rounded-2xl bg-white dark:bg-slate-900 border p-5 shadow-sm hover:shadow-md transition flex flex-col justify-between ${
@@ -603,9 +595,14 @@ export default function TournamentView({ data }: { data: TournamentData }) {
               <div className="space-y-3">
                 {/* Date & Stage Header */}
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-mono text-slate-500 dark:text-slate-400">
-                    {fixture.date}
-                  </span>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="font-mono text-slate-500 dark:text-slate-400">
+                      {fixture.date}
+                    </span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 font-mono">
+                      Desi Boys May 2026
+                    </span>
+                  </div>
                   <span
                     className={`px-2 py-0.5 rounded-md font-bold uppercase tracking-wider text-[10px] ${
                       fixture.stage === "Final"
@@ -704,18 +701,21 @@ export default function TournamentView({ data }: { data: TournamentData }) {
                 </div>
               </div>
 
-              {/* View Scorecard Button */}
+              {/* View Scorecard & Match Analysis Buttons */}
               <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                <button
-                  onClick={() => {
-                    setSelectedScorecard(fixture);
-                    setScorecardZoom(1);
-                  }}
-                  className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 flex items-center gap-1 transition"
-                >
-                  <span>Scorecard</span>
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      setSelectedScorecard(fixture);
+                      setScorecardZoom(1);
+                    }}
+                    className="text-xs font-bold text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-1 transition"
+                  >
+                    <span>Scorecard</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                  <MatchAnalysisButton matchId={fixture.id} />
+                </div>
 
                 <a
                   href={fixture.scorecardUrl}

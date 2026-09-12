@@ -16,7 +16,7 @@ export default function Navigation() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Exact primary navigation as requested in media_1789209157520.png
+  // Exact primary navigation as requested: Tournaments, Players, Matches
   const navLinks = [
     { href: "/tournaments", label: "Tournaments", icon: Trophy },
     { href: "/players", label: "Players", icon: Users },
@@ -78,28 +78,9 @@ export default function Navigation() {
             </div>
           </div>
 
-          {/* Right Action Controls: Share + User Switcher */}
+          {/* Right Action: Single Clean Share Button */}
           <div className="flex items-center gap-2.5">
-            {/* Share Button with Web Share API & WhatsApp */}
             <ShareButton />
-
-            {/* User Profile */}
-            <Link
-              href="/player/35"
-              className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-full border border-slate-200/80 bg-slate-50 hover:bg-white hover:border-slate-300 hover:shadow-xs transition-all"
-            >
-              <div className="h-7 w-7 rounded-full bg-emerald-600 text-xs font-bold text-white flex items-center justify-center shadow-xs">
-                MP
-              </div>
-              <div className="hidden sm:flex flex-col text-left">
-                <span className="text-xs font-bold text-slate-900 leading-tight">
-                  Manish Pandey
-                </span>
-                <span className="text-[10px] text-slate-500 leading-tight">
-                  Captain / Admin
-                </span>
-              </div>
-            </Link>
 
             {/* Mobile Menu Button */}
             <button
@@ -134,9 +115,6 @@ export default function Navigation() {
                 </Link>
               );
             })}
-            <div className="pt-2 border-t border-slate-100 px-3">
-              <ShareButton className="w-full" />
-            </div>
           </div>
         )}
       </div>

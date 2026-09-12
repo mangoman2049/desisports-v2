@@ -15,7 +15,7 @@ import {
   Activity,
   Layers,
 } from "lucide-react";
-import ShareButton from "@/components/ShareButton";
+import { getTeamTacticalData } from "@/lib/team-tactical";
 
 interface PageProps {
   params: {
@@ -28,13 +28,14 @@ export async function generateMetadata({ params }: PageProps) {
   const teamIdNum = parseInt(params.teamId, 10);
   const squad = tournamentData.squads.find((s) => s.id === teamIdNum);
   const teamName = squad ? squad.team : `Team ${params.teamId}`;
+  const tactical = getTeamTacticalData(teamName);
 
   return {
     title: `${teamName} — Team DNA™ & Squad | DesiSports V2`,
     description: `Registered squad, player archetypes, pair combination intelligence, and Team DNA™ scores for ${teamName}.`,
     openGraph: {
       title: `${teamName} — Team DNA™ & Intelligence`,
-      description: `Explore ${teamName}'s Team DNA (Batting 78, Bowling 72, Fielding 81, Chemistry 76) on DesiSports V2.`,
+      description: `Explore ${teamName}'s Team DNA (Batting ${tactical.batting}, Bowling ${tactical.bowling}, Fielding ${tactical.fielding}, Chemistry ${tactical.teamChemistry}) on DesiSports V2.`,
       images: ["/images/team-dna-share.png"],
     },
   };
@@ -54,13 +55,15 @@ export default function DedicatedTeamPage({ params }: PageProps) {
     color: "purple",
   };
 
-  // Team DNA dimensions (from PRD & official Team DNA graphic)
+  const tactical = getTeamTacticalData(squad.team);
+
+  // Grounded Team DNA dimensions strictly tied to tournament finish
   const teamDNA = {
-    batting: 78,
-    bowling: 72,
-    fielding: 81,
-    teamChemistry: 76,
-    dependencyScore: 41, // Top 2 combinations generate 41% of wicket impact
+    batting: tactical.batting,
+    bowling: tactical.bowling,
+    fielding: tactical.fielding,
+    teamChemistry: tactical.teamChemistry,
+    dependencyScore: 41,
   };
 
   // Derived Archetypes for squad members (PRD Section 7 & 12)
@@ -74,42 +77,6 @@ export default function DedicatedTeamPage({ params }: PageProps) {
     { label: "Death Specialist", color: "bg-pink-50 text-pink-700 border-pink-200" },
   ];
 
-  // Pair Combination Intelligence (PRD Section 8 & 18)
-  const pairCombinations = [
-    {
-      skin: 1,
-      pair: [squad.players[0]?.name || "Batter 1", squad.players[1]?.name || "Batter 2"],
-      objective: "Powerplay Acceleration",
-      netRunsExpected: "+28.4 runs",
-      synergyUplift: "+6.8 vs baselines",
-      reasoning: "Aggressive boundary hunter paired with high-rotation accumulator to minimize dot-ball pressure.",
-    },
-    {
-      skin: 2,
-      pair: [squad.players[2]?.name || "Batter 3", squad.players[3]?.name || "Batter 4"],
-      objective: "Skin Consolidation & Rebuild",
-      netRunsExpected: "+22.1 runs",
-      synergyUplift: "+4.2 vs baselines",
-      reasoning: "Dual anchors with exceptionally low dismissal rates (-5 penalty mitigation).",
-    },
-    {
-      skin: 3,
-      pair: [squad.players[4]?.name || "Batter 5", squad.players[5]?.name || "Batter 6"],
-      objective: "Middle-Overs Leverage",
-      netRunsExpected: "+25.6 runs",
-      synergyUplift: "+5.1 vs baselines",
-      reasoning: "Exploits opposition second-string bowling spells with rapid twos and boundary strike.",
-    },
-    {
-      skin: 4,
-      pair: [squad.players[6]?.name || "Batter 7", squad.players[7]?.name || "Batter 8"],
-      objective: "Death Overs Climax",
-      netRunsExpected: "+31.0 runs",
-      synergyUplift: "+7.9 vs baselines",
-      reasoning: "High-risk high-reward boundary hitters maximizing net run difference in final skin.",
-    },
-  ];
-
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-16 font-sans">
       {/* Navigation Breadcrumb */}
@@ -121,9 +88,6 @@ export default function DedicatedTeamPage({ params }: PageProps) {
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition" />
           <span>Back to Desi Boys Tournament May 2026</span>
         </Link>
-        <div className="flex items-center gap-3">
-          <ShareButton />
-        </div>
       </div>
 
       {/* Team Header Card */}
@@ -147,7 +111,7 @@ export default function DedicatedTeamPage({ params }: PageProps) {
               {squad.team}
             </h1>
             <p className="text-sm font-semibold text-slate-500 mt-0.5">
-              {squad.captain}
+              {squad.captain.replace(/^Captain:\s*/i, "Captain: ")}
             </p>
             <div className="flex flex-wrap items-center gap-2 mt-2.5">
               <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -314,22 +278,45 @@ export default function DedicatedTeamPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* SECTION 2: COMBINATION INTELLIGENCE & PAIR RECOMMENDATIONS (PRD Section 8) */}
+      {/* SECTION 2: COMBINATION INTELLIGENCE & TOURNAMENT PAIR DYNAMICS */}
       <section className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Zap className="w-5 h-5 text-amber-500" />
             <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-              Combination Intelligence & Skin Pairings
+              Combination Intelligence & Tournament Pair Dynamics
             </h2>
           </div>
-          <span className="text-xs text-slate-500 font-mono">
-            4 Skins • 16 Overs Allocation
-          </span>
+          <div className="flex items-center gap-2 text-xs font-mono text-slate-500">
+            <span>Prioritizing Recent Match: {tactical.recentMatchTitle}</span>
+          </div>
         </div>
 
+        {/* Dynamic Reshuffle Insight Box */}
+        <div className="p-5 rounded-3xl bg-amber-50/60 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/60 space-y-2">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              <h3 className="text-xs font-black uppercase tracking-wider text-amber-950 dark:text-amber-200">
+                Tournament Pairing Evolution: {tactical.reshuffleInsight.title}
+              </h3>
+            </div>
+            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-white dark:bg-slate-900 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-700 font-mono">
+              {tactical.recentMatchResult}
+            </span>
+          </div>
+          <p className="text-xs text-amber-900 dark:text-amber-300 leading-relaxed font-medium">
+            {tactical.reshuffleInsight.description}
+          </p>
+          <div className="pt-2 border-t border-amber-200/60 dark:border-amber-800/40 flex items-center justify-between text-[11px] text-amber-800 dark:text-amber-400 font-bold">
+            <span>Tactical Impact: {tactical.reshuffleInsight.impact}</span>
+            <span className="font-mono text-slate-500">Spawtz Net Run Differential Model</span>
+          </div>
+        </div>
+
+        {/* 4 Skin Pair Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {pairCombinations.map((combo) => (
+          {tactical.pairs.map((combo) => (
             <div
               key={combo.skin}
               className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col justify-between space-y-3"
@@ -366,7 +353,9 @@ export default function DedicatedTeamPage({ params }: PageProps) {
                   <TrendingUp className="w-3.5 h-3.5" />
                   <span>{combo.synergyUplift}</span>
                 </span>
-                <span className="text-slate-400 text-[11px]">Recommended Pair</span>
+                <span className="text-slate-600 dark:text-slate-400 text-[11px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800">
+                  {combo.historicalStatus}
+                </span>
               </div>
             </div>
           ))}

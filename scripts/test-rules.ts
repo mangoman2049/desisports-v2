@@ -7,6 +7,7 @@ import { prisma } from "../src/lib/prisma";
 import fs from "fs";
 import path from "path";
 import tournament1Data from "../prisma/tournament_1_data.json";
+import { validateOcrSanity } from "./validate-ocr-sanity";
 
 async function runTestSuite() {
   console.log("==================================================");
@@ -151,13 +152,13 @@ async function runTestSuite() {
   }
 
   // Verify Gagandeep Singh database records match media_1789209845228.jpg
-  const gagan = await prisma.player.findUnique({
-    where: { id: 36 },
+  const gagan = await prisma.player.findFirst({
+    where: { canonicalName: "Gagandeep Singh" },
     include: { stats: true },
   });
 
   if (!gagan) {
-    console.error("FAIL: Player 36 (Gagandeep Singh) not found in database!");
+    console.error("FAIL: Gagandeep Singh not found in database!");
     passedAll = false;
   } else {
     const totalRuns = gagan.stats.reduce((acc, s) => acc + s.runsScored, 0);
@@ -225,6 +226,16 @@ async function runTestSuite() {
     passedAll = false;
   } else {
     console.log("PASS: Social media share preview images verified.");
+  }
+
+  // Test 10: Full Spawtz OCR Sanity Suite
+  console.log("\n[Test 10] Spawtz OCR Sanity Verification Suite:");
+  try {
+    await validateOcrSanity();
+    console.log("PASS: Full OCR sanity verification succeeded.");
+  } catch (err) {
+    console.error("FAIL: OCR sanity check encountered an error:", err);
+    passedAll = false;
   }
 
   await prisma.$disconnect();

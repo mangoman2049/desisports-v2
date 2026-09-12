@@ -271,7 +271,7 @@
     {
       "id": 1,
       "team": "DesiDabanggs",
-      "captain": "Captain:Darshan Mody",
+      "captain": "Captain: Darshan Mody",
       "playerCount": 14,
       "players": [
         {
@@ -349,7 +349,7 @@
     {
       "id": 2,
       "team": "DesiTitans",
-      "captain": "Captain:Hardik Desai",
+      "captain": "Captain: Hardik Desai",
       "playerCount": 17,
       "players": [
         {
@@ -442,7 +442,7 @@
     {
       "id": 3,
       "team": "VPGR",
-      "captain": "Captain:Himanshu Kalyani",
+      "captain": "Captain: Himanshu Kalyani",
       "playerCount": 14,
       "players": [
         {
@@ -520,7 +520,7 @@
     {
       "id": 4,
       "team": "DesiTigers",
-      "captain": "Captain:Manthan Shah",
+      "captain": "Captain: Manthan Shah",
       "playerCount": 13,
       "players": [
         {

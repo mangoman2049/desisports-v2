@@ -11,7 +11,7 @@ import {
   Flame,
   Award,
 } from "lucide-react";
-import ShareButton from "@/components/ShareButton";
+import MatchAnalysisButton from "@/components/MatchAnalysisButton";
 
 export const metadata = {
   title: "Desisports Regular Practice | DesiSports V2",
@@ -30,14 +30,14 @@ export default function TournamentZeroPage() {
       score1: 63,
       team2: "Away Team",
       score2: 120,
-      potm: "Yash (+46 contribution)",
+      potm: "Yash (+19 contribution)",
       status: "Completed",
       scorecardUrl: "/admin/scorecards/1/review",
     },
   ];
 
   const topPracticePerformers = [
-    { name: "Yash", runs: 38, wickets: 3, contribution: "+46", potm: "1 Award", avatar: null, id: 65 },
+    { name: "Yash", runs: 18, wickets: 3, contribution: "+19", potm: "1 Award", avatar: null, id: 65 },
     { name: "Manthan Shah", runs: 28, wickets: 2, contribution: "+32", potm: "0", avatar: null, id: 36 },
     { name: "Himanshu Kalyani", runs: 24, wickets: 2, contribution: "+28", potm: "0", avatar: null, id: 27 },
     { name: "Ankush Goel", runs: 20, wickets: 3, contribution: "+26", potm: "0", avatar: null, id: 5 },
@@ -73,7 +73,6 @@ export default function TournamentZeroPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <ShareButton />
             <Link
               href="/admin/scorecards/new?tournamentId=0"
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold tracking-wide transition shadow-lg shadow-emerald-900/30"
@@ -157,13 +156,16 @@ export default function TournamentZeroPage() {
                   <Award className="w-3.5 h-3.5" />
                   <span>POTM: {fix.potm}</span>
                 </div>
-                <Link
-                  href={fix.scorecardUrl}
-                  className="inline-flex items-center gap-1 font-bold text-emerald-600 hover:text-emerald-700"
-                >
-                  <FileText className="w-3.5 h-3.5" />
-                  <span>View Scorecard</span>
-                </Link>
+                <div className="flex items-center gap-2">
+                  <MatchAnalysisButton matchId="7" />
+                  <Link
+                    href={fix.scorecardUrl}
+                    className="inline-flex items-center gap-1 font-bold text-emerald-600 hover:text-emerald-700"
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>View Scorecard</span>
+                  </Link>
+                </div>
               </div>
             </div>
           ))}

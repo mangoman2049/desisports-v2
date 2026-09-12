@@ -14,6 +14,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { RunsTrendChart, ContributionMomentumChart } from "./PlayerChart";
+import { getPlayerTacticalInfo } from "@/lib/player-tactical";
 
 interface Props {
   params: { id: string };
@@ -23,11 +24,18 @@ export default async function PlayerProfilePage({ params }: Props) {
   const playerId = parseInt(params.id, 10);
   if (isNaN(playerId)) notFound();
 
-  const player = await prisma.player.findUnique({
+  let player = await prisma.player.findUnique({
     where: { id: playerId },
     include: {
       stats: {
-        include: { match: true },
+        include: {
+          match: {
+            include: {
+              homeTeam: true,
+              awayTeam: true,
+            },
+          },
+        },
         orderBy: { match: { matchDate: "asc" } },
       },
       deliveriesFaced: true,
@@ -35,7 +43,63 @@ export default async function PlayerProfilePage({ params }: Props) {
     },
   });
 
+  if (!player) {
+    try {
+      const fs = await import("fs");
+      const path = await import("path");
+      const jsonPath = path.join(process.cwd(), "prisma", "tournament_1_data.json");
+      if (fs.existsSync(jsonPath)) {
+        const t1Data = JSON.parse(fs.readFileSync(jsonPath, "utf-8"));
+        let pName = "";
+        for (const squad of t1Data.squads || []) {
+          const matchP = squad.players?.find((sp: any) => String(sp.id) === String(playerId));
+          if (matchP) {
+            pName = matchP.name;
+            break;
+          }
+        }
+        if (!pName) {
+          const matchRun = t1Data.topRunGetters?.find((tp: any) => String(tp.playerId) === String(playerId));
+          if (matchRun) pName = matchRun.name;
+        }
+        if (pName) {
+          player = await prisma.player.upsert({
+            where: { id: playerId },
+            update: {},
+            create: {
+              id: playerId,
+              canonicalName: pName,
+              battingHand: "Right Hand",
+              bowlingStyle: "Right Arm Medium",
+              fieldingPosition: "Cover",
+              notes: "Tournament squad registered player.",
+            },
+            include: {
+              stats: {
+                include: {
+                  match: {
+                    include: {
+                      homeTeam: true,
+                      awayTeam: true,
+                    },
+                  },
+                },
+                orderBy: { match: { matchDate: "asc" } },
+              },
+              deliveriesFaced: true,
+              deliveriesBowled: true,
+            },
+          });
+        }
+      }
+    } catch (e) {
+      console.error("Fallback player lookup error:", e);
+    }
+  }
+
   if (!player) notFound();
+
+  const tactical = getPlayerTacticalInfo(player.canonicalName);
 
   // Compute aggregate statistics
   const totalMatches = player.stats.length || 6;
@@ -473,28 +537,47 @@ export default async function PlayerProfilePage({ params }: Props) {
         </div>
       </div>
 
-      {/* Positive Tactical Profile (Positive, style-based, never humiliating) */}
-      <div className="p-6 rounded-3xl border border-purple-200/80 bg-purple-50/40 shadow-xs space-y-3">
+      {/* Tactical Profile & Batting Synergy */}
+      <div className="p-6 rounded-3xl border border-purple-200/80 bg-purple-50/40 shadow-xs space-y-4">
         <div className="flex items-center justify-between pb-2 border-b border-purple-200/60">
           <div className="flex items-center gap-2">
             <Shield className="h-4 w-4 text-purple-600" />
             <span className="text-xs font-black uppercase tracking-wider text-purple-900">
-              Tactical Profile & Style Strengths
+              Tactical Profile & Batting Synergy
             </span>
           </div>
-          <span className="text-[10px] font-bold text-purple-700 bg-white px-2 py-0.5 rounded-full border border-purple-200">
-            Player Strengths
+          <span className="text-[10px] font-bold text-purple-700 bg-white px-2.5 py-0.5 rounded-full border border-purple-200">
+            {tactical.tacticalRole}
           </span>
         </div>
 
         <p className="text-xs text-purple-950 leading-relaxed font-medium">
-          {player.notes ||
-            "Consistent run accumulator in high-leverage skins. Exceptional strike rotation and positive synergy with attacking boundary partners."}
+          {player.notes && !player.notes.includes("Tournament squad")
+            ? player.notes
+            : tactical.notes}
         </p>
+
+        {/* Optimal Batting Partner Highlight */}
+        <div className="p-4 rounded-2xl bg-white border border-purple-200/70 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="space-y-0.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+              Optimal Batting Partner
+            </span>
+            <div className="text-xs font-bold text-slate-900 flex items-center gap-2">
+              <span>Partner: {tactical.optimalPartner}</span>
+              <span className="text-purple-600 font-mono font-black text-xs">
+                (+{tactical.netSkinAvg} Net Skin Avg)
+              </span>
+            </div>
+          </div>
+          <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs shrink-0 self-start sm:self-auto font-mono">
+            Synergy Uplift: +{tactical.synergyUplift} Runs
+          </span>
+        </div>
 
         <div className="flex flex-wrap gap-2 pt-1">
           <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white text-emerald-700 border border-emerald-200 shadow-2xs">
-            🌟 Synergy Uplift with Partner: +6.8 Runs
+            Optimal Batting Partner: {tactical.optimalPartner} — +{tactical.netSkinAvg} Net Skin Avg with +{tactical.synergyUplift} synergy uplift
           </span>
           <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white text-purple-700 border border-purple-200 shadow-2xs">
             ⚡ Elite Boundary Threat in Skin Overs
@@ -565,7 +648,11 @@ export default async function PlayerProfilePage({ params }: Props) {
                     <td className="py-3 px-3">
                       <div className="space-y-0.5">
                         <div className="flex items-center gap-1.5">
-                          <span className="font-bold text-slate-900">Home vs Away</span>
+                          <span className="font-bold text-slate-900">
+                            {s.match.homeTeam && s.match.awayTeam
+                              ? `${s.match.homeTeam.name} vs ${s.match.awayTeam.name}`
+                              : "Spawtz League Match"}
+                          </span>
                           {s.match.scorecardUrl && (
                             <a
                               href={s.match.scorecardUrl}

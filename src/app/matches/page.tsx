@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Calendar, Trophy, ArrowRight, FileText, UploadCloud } from "lucide-react";
+import MatchAnalysisButton from "@/components/MatchAnalysisButton";
 
 export default async function MatchesPage() {
   const matches = await prisma.match.findMany({
@@ -8,8 +9,9 @@ export default async function MatchesPage() {
       homeTeam: true,
       awayTeam: true,
       potmPlayer: true,
+      tournament: true,
     },
-    orderBy: { id: "asc" },
+    orderBy: { id: "desc" },
   });
 
   return (
@@ -47,7 +49,12 @@ export default async function MatchesPage() {
           >
             <div>
               <div className="flex items-center justify-between text-xs text-slate-500 font-mono pb-2 border-b border-slate-100 dark:border-slate-800">
-                <span>{m.matchDate}</span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span>{m.matchDate}</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-sans font-medium">
+                    {m.tournament?.name || (m.tournamentId === 0 ? "Regular Practice" : "Desi Boys May 2026")}
+                  </span>
+                </div>
                 <span className="font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded">
                   {m.status}
                 </span>
@@ -108,8 +115,9 @@ export default async function MatchesPage() {
               </span>
 
               <div className="flex items-center gap-2">
+                <MatchAnalysisButton matchId={m.id} />
                 <Link
-                  href="/admin/scorecards/upload-demo-01/review"
+                  href={m.tournamentId === 0 ? "/admin/scorecards/1/review" : "/admin/scorecards/upload-demo-01/review"}
                   className="font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
                 >
                   <span>Scorecard Inspection</span>
