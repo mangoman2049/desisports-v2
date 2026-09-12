@@ -11,6 +11,7 @@ export interface MatchHistoryItem {
   opponentTitle: string;
   scorecardUrl?: string | null;
   runsScored: number;
+  outs: number;
   oversBowled: number;
   runsConceded: number;
   wickets: number;
@@ -28,6 +29,7 @@ type SortCol =
   | "date"
   | "opponent"
   | "runsScored"
+  | "outs"
   | "oversBowled"
   | "runsConceded"
   | "wickets"
@@ -125,7 +127,12 @@ export default function PlayerMatchHistoryTable({ matches }: Props) {
             >
               RS {renderSortIcon("runsScored")}
             </th>
-            <th className="py-2.5 px-3 text-center">OUT</th>
+            <th
+              onClick={() => handleSort("outs")}
+              className="py-2.5 px-3 text-center cursor-pointer hover:text-slate-900 dark:hover:text-white"
+            >
+              OUT {renderSortIcon("outs")}
+            </th>
             <th
               onClick={() => handleSort("oversBowled")}
               className="py-2.5 px-3 text-center cursor-pointer hover:text-slate-900 dark:hover:text-white"
@@ -231,8 +238,8 @@ export default function PlayerMatchHistoryTable({ matches }: Props) {
                 </td>
 
                 {/* OUT */}
-                <td className="py-3 px-3 text-center font-mono text-slate-500">
-                  0
+                <td className="py-3 px-3 text-center font-mono font-medium text-rose-600 dark:text-rose-400">
+                  {s.outs}
                 </td>
 
                 {/* OB */}

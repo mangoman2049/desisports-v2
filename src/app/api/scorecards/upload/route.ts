@@ -8,6 +8,7 @@ import { generateAndSaveMatchAnalysis } from "@/lib/match-analyzer";
 import fs from "fs/promises";
 import path from "path";
 import sharp from "sharp";
+import { preprocessScorecardImage } from "@/lib/image-preprocessor";
 
 export async function POST(req: NextRequest) {
   try {
@@ -35,22 +36,15 @@ export async function POST(req: NextRequest) {
       width = meta.width || 1600;
       height = meta.height || 2844;
 
-      const optimizedBuffer = await sharp(rawBuffer)
-        .resize({
-          width: 1800,
-          height: 1800,
-          fit: "inside",
-          withoutEnlargement: true,
-        })
-        .webp({ quality: 75 })
-        .toBuffer();
-
-      base64Image = optimizedBuffer.toString("base64");
+      const preprocessResult = await preprocessScorecardImage(rawBuffer);
+      width = preprocessResult.width;
+      height = preprocessResult.height;
+      base64Image = preprocessResult.buffer.toString("base64");
 
       // Save optimized WebP file
       const filename = `${uploadId}.webp`;
       const filePath = path.join(uploadDir, filename);
-      await fs.writeFile(filePath, optimizedBuffer);
+      await fs.writeFile(filePath, preprocessResult.buffer);
       imageUrl = `/uploads/scorecards/${filename}`;
     }
 

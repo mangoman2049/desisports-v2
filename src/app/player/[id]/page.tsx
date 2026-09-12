@@ -113,8 +113,8 @@ export default async function PlayerProfilePage({ params }: Props) {
   const totalWickets = hasMatchData ? player.stats.reduce((acc, s) => acc + s.wickets, 0) : 0;
   const totalContribution = hasMatchData ? player.stats.reduce((acc, s) => acc + s.contribution, 0) : 0;
   const potmCount = hasMatchData ? player.stats.filter((s) => s.isPotm).length : 0;
-  const totalDismissals = hasMatchData && (player as any).deliveriesFaced
-    ? (player as any).deliveriesFaced.filter((d: any) => d.dismissalType || d.penaltyRuns < 0).length
+  const totalDismissals = hasMatchData
+    ? player.stats.reduce((acc, s) => acc + ((s as any).timesOut || 0), 0)
     : 0;
 
   const bestPerformanceStat = hasMatchData
@@ -143,6 +143,7 @@ export default async function PlayerProfilePage({ params }: Props) {
       : "Spawtz Match",
     scorecardUrl: s.match.scorecardUrl,
     runsScored: s.runsScored,
+    outs: (s as any).timesOut || 0,
     oversBowled: s.oversBowled,
     runsConceded: s.runsConceded,
     wickets: s.wickets,

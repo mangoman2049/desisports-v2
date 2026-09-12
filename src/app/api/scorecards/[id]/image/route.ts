@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import sharp from "sharp";
 import { prisma } from "@/lib/prisma";
+import { preprocessScorecardImage } from "@/lib/image-preprocessor";
 
 const STATIC_MATCH_SCORECARDS: Record<string, string> = {
   "1": "https://desisports.milanchheda.com/storage/scorecards/iVA2RZBZK6iu9zaGBGZKItLdkqaL4D7uGPGTpKUg.jpg",
@@ -112,11 +113,9 @@ export async function GET(
       rawBuffer = await fs.promises.readFile(diskPath);
     }
 
-    // 4. Convert to WebP using Sharp at Q75 and max 1800px bounding box
-    const webpBuffer = await sharp(rawBuffer)
-      .resize(1800, 1800, { fit: "inside", withoutEnlargement: true })
-      .webp({ quality: 75 })
-      .toBuffer();
+    // 4. Crop to paper boundaries, convert to grayscale, normalize contrast, and generate WebP Q75
+    const preprocessRes = await preprocessScorecardImage(rawBuffer);
+    const webpBuffer = preprocessRes.buffer;
 
     // Cache the WebP buffer for future requests
     try {
@@ -136,7 +135,7 @@ export async function GET(
       headers["Content-Disposition"] = `attachment; filename="scorecard-${id}.webp"`;
     }
 
-    return new NextResponse(webpBuffer, { status: 200, headers });
+    return new NextResponse(new Uint8Array(webpBuffer), { status: 200, headers });
   } catch (err: any) {
     console.error("Scorecard image route error:", err);
     return NextResponse.json({ error: err.message || "Failed to load scorecard image" }, { status: 500 });

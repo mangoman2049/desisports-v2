@@ -145,6 +145,7 @@ model PlayerMatchStat {
   player          Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
   teamId          Int
   runsScored      Int      @default(0) // RS
+  timesOut        Int      @default(0) // Dismissals / Out
   oversBowled     Float    @default(0.0) // OB
   runsConceded    Int      @default(0) // RC
   wickets         Int      @default(0) // Wkts

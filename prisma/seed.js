@@ -290,13 +290,14 @@ async function main() {
   }
 
   // Helper to create PlayerMatchStat cleanly without excess properties
-  async function addStat(matchId, playerId, teamId, rs, ob, rc, wkts, econ, c, isPotm = false, note = null) {
+  async function addStat(matchId, playerId, teamId, rs, ob, rc, wkts, econ, c, isPotm = false, note = null, timesOut = 1) {
     await prisma.playerMatchStat.create({
       data: {
         matchId,
         playerId,
         teamId,
         runsScored: rs,
+        timesOut: timesOut !== undefined ? timesOut : 1,
         oversBowled: ob,
         runsConceded: rc,
         wickets: wkts,
@@ -354,18 +355,18 @@ async function main() {
   await addStat(5, 2, desiTigers.id, 19, 2.0, 5, 2, 2.5, 14, true);
 
   // 10. Manish Pandey (ID 35) — 4 matches seeded
-  await addStat(3, 35, awayTeam.id, 4, 2.0, 14, 0, 7.0, -10, false, "📉 Negative contribution");
-  await addStat(5, 35, awayTeam.id, 16, 2.0, 3, 3, 1.5, 13, true, "⭐ Excellent batting — not out!");
-  await addStat(6, 35, awayTeam.id, 3, 2.0, 2, 2, 1.0, 1, false, "⚡ Excellent economy");
-  await addStat(7, 35, awayTeam.id, 20, 2.0, 14, 1, 7.0, 6, false, "⭐ Top scorer for Away (20 RS)");
+  await addStat(3, 35, awayTeam.id, 4, 2.0, 14, 0, 7.0, -10, false, "📉 Negative contribution", 2);
+  await addStat(5, 35, awayTeam.id, 16, 2.0, 3, 3, 1.5, 13, true, "⭐ Excellent batting — not out!", 0);
+  await addStat(6, 35, awayTeam.id, 3, 2.0, 2, 2, 1.0, 1, false, "⚡ Excellent economy", 1);
+  await addStat(7, 35, awayTeam.id, 20, 2.0, 14, 1, 7.0, 6, false, "⭐ Top scorer for Away (20 RS)", 1);
 
   // 11. Gagandeep Singh (ID 20) — 6 matches strictly matching media_1789209845228.jpg
-  await addStat(1, 20, desiDabanggs.id, 18, 2.0, 18, 0, 9.0, 0, false, null);
-  await addStat(2, 20, desiDabanggs.id, 7, 2.0, 17, 0, 8.5, -10, false, null);
-  await addStat(3, 20, desiDabanggs.id, 13, 2.0, 16, 2, 8.0, -3, false, "⚡ 2 wickets");
-  await addStat(4, 20, desiDabanggs.id, 12, 2.0, 7, 2, 3.5, 5, false, "⚡ 2 wickets");
-  await addStat(5, 20, desiDabanggs.id, 4, 2.0, 1, 3, 0.5, 3, false, "⚡ 3 wickets");
-  await addStat(6, 20, desiDabanggs.id, 14, 2.0, -8, 4, -4.0, 22, true, "★ Player of the match!");
+  await addStat(1, 20, desiDabanggs.id, 18, 2.0, 18, 0, 9.0, 0, false, null, 1);
+  await addStat(2, 20, desiDabanggs.id, 7, 2.0, 17, 0, 8.5, -10, false, null, 2);
+  await addStat(3, 20, desiDabanggs.id, 13, 2.0, 16, 2, 8.0, -3, false, "⚡ 2 wickets", 1);
+  await addStat(4, 20, desiDabanggs.id, 12, 2.0, 7, 2, 3.5, 5, false, "⚡ 2 wickets", 1);
+  await addStat(5, 20, desiDabanggs.id, 4, 2.0, 1, 3, 0.5, 3, false, "⚡ 3 wickets", 1);
+  await addStat(6, 20, desiDabanggs.id, 14, 2.0, -8, 4, -4.0, 22, true, "★ Player of the match!", 0);
 
   // 12. Yash (ID 101) — Practice Match POTM: RS 18, RC -1, WKTS 3, ECON -0.5, C 19!
   await prisma.playerMatchStat.create({
@@ -374,6 +375,7 @@ async function main() {
       playerId: 101,
       teamId: awayTeam.id,
       runsScored: 18,
+      timesOut: 0,
       oversBowled: 2.0,
       runsConceded: -1,
       wickets: 3,

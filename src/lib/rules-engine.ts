@@ -67,25 +67,37 @@ export function parseBallToken(raw: string): {
   // Check for circled dismissals like (R), (B), (C), (S), or explicit text
   const dismissalMatch = token.match(/\(([A-Za-z/]+)\)|([CRBSMLH]|RO|NB|W|LBW|HW)/i);
 
-  // Check extras
-  if (upper.includes("NB")) {
+  // 1. Check extras
+  if (upper.includes("NB") || upper === "NO BALL") {
     extrasType = "NB";
-    runs = 2; // Default indoor cricket penalty for no-ball
-  } else if (upper.includes("W") && !upper.includes("HW") && !upper.includes("LBW")) {
-    extrasType = "W";
-    runs = 2; // Default wide award
-  } else if (upper.includes("LS")) {
+    runs = 2; // Default indoor cricket award for no-ball
+  } else if (upper.includes("LS") || upper === "LEG SIDE") {
     extrasType = "LS";
     runs = 1;
+  } else if ((upper.includes("W") || upper === "WIDE") && !upper.includes("HW") && !upper.includes("LBW")) {
+    extrasType = "W";
+    runs = 2; // Default wide award
   }
 
-  // Check dismissals
-  if (token.includes("(") || upper.includes("(R)") || upper.includes("(C)") || upper.includes("(B)") || upper.includes("(S)")) {
-    const code = token.replace(/[^A-Za-z]/g, "").toLowerCase();
-    if (KNOWN_DISMISSAL_TOKENS[code]) {
-      dismissalType = KNOWN_DISMISSAL_TOKENS[code];
-      penaltyRuns = -5;
+  // 2. Check dismissals:
+  // In Spawtz indoor cricket, if not a run or extra, any token with a circle or letter
+  // (C: caught, R: runout, B: bowled, S: stumped, M: mankad, LBW, HW) is an OUT with -5 penalty.
+  const cleanCode = token.replace(/[^A-Za-z]/g, "").toLowerCase();
+  const isCircledOrParen = token.includes("(") || token.includes(")") || token.includes("○") || token.includes("O");
+
+  if (KNOWN_DISMISSAL_TOKENS[cleanCode] && cleanCode !== "w" && cleanCode !== "nb" && cleanCode !== "ls") {
+    dismissalType = KNOWN_DISMISSAL_TOKENS[cleanCode];
+    penaltyRuns = -5;
+  } else if (isCircledOrParen) {
+    if (cleanCode && KNOWN_DISMISSAL_TOKENS[cleanCode]) {
+      dismissalType = KNOWN_DISMISSAL_TOKENS[cleanCode];
+    } else {
+      dismissalType = upper.includes("R") ? "RO" : upper.includes("B") ? "B" : upper.includes("S") ? "ST" : "C";
     }
+    penaltyRuns = -5;
+  } else if (!extrasType && cleanCode.length > 0 && KNOWN_DISMISSAL_TOKENS[cleanCode]) {
+    dismissalType = KNOWN_DISMISSAL_TOKENS[cleanCode];
+    penaltyRuns = -5;
   }
 
   // Extract any run digit

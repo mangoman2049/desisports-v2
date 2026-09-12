@@ -12,6 +12,7 @@ import {
   Award,
 } from "lucide-react";
 import MatchAnalysisButton from "@/components/MatchAnalysisButton";
+import MatchCard from "@/components/MatchCard";
 import PracticePointsTable, { PracticePlayerStat } from "./PracticePointsTable";
 
 export const metadata = {
@@ -127,60 +128,27 @@ export default function TournamentZeroPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {practiceFixtures.map((fix) => (
-            <div
+            <MatchCard
               key={fix.id}
-              className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between space-y-4"
-            >
-              <div className="flex items-center justify-between text-xs text-slate-500 pb-3 border-b border-slate-100 dark:border-slate-800">
-                <span className="font-semibold">{fix.date} • {fix.time}</span>
-                <span className="font-mono text-[11px] bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full font-bold text-slate-600 dark:text-slate-300">
-                  {fix.venue}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between px-2">
-                {/* Team 1 */}
-                <div className="space-y-1">
-                  <span className="text-xs font-bold text-slate-500 uppercase block">
-                    {fix.team1}
-                  </span>
-                  <span className="text-2xl font-black text-slate-900 dark:text-white font-mono">
-                    {fix.score1}
-                  </span>
-                </div>
-
-                <span className="text-xs font-bold text-slate-400 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 font-mono">
-                  VS
-                </span>
-
-                {/* Team 2 */}
-                <div className="space-y-1 text-right">
-                  <span className="text-xs font-bold text-emerald-600 uppercase block">
-                    {fix.team2} ★
-                  </span>
-                  <span className="text-2xl font-black text-emerald-600 font-mono">
-                    {fix.score2}
-                  </span>
-                </div>
-              </div>
-
-              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-1.5 text-amber-600 font-medium">
-                  <Award className="w-3.5 h-3.5" />
-                  <span>POTM: {fix.potm}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <MatchAnalysisButton matchId="7" />
-                  <Link
-                    href={fix.scorecardUrl}
-                    className="inline-flex items-center gap-1 font-bold text-emerald-600 hover:text-emerald-700"
-                  >
-                    <FileText className="w-3.5 h-3.5" />
-                    <span>View Scorecard</span>
-                  </Link>
-                </div>
-              </div>
-            </div>
+              id="7"
+              date={fix.date}
+              time={fix.time}
+              tournamentName="Regular Practice"
+              stage="Practice Match"
+              venue={fix.venue}
+              team1={{
+                name: fix.team1,
+                score: fix.score1,
+                isWinner: fix.score1 > fix.score2,
+              }}
+              team2={{
+                name: fix.team2,
+                score: fix.score2,
+                isWinner: fix.score2 > fix.score1,
+              }}
+              potm={fix.potm}
+              scorecardUrl={fix.scorecardUrl}
+            />
           ))}
         </div>
       </section>

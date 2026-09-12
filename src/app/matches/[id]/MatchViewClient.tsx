@@ -142,8 +142,8 @@ export default function MatchViewClient({
           </span>
         </div>
 
-        {/* Action Buttons: Share, Print PDF, Download WebP, Auditable JSON */}
-        <div className="flex flex-wrap items-center gap-2">
+        {/* Action Buttons: Share, Print PDF */}
+        <div className="flex items-center gap-2">
           <button
             onClick={handleShare}
             className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 shadow-xs transition cursor-pointer"
@@ -170,26 +170,6 @@ export default function MatchViewClient({
             <Printer className="w-4 h-4 text-slate-500" />
             <span>Download PDF</span>
           </button>
-
-          <a
-            href={`/api/scorecards/${matchId}/image?format=webp&download=true`}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-400 shadow-xs transition"
-            title="Download Official Scorecard Image in WebP format"
-          >
-            <Download className="w-4 h-4 text-emerald-600" />
-            <span>Download WebP</span>
-          </a>
-
-          <a
-            href={`/api/scorecards/${matchId}/json?download=true`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 shadow-xs transition"
-            title="Download Auditable Scorecard JSON"
-          >
-            <FileDown className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <span>Auditable JSON</span>
-          </a>
         </div>
       </div>
 
@@ -629,68 +609,6 @@ export default function MatchViewClient({
               </div>
             </div>
           </div>
-
-          {/* Section 2: Player Stats Summary Table (if data available) */}
-          {scorecardData?.playerStats && scorecardData.playerStats.length > 0 && (
-            <div className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm space-y-4">
-              <div>
-                <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white">
-                  Audited Player Performance Breakdown
-                </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  Extracted from bottom summary row. Contribution: $C = RS - RC$. Econ = $RC / OB$.
-                </p>
-              </div>
-
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs text-left">
-                  <thead>
-                    <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-400 font-mono text-[10px] uppercase">
-                      <th className="py-2.5 px-3">Player</th>
-                      <th className="py-2.5 px-3 text-right">Runs Scored (RS)</th>
-                      <th className="py-2.5 px-3 text-right">Overs Bowled (OB)</th>
-                      <th className="py-2.5 px-3 text-right">Runs Conceded (RC)</th>
-                      <th className="py-2.5 px-3 text-right">Wickets (W)</th>
-                      <th className="py-2.5 px-3 text-right">Net Contribution (C)</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                    {scorecardData.playerStats.map((ps: any, idx: number) => (
-                      <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-850">
-                        <td className="py-2.5 px-3 font-semibold">
-                          <Link
-                            href={`/player/${ps.playerId}`}
-                            className="text-emerald-700 dark:text-emerald-400 hover:underline"
-                          >
-                            {ps.playerName}
-                          </Link>
-                        </td>
-                        <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900 dark:text-white">
-                          {ps.runsScored}
-                        </td>
-                        <td className="py-2.5 px-3 text-right font-mono text-slate-600 dark:text-slate-300">
-                          {ps.oversBowled}
-                        </td>
-                        <td className="py-2.5 px-3 text-right font-mono text-slate-600 dark:text-slate-300">
-                          {ps.runsConceded}
-                        </td>
-                        <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-600">
-                          {ps.wickets}
-                        </td>
-                        <td
-                          className={`py-2.5 px-3 text-right font-mono font-bold ${
-                            ps.netContribution >= 0 ? "text-emerald-600" : "text-rose-600"
-                          }`}
-                        >
-                          {ps.netContribution > 0 ? `+${ps.netContribution}` : ps.netContribution}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
         </div>
       )}
     </div>
