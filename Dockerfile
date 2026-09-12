@@ -16,10 +16,14 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma Client and build Next.js
+# Generate Prisma Client, push schema, seed DB and build Next.js
 ENV NEXT_TELEMETRY_DISABLED 1
 ENV NODE_ENV production
+ENV DATABASE_URL "file:./dev.db"
 RUN npx prisma generate
+RUN npx prisma db push
+RUN node prisma/seed.js
+RUN npx tsx scripts/rerun-match-analyses.ts
 RUN npm run build
 
 # Step 3: Production runner
@@ -30,12 +34,14 @@ ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
 ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
+ENV DATABASE_URL "file:./dev.db"
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/prisma ./prisma
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
+COPY --from=builder --chown=nextjs:nodejs /app/dev.db ./dev.db
 
 # Automatically leverage output traces to reduce image size
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
