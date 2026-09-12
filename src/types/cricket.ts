@@ -88,6 +88,9 @@ export interface PlayerSummaryRow {
   wickets: number; // Wkts
   economy: number; // Econ
   contribution: number; // C = RS - RC
+  resolvedPlayerId?: number;
+  canonicalName?: string;
+  matchType?: string;
 }
 
 export interface InningsExtraction {
@@ -103,6 +106,7 @@ export interface InningsExtraction {
 
 export interface ParsedScorecard {
   matchInfo: {
+    title?: string;
     dateTime: string;
     league?: string;
     court?: string;
@@ -116,6 +120,16 @@ export interface ParsedScorecard {
   homeInnings: InningsExtraction;
   awayInnings: InningsExtraction;
   validation: ValidationReport;
+  nameResolutions?: Record<
+    string,
+    {
+      rawName: string;
+      matchedPlayerId: number;
+      matchedName: string;
+      confidence: number;
+      matchType: string;
+    }
+  >;
 }
 
 export interface ValidationIssue {

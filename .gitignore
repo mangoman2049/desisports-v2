@@ -30,3 +30,7 @@ yarn-error.log*
 # OS metadata
 .DS_Store
 Thumbs.db
+
+# Uploads & Build cache
+public/uploads/scorecards/upload-*
+*.tsbuildinfo

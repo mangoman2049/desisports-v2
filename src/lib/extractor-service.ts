@@ -7,6 +7,7 @@ import {
   PlayerSummaryRow,
 } from "@/types/cricket";
 import { parseBallToken, validateIndoorCricketScorecard } from "./rules-engine";
+import { resolvePlayerName } from "./name-resolver";
 
 /**
  * Deterministic extraction for Spawtz 16-over indoor cricket format.

@@ -1,0 +1,594 @@
+{
+  "title": "Desi Boys Tournament May 2026",
+  "teams": [
+    {
+      "name": "DesiDabanggs",
+      "captain": "Darshan Mody",
+      "badge": "D",
+      "color": "amber"
+    },
+    {
+      "name": "DesiTitans",
+      "captain": "Hardik Desai",
+      "badge": "D",
+      "color": "blue"
+    },
+    {
+      "name": "VPGR",
+      "captain": "Himanshu Kalyani",
+      "badge": "V",
+      "color": "purple"
+    },
+    {
+      "name": "DesiTigers",
+      "captain": "Manthan Shah",
+      "badge": "D",
+      "color": "emerald"
+    }
+  ],
+  "standings": [
+    {
+      "pos": 1,
+      "team": "DesiTigers",
+      "played": 3,
+      "won": 3,
+      "lost": 0,
+      "tied": 0,
+      "forRuns": 327,
+      "againstRuns": 216,
+      "diff": "+111",
+      "points": 16
+    },
+    {
+      "pos": 2,
+      "team": "VPGR",
+      "played": 3,
+      "won": 2,
+      "lost": 1,
+      "tied": 0,
+      "forRuns": 322,
+      "againstRuns": 208,
+      "diff": "+114",
+      "points": 15
+    },
+    {
+      "pos": 3,
+      "team": "DesiDabanggs",
+      "played": 3,
+      "won": 1,
+      "lost": 2,
+      "tied": 0,
+      "forRuns": 203,
+      "againstRuns": 337,
+      "diff": "-134",
+      "points": 6
+    },
+    {
+      "pos": 4,
+      "team": "DesiTitans",
+      "played": 3,
+      "won": 0,
+      "lost": 3,
+      "tied": 0,
+      "forRuns": 186,
+      "againstRuns": 277,
+      "diff": "-91",
+      "points": 5
+    }
+  ],
+  "topRunGetters": [
+    {
+      "rank": "🥇",
+      "playerId": "45",
+      "name": "Prateek Nahar",
+      "value": "74",
+      "avatar": "https://desisports.milanchheda.com/storage/profile-photos/a481cd9a-8560-4ed8-94ce-4bfb364db8cd.jpg"
+    },
+    {
+      "rank": "2",
+      "playerId": "53",
+      "name": "Sajid Merchant",
+      "value": "67",
+      "avatar": "https://desisports.milanchheda.com/storage/profile-photos/fbe12178-ab3a-4ae8-9cb1-5a4b83e30a1f.jpg"
+    },
+    {
+      "rank": "3",
+      "playerId": "27",
+      "name": "Himanshu Kalyani",
+      "value": "62",
+      "avatar": "https://desisports.milanchheda.com/storage/profile-photos/84f4409f-5c32-4228-84ad-b8be54e98389.jpg"
+    },
+    {
+      "rank": "4",
+      "playerId": "30",
+      "name": "Kalrav Shah",
+      "value": "58",
+      "avatar": "https://desisports.milanchheda.com/storage/profiles/7TVwUhysOFdYJLv56KNSIDeXMZWOktapfrXKqA5r.jpg"
+    },
+    {
+      "rank": "5",
+      "playerId": "25",
+      "name": "Harshal joshi",
+      "value": "54",
+      "avatar": null
+    }
+  ],
+  "topWicketTakers": [
+    {
+      "rank": "🥇",
+      "playerId": "5",
+      "name": "Ankush Goel",
+      "value": "10",
+      "avatar": null
+    },
+    {
+      "rank": "2",
+      "playerId": "25",
+      "name": "Harshal joshi",
+      "value": "9",
+      "avatar": null
+    },
+    {
+      "rank": "3",
+      "playerId": "36",
+      "name": "Manthan Shah",
+      "value": "8",
+      "avatar": "https://desisports.milanchheda.com/storage/profile-photos/f8e2d2e6-31cf-45f3-89cd-a278bae6a9f2.jpg"
+    },
+    {
+      "rank": "4",
+      "playerId": "60",
+      "name": "Tejas Shah",
+      "value": "7",
+      "avatar": null
+    },
+    {
+      "rank": "5",
+      "playerId": "53",
+      "name": "Sajid Merchant",
+      "value": "6",
+      "avatar": "https://desisports.milanchheda.com/storage/profile-photos/fbe12178-ab3a-4ae8-9cb1-5a4b83e30a1f.jpg"
+    }
+  ],
+  "topContributors": [
+    {
+      "rank": "🥇",
+      "playerId": "5",
+      "name": "Ankush Goel",
+      "value": "48",
+      "avatar": null
+    },
+    {
+      "rank": "2",
+      "playerId": "45",
+      "name": "Prateek Nahar",
+      "value": "44",
+      "avatar": "https://desisports.milanchheda.com/storage/profile-photos/a481cd9a-8560-4ed8-94ce-4bfb364db8cd.jpg"
+    },
+    {
+      "rank": "3",
+      "playerId": "25",
+      "name": "Harshal joshi",
+      "value": "42",
+      "avatar": null
+    },
+    {
+      "rank": "4",
+      "playerId": "27",
+      "name": "Himanshu Kalyani",
+      "value": "37",
+      "avatar": "https://desisports.milanchheda.com/storage/profile-photos/84f4409f-5c32-4228-84ad-b8be54e98389.jpg"
+    },
+    {
+      "rank": "5",
+      "playerId": "53",
+      "name": "Sajid Merchant",
+      "value": "29",
+      "avatar": "https://desisports.milanchheda.com/storage/profile-photos/fbe12178-ab3a-4ae8-9cb1-5a4b83e30a1f.jpg"
+    }
+  ],
+  "fixtures": [
+    {
+      "id": 1,
+      "date": "11 May 2026",
+      "stage": "Group Match",
+      "team1": "VPGR",
+      "score1": 80,
+      "winner1": true,
+      "team2": "DesiTitans",
+      "score2": 41,
+      "winner2": false,
+      "potm": "Ankush Goel",
+      "scorecardUrl": "https://desisports.milanchheda.com/storage/scorecards/YQOEHxMzRewtNoGBmz3QruKNmb65XMy24UIOT5Zz.jpg"
+    },
+    {
+      "id": 2,
+      "date": "13 May 2026",
+      "stage": "Group Match",
+      "team1": "DesiDabanggs",
+      "score1": 53,
+      "winner1": false,
+      "team2": "DesiTigers",
+      "score2": 113,
+      "winner2": true,
+      "potm": "Manthan Shah",
+      "scorecardUrl": "https://desisports.milanchheda.com/storage/scorecards/fqE8sNVWXGaSTllHF5CGZkOMXfSpzyYRdwEgczUN.png"
+    },
+    {
+      "id": 3,
+      "date": "15 May 2026",
+      "stage": "Group Match",
+      "team1": "VPGR",
+      "score1": 148,
+      "winner1": true,
+      "team2": "DesiDabanggs",
+      "score2": 56,
+      "winner2": false,
+      "potm": "Ankush Goel",
+      "scorecardUrl": "https://desisports.milanchheda.com/storage/scorecards/02KD0VPf6dyf3uTkGmhwcPrdWIRHSOWpISGWFSod.jpg"
+    },
+    {
+      "id": 4,
+      "date": "15 May 2026",
+      "stage": "Group Match",
+      "team1": "DesiTitans",
+      "score1": 69,
+      "winner1": false,
+      "team2": "DesiTigers",
+      "score2": 103,
+      "winner2": true,
+      "potm": "Prateek Nahar",
+      "scorecardUrl": "https://desisports.milanchheda.com/storage/scorecards/EP1nCbFtgbwsZTrmgL1ZCrAgXGJc3xIC7S8Kza6X.jpg"
+    },
+    {
+      "id": 5,
+      "date": "18 May 2026",
+      "stage": "Final",
+      "team1": "VPGR",
+      "score1": 94,
+      "winner1": false,
+      "team2": "DesiTigers",
+      "score2": 111,
+      "winner2": true,
+      "potm": "Abhishek Agarwal",
+      "scorecardUrl": "https://desisports.milanchheda.com/storage/scorecards/YPHhaKOiQBk84QpYKgnUkdvhMi2HAhwCeHwg1hMn.jpg"
+    },
+    {
+      "id": 6,
+      "date": "18 May 2026",
+      "stage": "3rd Place Playoff",
+      "team1": "DesiTitans",
+      "score1": 76,
+      "winner1": false,
+      "team2": "DesiDabanggs",
+      "score2": 94,
+      "winner2": true,
+      "potm": "Preraq Mistry",
+      "scorecardUrl": "https://desisports.milanchheda.com/storage/scorecards/HUgA0EWeB18PpBKpWn15HkvqVRg2G09bTe396TjE.jpg"
+    }
+  ],
+  "squads": [
+    {
+      "id": 1,
+      "team": "DesiDabanggs",
+      "captain": "Captain:Darshan Mody",
+      "playerCount": 14,
+      "players": [
+        {
+          "id": "46",
+          "name": "Preraq Mistry",
+          "avatar": null
+        },
+        {
+          "id": "5",
+          "name": "Ankush Goel",
+          "avatar": null
+        },
+        {
+          "id": "36",
+          "name": "Manthan Shah",
+          "avatar": null
+        },
+        {
+          "id": "47",
+          "name": "Ravi kumar",
+          "avatar": null
+        },
+        {
+          "id": "56",
+          "name": "Sandesh Jagtap",
+          "avatar": null
+        },
+        {
+          "id": "14",
+          "name": "Darshan Mody",
+          "avatar": null
+        },
+        {
+          "id": "20",
+          "name": "Gagandeep Singh",
+          "avatar": null
+        },
+        {
+          "id": "39",
+          "name": "Narendra Tiwari",
+          "avatar": null
+        },
+        {
+          "id": "55",
+          "name": "Sandeep Khedekar",
+          "avatar": null
+        },
+        {
+          "id": "41",
+          "name": "Nitesh Lokwani",
+          "avatar": null
+        },
+        {
+          "id": "57",
+          "name": "Saurabh Ranjan",
+          "avatar": null
+        },
+        {
+          "id": "12",
+          "name": "Chittaranjan Dey",
+          "avatar": null
+        },
+        {
+          "id": "49",
+          "name": "Ritesh sarda",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/bde80f6d-5860-457f-9395-c67731be794a.jpg"
+        },
+        {
+          "id": "35",
+          "name": "Home",
+          "avatar": null
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "team": "DesiTitans",
+      "captain": "Captain:Hardik Desai",
+      "playerCount": 17,
+      "players": [
+        {
+          "id": "46",
+          "name": "Preraq Mistry",
+          "avatar": null
+        },
+        {
+          "id": "45",
+          "name": "Prateek Nahar",
+          "avatar": null
+        },
+        {
+          "id": "5",
+          "name": "Ankush Goel",
+          "avatar": null
+        },
+        {
+          "id": "44",
+          "name": "Prateek Jain",
+          "avatar": null
+        },
+        {
+          "id": "63",
+          "name": "Vipul Jain",
+          "avatar": null
+        },
+        {
+          "id": "50",
+          "name": "Ronak Jain",
+          "avatar": null
+        },
+        {
+          "id": "64",
+          "name": "Yash sisodia",
+          "avatar": null
+        },
+        {
+          "id": "37",
+          "name": "Mayank Agarwal",
+          "avatar": null
+        },
+        {
+          "id": "24",
+          "name": "Harsh Ramnani",
+          "avatar": null
+        },
+        {
+          "id": "39",
+          "name": "Narendra Tiwari",
+          "avatar": null
+        },
+        {
+          "id": "38",
+          "name": "Milan Chheda",
+          "avatar": null
+        },
+        {
+          "id": "8",
+          "name": "Bhavesh",
+          "avatar": null
+        },
+        {
+          "id": "16",
+          "name": "Deepak thawani",
+          "avatar": null
+        },
+        {
+          "id": "65",
+          "name": "Shaurya Bhatnagar",
+          "avatar": null
+        },
+        {
+          "id": "23",
+          "name": "Hardik Desai",
+          "avatar": null
+        },
+        {
+          "id": "61",
+          "name": "UUdit Verma",
+          "avatar": null
+        },
+        {
+          "id": "35",
+          "name": "Home",
+          "avatar": null
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "team": "VPGR",
+      "captain": "Captain:Himanshu Kalyani",
+      "playerCount": 14,
+      "players": [
+        {
+          "id": "2",
+          "name": "Abhishek Agarwal",
+          "avatar": null
+        },
+        {
+          "id": "5",
+          "name": "Ankush Goel",
+          "avatar": null
+        },
+        {
+          "id": "27",
+          "name": "Himanshu Kalyani",
+          "avatar": null
+        },
+        {
+          "id": "53",
+          "name": "Sajid Merchant",
+          "avatar": null
+        },
+        {
+          "id": "59",
+          "name": "Sidhaarth Sashtri",
+          "avatar": null
+        },
+        {
+          "id": "15",
+          "name": "Deepak Kherajani",
+          "avatar": null
+        },
+        {
+          "id": "60",
+          "name": "Tejas Shah",
+          "avatar": null
+        },
+        {
+          "id": "66",
+          "name": "Zaheer Merchant",
+          "avatar": null
+        },
+        {
+          "id": "40",
+          "name": "Neeraj Bachani",
+          "avatar": null
+        },
+        {
+          "id": "7",
+          "name": "AAtul Mishra",
+          "avatar": null
+        },
+        {
+          "id": "9",
+          "name": "CChaitanya Shah",
+          "avatar": null
+        },
+        {
+          "id": "33",
+          "name": "MManish Daultani",
+          "avatar": null
+        },
+        {
+          "id": "34",
+          "name": "MManish Jain",
+          "avatar": null
+        },
+        {
+          "id": "35",
+          "name": "Home",
+          "avatar": null
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "team": "DesiTigers",
+      "captain": "Captain:Manthan Shah",
+      "playerCount": 13,
+      "players": [
+        {
+          "id": "2",
+          "name": "Abhishek Agarwal",
+          "avatar": null
+        },
+        {
+          "id": "45",
+          "name": "Prateek Nahar",
+          "avatar": null
+        },
+        {
+          "id": "36",
+          "name": "Manthan Shah",
+          "avatar": null
+        },
+        {
+          "id": "25",
+          "name": "Harshal joshi",
+          "avatar": null
+        },
+        {
+          "id": "30",
+          "name": "Kalrav Shah",
+          "avatar": null
+        },
+        {
+          "id": "43",
+          "name": "Prateek Attree",
+          "avatar": null
+        },
+        {
+          "id": "26",
+          "name": "Hemang Shah",
+          "avatar": null
+        },
+        {
+          "id": "58",
+          "name": "Siddharth Gandhi",
+          "avatar": null
+        },
+        {
+          "id": "32",
+          "name": "Kunal soni",
+          "avatar": null
+        },
+        {
+          "id": "21",
+          "name": "Gaurav Arora",
+          "avatar": null
+        },
+        {
+          "id": "51",
+          "name": "Sahil Aggarwal",
+          "avatar": null
+        },
+        {
+          "id": "6",
+          "name": "Ashish Sirohi",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/6491f062-49f0-4183-9298-e1197b4ef9f9.jpg"
+        },
+        {
+          "id": "35",
+          "name": "Home",
+          "avatar": null
+        }
+      ]
+    }
+  ]
+}

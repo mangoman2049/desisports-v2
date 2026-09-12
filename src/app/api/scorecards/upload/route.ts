@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { evaluateQualityGate } from "@/lib/quality-gate";
 import { getSampleScorecardExtraction, extractScorecardWithLiteLLM } from "@/lib/extractor-service";
 import { checkForDuplicateScorecard } from "@/lib/duplicate-detector";
+import { resolveAllScorecardPlayers } from "@/lib/name-resolver";
 import fs from "fs/promises";
 import path from "path";
 
@@ -12,6 +13,7 @@ export async function POST(req: NextRequest) {
     const file = formData.get("file") as File | null;
     const forceSample = formData.get("forceSample") === "true";
     const forceDuplicate = formData.get("forceDuplicate") === "true";
+    const matchTitle = (formData.get("matchTitle") as string) || undefined;
 
     let imageUrl = "/uploads/scorecards/sample-scorecard.jpg";
     let width = 1600;
@@ -40,12 +42,20 @@ export async function POST(req: NextRequest) {
       ? await extractScorecardWithLiteLLM(base64Image)
       : getSampleScorecardExtraction();
 
+    if (matchTitle) {
+      parsed.matchInfo.title = matchTitle;
+    }
+
+    // Reconcile player names across both teams (8 home, 8 away, bowlers)
+    const { scorecard: reconciledScorecard, resolutions, matchedCount, unreconciledCount } =
+      await resolveAllScorecardPlayers(parsed);
+
     // DUPLICATE SCORECARD CHECK
     if (!forceDuplicate) {
       const duplicateCheck = await checkForDuplicateScorecard(
-        parsed.matchInfo.dateTime,
-        parsed.homeInnings.teamName,
-        parsed.awayInnings.teamName
+        reconciledScorecard.matchInfo.dateTime,
+        reconciledScorecard.homeInnings.teamName,
+        reconciledScorecard.awayInnings.teamName
       );
 
       if (duplicateCheck.isDuplicate) {
@@ -70,8 +80,8 @@ export async function POST(req: NextRequest) {
         qualityScore: diagnostics.score,
         qualityDiagnostics: JSON.stringify(diagnostics),
         rawExtraction: JSON.stringify(parsed),
-        reconciledData: JSON.stringify(parsed),
-        validationScore: parsed.validation.confidenceScore,
+        reconciledData: JSON.stringify(reconciledScorecard),
+        validationScore: reconciledScorecard.validation.confidenceScore,
       },
     });
 
@@ -80,7 +90,13 @@ export async function POST(req: NextRequest) {
       uploadId: upload.id,
       imageUrl,
       diagnostics,
-      parsedScorecard: parsed,
+      parsedScorecard: reconciledScorecard,
+      resolutions,
+      nameResolutionSummary: {
+        matchedCount,
+        unreconciledCount,
+        total: matchedCount + unreconciledCount,
+      },
     });
   } catch (err: any) {
     console.error("Scorecard upload error:", err);

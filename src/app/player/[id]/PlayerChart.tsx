@@ -2,75 +2,131 @@
 
 import {
   ResponsiveContainer,
-  ComposedChart,
+  LineChart,
   Line,
-  Bar,
   XAxis,
   YAxis,
   Tooltip,
   CartesianGrid,
+  AreaChart,
+  Area,
 } from "recharts";
 
-interface Props {
-  data: {
-    labels: string[];
-    runs: number[];
-    wickets: number[];
-    contributions: number[];
-  };
+interface RunsChartProps {
+  dates: string[];
+  runs: number[];
 }
 
-export default function PlayerChart({ data }: Props) {
-  const chartPoints = data.labels.map((label, idx) => ({
-    name: label,
-    runs: data.runs[idx] || 0,
-    wickets: data.wickets[idx] || 0,
-    contribution: data.contributions[idx] || 0,
+export function RunsTrendChart({ dates, runs }: RunsChartProps) {
+  const data = dates.map((d, i) => ({
+    date: d,
+    runs: runs[i] || 0,
   }));
 
   return (
-    <ResponsiveContainer width="100%" height="100%">
-      <ComposedChart data={chartPoints} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.4} />
+    <ResponsiveContainer width="100%" height={160}>
+      <LineChart data={data} margin={{ top: 20, right: 15, left: -25, bottom: 0 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
         <XAxis
-          dataKey="name"
-          tick={{ fontSize: 11, fill: "#64748b" }}
+          dataKey="date"
+          tick={{ fontSize: 10, fill: "#94a3b8" }}
           tickLine={false}
-          axisLine={{ stroke: "#cbd5e1" }}
+          axisLine={{ stroke: "#e2e8f0" }}
+          dy={5}
         />
         <YAxis
-          tick={{ fontSize: 11, fill: "#64748b" }}
+          tick={{ fontSize: 10, fill: "#94a3b8" }}
           tickLine={false}
-          axisLine={{ stroke: "#cbd5e1" }}
+          axisLine={false}
+          domain={[0, "dataMax + 4"]}
         />
         <Tooltip
           contentStyle={{
             backgroundColor: "#0f172a",
-            borderColor: "#1e293b",
-            borderRadius: "8px",
-            color: "#f8fafc",
+            borderRadius: "10px",
+            border: "none",
+            color: "#fff",
             fontSize: "12px",
+            padding: "6px 10px",
           }}
-          itemStyle={{ padding: 0 }}
+          formatter={(value: any) => [`${value} Runs`, "Scored"]}
         />
-        <Bar dataKey="runs" fill="#16a34a" radius={[4, 4, 0, 0]} maxBarSize={32} name="Runs" />
         <Line
+          type="monotone"
+          dataKey="runs"
+          stroke="#10b981"
+          strokeWidth={2.5}
+          dot={{ r: 5, fill: "#10b981", strokeWidth: 2, stroke: "#ffffff" }}
+          activeDot={{ r: 7, fill: "#059669" }}
+        />
+      </LineChart>
+    </ResponsiveContainer>
+  );
+}
+
+interface MomentumChartProps {
+  dates: string[];
+  contributions: number[];
+}
+
+export function ContributionMomentumChart({ dates, contributions }: MomentumChartProps) {
+  const data = dates.map((d, i) => ({
+    date: d,
+    contribution: contributions[i] || 0,
+  }));
+
+  const gradientOffset = () => {
+    const dataMax = Math.max(...contributions);
+    const dataMin = Math.min(...contributions);
+    if (dataMax <= 0) return 0;
+    if (dataMin >= 0) return 1;
+    return dataMax / (dataMax - dataMin);
+  };
+
+  const off = gradientOffset();
+
+  return (
+    <ResponsiveContainer width="100%" height={160}>
+      <AreaChart data={data} margin={{ top: 20, right: 15, left: -25, bottom: 0 }}>
+        <defs>
+          <linearGradient id="splitColor" x1="0" y1="0" x2="0" y2="1">
+            <stop offset={off} stopColor="#10b981" stopOpacity={0.4} />
+            <stop offset={off} stopColor="#ef4444" stopOpacity={0.4} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+        <XAxis
+          dataKey="date"
+          tick={{ fontSize: 10, fill: "#94a3b8" }}
+          tickLine={false}
+          axisLine={{ stroke: "#e2e8f0" }}
+          dy={5}
+        />
+        <YAxis
+          tick={{ fontSize: 10, fill: "#94a3b8" }}
+          tickLine={false}
+          axisLine={false}
+        />
+        <Tooltip
+          contentStyle={{
+            backgroundColor: "#0f172a",
+            borderRadius: "10px",
+            border: "none",
+            color: "#fff",
+            fontSize: "12px",
+            padding: "6px 10px",
+          }}
+          formatter={(value: any) => [`${value > 0 ? "+" : ""}${value} Impact`, "Contribution"]}
+        />
+        <Area
           type="monotone"
           dataKey="contribution"
-          stroke="#9333ea"
+          stroke="#10b981"
           strokeWidth={2.5}
-          dot={{ r: 4, fill: "#9333ea" }}
-          name="Contribution"
+          fill="url(#splitColor)"
+          dot={{ r: 4, fill: "#10b981", stroke: "#ffffff", strokeWidth: 2 }}
         />
-        <Line
-          type="monotone"
-          dataKey="wickets"
-          stroke="#2563eb"
-          strokeWidth={2}
-          dot={{ r: 3, fill: "#2563eb" }}
-          name="Wickets"
-        />
-      </ComposedChart>
+      </AreaChart>
     </ResponsiveContainer>
   );
 }

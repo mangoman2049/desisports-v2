@@ -22,6 +22,9 @@ model Player {
   bowlingStyle     String?            // Right Arm Off Spin, Right Arm Medium, etc.
   fieldingPosition String?            // Cover, Wicket Keeper, Left Sweeper, etc.
   captainTags      String?            // JSON: ["Aggressive", "Anchor", "Clutch Bowler"]
+  fuzzyVariants    String?            // JSON string array of known typos: ["Maneesh", "Manis", "Maanes"]
+  isUnreconciled   Boolean            @default(false)
+  avatarUrl        String?
   notes            String?
   aliases          PlayerAlias[]
   stats            PlayerMatchStat[]
