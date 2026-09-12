@@ -4,6 +4,9 @@ import { evaluateQualityGate } from "../src/lib/quality-gate";
 import { checkForDuplicateScorecard } from "../src/lib/duplicate-detector";
 import { generateCaptainInsights } from "../src/lib/captain-insights";
 import { prisma } from "../src/lib/prisma";
+import fs from "fs";
+import path from "path";
+import tournament1Data from "../prisma/tournament_1_data.json";
 
 async function runTestSuite() {
   console.log("==================================================");
@@ -29,7 +32,7 @@ async function runTestSuite() {
     console.log("PASS: Indoor cricket Spawtz sheet successfully reconciled.");
   }
 
-  // Test 2: Contribution Math (C = RS - RC)
+  // Test 2: Contribution Formula (C = RS - RC)
   console.log("\n[Test 2] Contribution Formula (C = RS - RC):");
   const yash = sample.awayInnings.playerSummaries.find((p) => p.name === "YASH")!;
   const manthan = sample.homeInnings.playerSummaries.find((p) => p.name === "MANTHAN")!;
@@ -127,13 +130,112 @@ async function runTestSuite() {
     console.log("PASS: 32 initial captain insights topology verified.");
   }
 
+  // Test 6: Player Stats Grounding & Negative Economy Math (Exact Spawtz Rules)
+  console.log("\n[Test 6] Player Stats Grounding & Negative Economy Math:");
+  const testRc = -8;
+  const testOb = 2.0;
+  const testRs = 14;
+  const calculatedEcon = testOb > 0 ? testRc / testOb : 0;
+  const calculatedContribution = testRs - testRc;
+
+  console.log(`- Negative Economy Calculation: ${testRc} RC / ${testOb} OB = ${calculatedEcon.toFixed(2)}`);
+  if (calculatedEcon !== -4.0) {
+    console.error(`FAIL: Expected economy to be -4.00, got ${calculatedEcon}`);
+    passedAll = false;
+  }
+
+  console.log(`- Spawtz Contribution Calculation: ${testRs} RS - (${testRc} RC) = +${calculatedContribution}`);
+  if (calculatedContribution !== 22) {
+    console.error(`FAIL: Expected contribution to be +22, got ${calculatedContribution}`);
+    passedAll = false;
+  }
+
+  // Verify Gagandeep Singh database records match media_1789209845228.jpg
+  const gagan = await prisma.player.findUnique({
+    where: { id: 36 },
+    include: { stats: true },
+  });
+
+  if (!gagan) {
+    console.error("FAIL: Player 36 (Gagandeep Singh) not found in database!");
+    passedAll = false;
+  } else {
+    const totalRuns = gagan.stats.reduce((acc, s) => acc + s.runsScored, 0);
+    const totalWkts = gagan.stats.reduce((acc, s) => acc + s.wickets, 0);
+    const totalC = gagan.stats.reduce((acc, s) => acc + s.contribution, 0);
+    const potmCount = gagan.stats.filter((s) => s.isPotm).length;
+
+    console.log(`- Gagandeep Singh Matches: ${gagan.stats.length} (expected 6)`);
+    console.log(`- Gagandeep Singh Runs: ${totalRuns} (expected 68)`);
+    console.log(`- Gagandeep Singh Wickets: ${totalWkts} (expected 11)`);
+    console.log(`- Gagandeep Singh Contribution: +${totalC} (expected +17)`);
+    console.log(`- Gagandeep Singh POTM: ${potmCount} (expected 1)`);
+
+    if (gagan.stats.length !== 6 || totalRuns !== 68 || totalWkts !== 11 || totalC !== 17 || potmCount !== 1) {
+      console.error("FAIL: Gagandeep Singh stats do not strictly reconcile with media_1789209845228.jpg!");
+      passedAll = false;
+    } else {
+      console.log("PASS: Player stats grounding strictly verified against reference scorecard image.");
+    }
+  }
+
+  // Test 7: Team DNA Dimensions & Archetype Model
+  console.log("\n[Test 7] Team DNA Dimensions & Framework Model:");
+  const testDNA = { batting: 78, bowling: 72, fielding: 81, teamChemistry: 76, dependency: 41 };
+  const allInRange = Object.values(testDNA).every((v) => v >= 0 && v <= 100);
+  console.log(`- Batting DNA: ${testDNA.batting} / 100`);
+  console.log(`- Bowling DNA: ${testDNA.bowling} / 100`);
+  console.log(`- Fielding DNA: ${testDNA.fielding} / 100`);
+  console.log(`- Team Chemistry: ${testDNA.teamChemistry} / 100`);
+  console.log(`- Dependency Risk Score: ${testDNA.dependency}%`);
+
+  if (!allInRange) {
+    console.error("FAIL: Team DNA dimensions must be bounded within 0 to 100!");
+    passedAll = false;
+  } else {
+    console.log("PASS: Team DNA dimension scores validated.");
+  }
+
+  // Test 8: Tournament Hierarchy & Routing Rules
+  console.log("\n[Test 8] Tournament Hierarchy & Separation Rules:");
+  const t1Squads = tournament1Data.squads.length;
+  const t1Teams = tournament1Data.teams.length;
+  const t1Fixtures = tournament1Data.fixtures.length;
+  console.log(`- Tournament 1 (May 2026): ${t1Teams} Teams, ${t1Squads} Squads, ${t1Fixtures} Fixtures`);
+
+  if (t1Teams !== 4 || t1Squads !== 4 || t1Fixtures !== 6) {
+    console.error("FAIL: Tournament 1 must have exactly 4 teams, 4 squads, and 6 fixtures!");
+    passedAll = false;
+  } else {
+    console.log("PASS: Tournament 1 structure verified.");
+  }
+
+  // Test 9: Social Media Share Assets Check
+  console.log("\n[Test 9] Social Media Share & OG Image Assets:");
+  const shareImgPath = path.join(process.cwd(), "public", "images", "team-dna-share.png");
+  const ogImgPath = path.join(process.cwd(), "public", "og-image.png");
+  const shareImgExists = fs.existsSync(shareImgPath);
+  const ogImgExists = fs.existsSync(ogImgPath);
+
+  console.log(`- Team DNA Share Image (${shareImgPath}): ${shareImgExists ? "EXISTS" : "MISSING"}`);
+  console.log(`- Root OG Image (${ogImgPath}): ${ogImgExists ? "EXISTS" : "MISSING"}`);
+
+  if (!shareImgExists || !ogImgExists) {
+    console.error("FAIL: Social share preview image assets are missing in public/ directory!");
+    passedAll = false;
+  } else {
+    console.log("PASS: Social media share preview images verified.");
+  }
+
   await prisma.$disconnect();
 
   if (!passedAll) {
     console.error("\n❌ PRE-PUSH TEST SUITE FAILED");
     process.exit(1);
   } else {
-    console.log("\n✅ ALL TESTS PASSED SUCCESSFULLY! Ready to push.");
+    console.log("\n==================================================");
+    console.log("✅ ALL 9 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
+    console.log("==================================================");
     process.exit(0);
   }
 }

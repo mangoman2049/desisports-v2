@@ -2,41 +2,25 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
-import Image from "next/image";
+import { useState } from "react";
 import {
   Trophy,
   Users,
-  Shield,
-  UploadCloud,
   Calendar,
   Menu,
   X,
-  Sparkles,
 } from "lucide-react";
+import ShareButton from "@/components/ShareButton";
 
 export default function Navigation() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Exact primary navigation as requested in media_1789209157520.png
   const navLinks = [
     { href: "/tournaments", label: "Tournaments", icon: Trophy },
-    { href: "/matches", label: "Matches", icon: Calendar },
     { href: "/players", label: "Players", icon: Users },
-    {
-      href: "/captain",
-      label: "Captain Intel",
-      icon: Shield,
-      badge: "32 Insights",
-      badgeColor: "bg-purple-50 text-purple-700 border border-purple-200 font-semibold",
-    },
-    {
-      href: "/admin",
-      label: "Scorecard Intake",
-      icon: UploadCloud,
-      badge: "Maker-Checker",
-      badgeColor: "bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold",
-    },
+    { href: "/matches", label: "Matches", icon: Calendar },
   ];
 
   return (
@@ -44,7 +28,7 @@ export default function Navigation() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Official Brand Logo */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <Link href="/tournaments" className="flex items-center gap-3 group">
               <div className="relative h-10 w-10 rounded-xl overflow-hidden shadow-xs border border-slate-200/60 bg-black flex items-center justify-center p-0.5">
                 <img
@@ -67,43 +51,42 @@ export default function Navigation() {
                 </span>
               </div>
             </Link>
+
+            {/* Desktop Nav Links: Tournaments, Players, Matches */}
+            <div className="hidden md:flex items-center gap-1">
+              {navLinks.map((link) => {
+                const Icon = link.icon;
+                const isActive =
+                  pathname === link.href ||
+                  (link.href !== "/" && pathname?.startsWith(link.href));
+
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
+                      isActive
+                        ? "bg-slate-900 text-white shadow-xs"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span>{link.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
 
-          {/* Desktop Nav Links */}
-          <div className="hidden md:flex items-center gap-1.5">
-            {navLinks.map((link) => {
-              const Icon = link.icon;
-              const isActive =
-                pathname === link.href ||
-                (link.href !== "/" && pathname?.startsWith(link.href));
-
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
-                    isActive
-                      ? "bg-slate-900 text-white shadow-xs"
-                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100/80"
-                  }`}
-                >
-                  <Icon className="h-4 w-4" />
-                  <span>{link.label}</span>
-                  {link.badge && !isActive && (
-                    <span className={`text-[10px] px-1.5 py-0.2 rounded-md ${link.badgeColor}`}>
-                      {link.badge}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* User Quick Switcher */}
+          {/* Right Action Controls: Share + User Switcher */}
           <div className="flex items-center gap-2.5">
+            {/* Share Button with Web Share API & WhatsApp */}
+            <ShareButton />
+
+            {/* User Profile */}
             <Link
               href="/player/35"
-              className="flex items-center gap-2 pl-2 pr-3.5 py-1.5 rounded-full border border-slate-200/80 bg-slate-50/80 hover:bg-white hover:border-slate-300 hover:shadow-xs transition-all"
+              className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-full border border-slate-200/80 bg-slate-50 hover:bg-white hover:border-slate-300 hover:shadow-xs transition-all"
             >
               <div className="h-7 w-7 rounded-full bg-emerald-600 text-xs font-bold text-white flex items-center justify-center shadow-xs">
                 MP
@@ -122,6 +105,7 @@ export default function Navigation() {
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100"
+              aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -139,24 +123,20 @@ export default function Navigation() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold ${
+                  className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold ${
                     isActive
                       ? "bg-slate-900 text-white"
                       : "text-slate-700 hover:bg-slate-100"
                   }`}
                 >
-                  <div className="flex items-center gap-2.5">
-                    <Icon className="h-4 w-4" />
-                    <span>{link.label}</span>
-                  </div>
-                  {link.badge && (
-                    <span className={`text-[10px] px-2 py-0.5 rounded-md font-mono ${link.badgeColor}`}>
-                      {link.badge}
-                    </span>
-                  )}
+                  <Icon className="h-4 w-4" />
+                  <span>{link.label}</span>
                 </Link>
               );
             })}
+            <div className="pt-2 border-t border-slate-100 px-3">
+              <ShareButton className="w-full" />
+            </div>
           </div>
         )}
       </div>

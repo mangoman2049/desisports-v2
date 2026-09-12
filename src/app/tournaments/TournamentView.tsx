@@ -17,6 +17,7 @@ import {
   Shield,
   Layers,
 } from "lucide-react";
+import ShareButton from "@/components/ShareButton";
 
 interface TeamStanding {
   pos: number;
@@ -145,6 +146,7 @@ export default function TournamentView({ data }: { data: TournamentData }) {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
+            <ShareButton />
             <Link
               href="/captain"
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold tracking-wide transition shadow-lg shadow-purple-900/30 hover:shadow-purple-900/50"
@@ -329,10 +331,10 @@ export default function TournamentView({ data }: { data: TournamentData }) {
             };
 
             return (
-              <div
+              <Link
                 key={squad.id}
-                onClick={() => setSelectedSquad(squad)}
-                className="group cursor-pointer rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 shadow-sm hover:shadow-md hover:border-purple-400/50 transition flex flex-col justify-between"
+                href={`/tournaments/1/teams/${squad.id}`}
+                className="group rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 shadow-sm hover:shadow-md hover:border-purple-400/50 transition flex flex-col justify-between block"
               >
                 <div className="space-y-3">
                   <div className="flex items-start justify-between">
@@ -389,10 +391,10 @@ export default function TournamentView({ data }: { data: TournamentData }) {
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs font-semibold text-purple-600 dark:text-purple-400">
-                  <span>View Full Squad</span>
+                  <span>View Team & Team DNA™</span>
                   <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition" />
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>

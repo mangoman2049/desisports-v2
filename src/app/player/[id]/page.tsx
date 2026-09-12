@@ -497,7 +497,7 @@ export default async function PlayerProfilePage({ params }: Props) {
             🌟 Synergy Uplift with Partner: +6.8 Runs
           </span>
           <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white text-purple-700 border border-purple-200 shadow-2xs">
-            ⚡ Dominant vs Medium-Fast Pace Lines (148 SR)
+            ⚡ Elite Boundary Threat in Skin Overs
           </span>
           <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white text-sky-700 border border-sky-200 shadow-2xs">
             🎯 Death Overs Containment Specialist

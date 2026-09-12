@@ -249,11 +249,11 @@ async function main() {
   // Wickets: (2) 17 Jun, (2) 22 Jun, (3) 24 Jun, (4) 01 Jul = 11 Wickets total
   // Last 5 Contributions: +22, +3, +5, -3, -10
   const gaganMatchStats = [
-    { matchId: 1, date: "15 May 2026", rs: 18, out: 0, ob: 2.0, rc: 28, wkts: 0, econ: 14.0, c: -10, potm: false, note: null },
-    { matchId: 2, date: "18 May 2026", rs: 7, out: 0, ob: 2.0, rc: 10, wkts: 0, econ: 5.0, c: -3, potm: false, note: null },
-    { matchId: 3, date: "17 Jun 2026", rs: 13, out: 0, ob: 2.0, rc: 8, wkts: 2, econ: 4.0, c: 5, potm: false, note: "⚡ 2 wickets" },
-    { matchId: 4, date: "22 Jun 2026", rs: 12, out: 0, ob: 2.0, rc: 9, wkts: 2, econ: 4.5, c: 3, potm: false, note: "⚡ 2 wickets" },
-    { matchId: 5, date: "24 Jun 2026", rs: 4, out: 0, ob: 2.0, rc: -4, wkts: 3, econ: -2.0, c: 8, potm: false, note: "⚡ 3 wickets" },
+    { matchId: 1, date: "15 May 2026", rs: 18, out: 0, ob: 2.0, rc: 18, wkts: 0, econ: 9.0, c: 0, potm: false, note: null },
+    { matchId: 2, date: "18 May 2026", rs: 7, out: 0, ob: 2.0, rc: 17, wkts: 0, econ: 8.5, c: -10, potm: false, note: null },
+    { matchId: 3, date: "17 Jun 2026", rs: 13, out: 0, ob: 2.0, rc: 16, wkts: 2, econ: 8.0, c: -3, potm: false, note: "⚡ 2 wickets" },
+    { matchId: 4, date: "22 Jun 2026", rs: 12, out: 0, ob: 2.0, rc: 7, wkts: 2, econ: 3.5, c: 5, potm: false, note: "⚡ 2 wickets" },
+    { matchId: 5, date: "24 Jun 2026", rs: 4, out: 0, ob: 2.0, rc: 1, wkts: 3, econ: 0.5, c: 3, potm: false, note: "⚡ 3 wickets" },
     { matchId: 6, date: "01 Jul 2026", rs: 14, out: 0, ob: 2.0, rc: -8, wkts: 4, econ: -4.0, c: 22, potm: true, note: "★ Player of the match!" },
   ];
 
