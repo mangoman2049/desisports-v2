@@ -725,9 +725,39 @@ export async function extractScorecardWithLiteLLM(
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000);
 
-    const prompt = `You are an expert Spawtz indoor cricket scorecard OCR extractor.
-Extract the 16 overs ball by ball for both teams, 4 skins each, bowler names, and bottom tables.
-Return strict JSON matching the ParsedScorecard schema.`;
+    const prompt = `You are a precision Spawtz Indoor Cricket Scorecard OCR Engine.
+Extract the scorecard by segmenting the document into 4 CANONICAL GEOMETRIC ZONES:
+
+ZONE 1: HEADER & MATCH CONTEXT (Top 10-15%)
+- League / Tournament Title, Match Date, Time, Court / Pitch ID, Umpire name.
+- Home Team Name and Away Team Name.
+- Toss Winner & Decision.
+
+ZONE 2: INNINGS 1 BREAKDOWN (Upper Middle Grid - 16 Overs)
+- 4 Batting Partnerships (Skins 1-4), exactly 2 Batters per Skin.
+- 4 Overs per Skin (Overs 1-16), Bowler Name for each over.
+- Ball-by-ball tokens (6 balls/over + extras): "0", "1", "2", "3", "4", "5", "6", "W" (wide +2), "NB" (no ball +2), "(R)" (run out -5), "(B)" (bowled -5), "(C)" (caught -5), "(ST)" (stumped -5).
+- Batter 1 Total, Batter 2 Total, Skin Net Total Runs, Skin Wickets.
+
+ZONE 3: INNINGS 2 BREAKDOWN (Lower Middle Grid - 16 Overs)
+- Mirror structure of Innings 1: 4 Skins, 2 Batters per pair, Overs 1-16, Bowler names, Ball-by-ball cells, Skin totals.
+
+ZONE 4: BOTTOM SUMMARY & TOTALS TABLE (Bottom 20-25%)
+- Player Performance Summary for both teams:
+  * Player Name
+  * Runs Scored (RS)
+  * Overs Bowled (OB)
+  * Runs Conceded (RC)
+  * Wickets Taken (W)
+  * Net Contribution (C = RS - RC)
+- Match Result: Final Home Total, Final Away Total, Skins Won (e.g. 3-1), Player of the Match (POTM).
+
+CROSS-ZONE RECONCILIATION RULES:
+1. Team Total Runs = Sum of 4 Skin Net Totals (Zone 2/3 must equal Zone 4).
+2. For each player in Zone 4: Net Contribution C = RS - RC.
+3. Economy = RC / OB.
+
+Return strict JSON adhering to the ParsedScorecard schema.`;
 
     const response = await fetch(`${apiBase}/v1/chat/completions`, {
       method: "POST",

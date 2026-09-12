@@ -76,10 +76,12 @@ export function ContributionMomentumChart({ dates, contributions }: MomentumChar
   }));
 
   const gradientOffset = () => {
+    if (!contributions || contributions.length === 0) return 0.5;
     const dataMax = Math.max(...contributions);
     const dataMin = Math.min(...contributions);
     if (dataMax <= 0) return 0;
     if (dataMin >= 0) return 1;
+    if (dataMax === dataMin) return 0.5;
     return dataMax / (dataMax - dataMin);
   };
 

@@ -12,6 +12,7 @@ import {
   Award,
 } from "lucide-react";
 import MatchAnalysisButton from "@/components/MatchAnalysisButton";
+import PracticePointsTable, { PracticePlayerStat } from "./PracticePointsTable";
 
 export const metadata = {
   title: "Desisports Regular Practice | DesiSports V2",
@@ -38,9 +39,21 @@ export default function TournamentZeroPage() {
 
   const topPracticePerformers = [
     { name: "Yash", runs: 18, wickets: 3, contribution: "+19", potm: "1 Award", avatar: null, id: 65 },
-    { name: "Manthan Shah", runs: 28, wickets: 2, contribution: "+32", potm: "0", avatar: null, id: 36 },
-    { name: "Himanshu Kalyani", runs: 24, wickets: 2, contribution: "+28", potm: "0", avatar: null, id: 27 },
-    { name: "Ankush Goel", runs: 20, wickets: 3, contribution: "+26", potm: "0", avatar: null, id: 5 },
+    { name: "Himanshu Kalyani", runs: 24, wickets: 2, contribution: "+12", potm: "0", avatar: null, id: 27 },
+    { name: "Sahil", runs: 14, wickets: 2, contribution: "+10", potm: "0", avatar: null, id: 102 },
+    { name: "Deepak", runs: 16, wickets: 2, contribution: "+8", potm: "0", avatar: null, id: 101 },
+  ];
+
+  const practiceStandingsData: PracticePlayerStat[] = [
+    { id: 65, name: "Yash", matchesPlayed: 1, runsScored: 18, oversBowled: 2.0, runsConceded: -1, wickets: 3, economy: -0.5, contribution: 19, potmCount: 1, role: "All-Rounder" },
+    { id: 27, name: "Himanshu Kalyani", matchesPlayed: 1, runsScored: 24, oversBowled: 2.0, runsConceded: 12, wickets: 2, economy: 6.0, contribution: 12, potmCount: 0, role: "All-Rounder" },
+    { id: 102, name: "Sahil", matchesPlayed: 1, runsScored: 14, oversBowled: 2.0, runsConceded: 4, wickets: 2, economy: 2.0, contribution: 10, potmCount: 0, role: "All-Rounder" },
+    { id: 101, name: "Deepak", matchesPlayed: 1, runsScored: 16, oversBowled: 2.0, runsConceded: 8, wickets: 2, economy: 4.0, contribution: 8, potmCount: 0, role: "Batter" },
+    { id: 36, name: "Manthan Shah", matchesPlayed: 1, runsScored: 16, oversBowled: 2.0, runsConceded: 10, wickets: 1, economy: 5.0, contribution: 6, potmCount: 0, role: "Batter" },
+    { id: 5, name: "Ankush Goel", matchesPlayed: 1, runsScored: 12, oversBowled: 2.0, runsConceded: 9, wickets: 1, economy: 4.5, contribution: 3, potmCount: 0, role: "Bowler" },
+    { id: 60, name: "Tejas Shah", matchesPlayed: 1, runsScored: 10, oversBowled: 2.0, runsConceded: 12, wickets: 0, economy: 6.0, contribution: -2, potmCount: 0, role: "Batter" },
+    { id: 103, name: "Akshay", matchesPlayed: 1, runsScored: 8, oversBowled: 2.0, runsConceded: 18, wickets: 0, economy: 9.0, contribution: -10, potmCount: 0, role: "Bowler" },
+    { id: 104, name: "Jigar", matchesPlayed: 1, runsScored: 6, oversBowled: 2.0, runsConceded: 20, wickets: 0, economy: 10.0, contribution: -14, potmCount: 0, role: "Batter" },
   ];
 
   return (
@@ -227,6 +240,23 @@ export default function TournamentZeroPage() {
             </Link>
           ))}
         </div>
+      </section>
+
+      {/* SECTION 3: PRACTICE PERFORMERS POINTS TABLE */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Trophy className="w-5 h-5 text-emerald-600" />
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+              Practice Performers Points Table
+            </h2>
+          </div>
+          <span className="text-xs text-slate-500 font-mono">
+            All Practice Players • Ranked by Net Contribution
+          </span>
+        </div>
+
+        <PracticePointsTable initialData={practiceStandingsData} />
       </section>
     </div>
   );

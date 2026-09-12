@@ -123,12 +123,18 @@ export async function validateOcrSanity() {
 
   if (!allPassed) {
     console.error("\n❌ SPAWTZ OCR SANITY CHECK FAILED");
-    process.exit(1);
+    if (require.main === module || process.argv[1]?.includes("validate-ocr-sanity")) {
+      process.exit(1);
+    }
+    return false;
   } else {
     console.log("\n==================================================");
     console.log("✅ ALL SPAWTZ OCR SANITY CHECKS PASSED!");
     console.log("==================================================");
-    process.exit(0);
+    if (require.main === module || process.argv[1]?.includes("validate-ocr-sanity")) {
+      process.exit(0);
+    }
+    return true;
   }
 }
 

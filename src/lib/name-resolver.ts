@@ -254,23 +254,63 @@ export async function resolveAllScorecardPlayers(scorecard: ParsedScorecard): Pr
     }
   }
 
-  // Clone scorecard and enrich player summaries with resolved names
+  // Clone scorecard and enrich player summaries and all skin/delivery structures with resolved canonical names
   const updatedScorecard = JSON.parse(JSON.stringify(scorecard)) as ParsedScorecard;
   updatedScorecard.nameResolutions = resolutions;
 
   const enrichSummaries = (summaries: typeof updatedScorecard.homeInnings.playerSummaries) => {
     summaries.forEach((p) => {
-      const match = resolutions[p.name.trim()];
-      if (match) {
-        p.resolvedPlayerId = match.matchedPlayerId;
+      const trimmed = p.name ? p.name.trim() : "";
+      const match = resolutions[trimmed];
+      if (match && match.matchedName) {
+        (p as any).rawName = p.name;
+        p.name = match.matchedName;
         p.canonicalName = match.matchedName;
+        p.resolvedPlayerId = match.matchedPlayerId;
         p.matchType = match.matchType;
       }
     });
   };
 
+  const enrichSkinsAndOvers = (skins: typeof updatedScorecard.homeInnings.skins) => {
+    skins.forEach((s) => {
+      if (s.batter1Name && resolutions[s.batter1Name.trim()]?.matchedName) {
+        (s as any).rawBatter1Name = s.batter1Name;
+        s.batter1Name = resolutions[s.batter1Name.trim()].matchedName;
+      }
+      if (s.batter2Name && resolutions[s.batter2Name.trim()]?.matchedName) {
+        (s as any).rawBatter2Name = s.batter2Name;
+        s.batter2Name = resolutions[s.batter2Name.trim()].matchedName;
+      }
+      s.overs?.forEach((o) => {
+        if (o.bowlerName && resolutions[o.bowlerName.trim()]?.matchedName) {
+          (o as any).rawBowlerName = o.bowlerName;
+          o.bowlerName = resolutions[o.bowlerName.trim()].matchedName;
+        }
+        o.balls?.forEach((b) => {
+          if (b.batterName && resolutions[b.batterName.trim()]?.matchedName) {
+            b.batterName = resolutions[b.batterName.trim()].matchedName;
+          }
+          if (b.bowlerName && resolutions[b.bowlerName.trim()]?.matchedName) {
+            b.bowlerName = resolutions[b.bowlerName.trim()].matchedName;
+          }
+        });
+        (o as any).deliveries?.forEach((d: any) => {
+          if (d.batterName && resolutions[d.batterName.trim()]?.matchedName) {
+            d.batterName = resolutions[d.batterName.trim()].matchedName;
+          }
+          if (d.bowlerName && resolutions[d.bowlerName.trim()]?.matchedName) {
+            d.bowlerName = resolutions[d.bowlerName.trim()].matchedName;
+          }
+        });
+      });
+    });
+  };
+
   enrichSummaries(updatedScorecard.homeInnings.playerSummaries);
   enrichSummaries(updatedScorecard.awayInnings.playerSummaries);
+  enrichSkinsAndOvers(updatedScorecard.homeInnings.skins);
+  enrichSkinsAndOvers(updatedScorecard.awayInnings.skins);
 
   return {
     scorecard: updatedScorecard,

@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import { RunsTrendChart, ContributionMomentumChart } from "./PlayerChart";
 import { getPlayerTacticalInfo } from "@/lib/player-tactical";
+import PlayerAvatar from "@/components/PlayerAvatar";
+import PlayerMatchHistoryTable, { MatchHistoryItem } from "./PlayerMatchHistoryTable";
 
 interface Props {
   params: { id: string };
@@ -36,7 +38,6 @@ export default async function PlayerProfilePage({ params }: Props) {
             },
           },
         },
-        orderBy: { match: { matchDate: "asc" } },
       },
       deliveriesFaced: true,
       deliveriesBowled: true,
@@ -84,7 +85,6 @@ export default async function PlayerProfilePage({ params }: Props) {
                     },
                   },
                 },
-                orderBy: { match: { matchDate: "asc" } },
               },
               deliveriesFaced: true,
               deliveriesBowled: true,
@@ -99,51 +99,71 @@ export default async function PlayerProfilePage({ params }: Props) {
 
   if (!player) notFound();
 
+  const hasMatchData = player.stats && player.stats.length > 0;
   const tactical = getPlayerTacticalInfo(player.canonicalName);
 
-  // Compute aggregate statistics
-  const totalMatches = player.stats.length || 6;
-  const totalRuns = player.stats.reduce((acc, s) => acc + s.runsScored, 0);
-  const totalWickets = player.stats.reduce((acc, s) => acc + s.wickets, 0);
-  const totalContribution = player.stats.reduce((acc, s) => acc + s.contribution, 0);
-  const potmCount = player.stats.filter((s) => s.isPotm).length;
-  const totalDismissals = 0; // In indoor cricket players bat for full skins
+  // Chronological sort: oldest to newest for charts (so latest match is on the far right)
+  const chronologicalStats = hasMatchData
+    ? [...player.stats].sort((a, b) => new Date(a.match.matchDate).getTime() - new Date(b.match.matchDate).getTime())
+    : [];
 
-  const bestPerformanceStat = player.stats.reduce(
-    (best, s) => (s.runsScored > best.runsScored ? s : best),
-    player.stats[0] || { runsScored: 18 }
-  );
-  const latestStat = player.stats[player.stats.length - 1] || { runsScored: 14 };
+  // Compute aggregate statistics (ZERO hallucination for 0-match players)
+  const totalMatches = player.stats.length;
+  const totalRuns = hasMatchData ? player.stats.reduce((acc, s) => acc + s.runsScored, 0) : 0;
+  const totalWickets = hasMatchData ? player.stats.reduce((acc, s) => acc + s.wickets, 0) : 0;
+  const totalContribution = hasMatchData ? player.stats.reduce((acc, s) => acc + s.contribution, 0) : 0;
+  const potmCount = hasMatchData ? player.stats.filter((s) => s.isPotm).length : 0;
+  const totalDismissals = hasMatchData && (player as any).deliveriesFaced
+    ? (player as any).deliveriesFaced.filter((d: any) => d.dismissalType || d.penaltyRuns < 0).length
+    : 0;
 
-  const last5Stats = player.stats.slice(-5);
+  const bestPerformanceStat = hasMatchData
+    ? player.stats.reduce((best, s) => (s.runsScored > best.runsScored ? s : best), player.stats[0])
+    : null;
+  const latestStat = hasMatchData
+    ? chronologicalStats[chronologicalStats.length - 1]
+    : null;
+
+  const last5Stats = chronologicalStats.slice(-5);
   const last5 = last5Stats.map((s) => s.contribution);
 
-  const dates = player.stats.map((s) => s.match.matchDate.split(",")[0].trim());
-  const runsArray = player.stats.map((s) => s.runsScored);
-  const contributionsArray = player.stats.map((s) => s.contribution);
+  const dates = chronologicalStats.map((s) => s.match.matchDate.split(",")[0].trim());
+  const runsArray = chronologicalStats.map((s) => s.runsScored);
+  const contributionsArray = chronologicalStats.map((s) => s.contribution);
 
   // Wickets impact sequence
-  const wicketMatches = player.stats.filter((s) => s.wickets > 0);
+  const wicketMatches = chronologicalStats.filter((s) => s.wickets > 0);
+
+  const matchHistoryItems: MatchHistoryItem[] = player.stats.map((s) => ({
+    id: s.id,
+    matchId: s.matchId,
+    matchDate: s.match.matchDate,
+    opponentTitle: s.match.homeTeam && s.match.awayTeam
+      ? `${s.match.homeTeam.name} vs ${s.match.awayTeam.name}`
+      : "Spawtz Match",
+    scorecardUrl: s.match.scorecardUrl,
+    runsScored: s.runsScored,
+    oversBowled: s.oversBowled,
+    runsConceded: s.runsConceded,
+    wickets: s.wickets,
+    economy: s.economy,
+    contribution: s.contribution,
+    isPotm: s.isPotm,
+    performanceNote: s.performanceNote,
+  }));
 
   return (
     <div className="space-y-6 pb-12 font-sans antialiased text-slate-800">
       {/* Top Profile Card (Exact replica of media_1789207004196.jpg) */}
       <div className="p-6 sm:p-8 rounded-3xl border border-slate-200/80 bg-white shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
-          {/* Avatar */}
-          <div className="relative h-20 w-20 sm:h-24 sm:w-24 rounded-2xl overflow-hidden shadow-xs border border-slate-200 bg-slate-100 flex items-center justify-center shrink-0">
-            {player.avatarUrl ? (
-              <img
-                src={player.avatarUrl}
-                alt={player.canonicalName}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="h-full w-full bg-gradient-to-br from-emerald-500 to-teal-700 text-white font-black text-2xl flex items-center justify-center">
-                {player.canonicalName.slice(0, 2).toUpperCase()}
-              </div>
-            )}
-          </div>
+          {/* Avatar with vector cricket iconography */}
+          <PlayerAvatar
+            name={player.canonicalName}
+            role={player.bowlingStyle || player.notes || "Cricket Player"}
+            size="xl"
+            showRoleBadge
+          />
 
           {/* Name & Badges */}
           <div className="space-y-2">
@@ -398,197 +418,222 @@ export default async function PlayerProfilePage({ params }: Props) {
       </div>
 
       {/* Row of 3 Cards (Exact replica of media_1789207004196.jpg) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        {/* Card 1: RUNS TREND */}
-        <div className="p-6 rounded-3xl border border-slate-200/80 bg-white shadow-xs flex flex-col justify-between space-y-4">
-          <div>
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <span className="text-sm">✏️</span>
-                <span className="text-xs font-black uppercase tracking-wider text-slate-900">
-                  Runs Trend
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-baseline justify-between mt-3">
-              <span className="text-2xl font-black text-slate-950 font-mono">
-                {totalRuns} <span className="text-xs font-semibold text-slate-500 font-sans">Total Runs</span>
-              </span>
-              <span className="text-xs font-bold text-rose-500 font-mono bg-rose-50 px-2 py-0.5 rounded-full">
-                Net change -4
-              </span>
-            </div>
-
-            {/* Curved Chart */}
-            <div className="pt-2">
-              <RunsTrendChart dates={dates} runs={runsArray} />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 pt-3 border-t border-slate-100 text-xs">
+      {hasMatchData ? (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+          {/* Card 1: RUNS TREND */}
+          <div className="p-6 rounded-3xl border border-slate-200/80 bg-white shadow-xs flex flex-col justify-between space-y-4">
             <div>
-              <span className="text-[10px] text-slate-400 font-bold uppercase block">
-                Best Performance
-              </span>
-              <span className="text-lg font-black text-emerald-600 font-mono">
-                {bestPerformanceStat.runsScored}
-              </span>
-              <span className="text-[11px] text-slate-500 block">vs VPGR</span>
-            </div>
-            <div>
-              <span className="text-[10px] text-slate-400 font-bold uppercase block">
-                Latest Performance
-              </span>
-              <span className="text-lg font-black text-slate-900 font-mono">
-                {latestStat.runsScored}
-              </span>
-              <span className="text-[11px] text-slate-500 block">vs Home</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 2: WICKETS (MATCH IMPACT) */}
-        <div className="p-6 rounded-3xl border border-slate-200/80 bg-white shadow-xs flex flex-col justify-between space-y-4">
-          <div>
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <span className="text-sm">⚡</span>
-                <span className="text-xs font-black uppercase tracking-wider text-slate-900">
-                  Wickets (Match Impact)
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-3">
-              <span className="text-2xl font-black text-purple-700 font-mono">
-                {totalWickets} <span className="text-xs font-semibold text-slate-500 font-sans">Total Wickets</span>
-              </span>
-            </div>
-
-            {/* Sequence Circles Flow */}
-            <div className="flex items-center justify-between gap-1 pt-6 pb-2 overflow-x-auto">
-              {wicketMatches.slice(-4).map((m, idx, arr) => (
-                <div key={idx} className="flex items-center gap-1.5 shrink-0">
-                  <div className="flex flex-col items-center">
-                    <div className="h-12 w-12 rounded-full bg-purple-100 text-purple-700 font-black text-lg flex items-center justify-center border-2 border-purple-200 shadow-2xs">
-                      {m.wickets}
-                    </div>
-                    <span className="text-[9px] font-bold text-slate-600 mt-1">
-                      {m.match.matchDate.split(",")[0].slice(0, 6)}
-                    </span>
-                    <span className="text-[8px] text-purple-600 font-medium">
-                      {m.wickets} Wickets
-                    </span>
-                  </div>
-                  {idx < arr.length - 1 && (
-                    <span className="text-purple-400 font-black text-sm mb-4">▶</span>
-                  )}
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">✏️</span>
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-900">
+                    Runs Trend
+                  </span>
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          <div className="pt-3 border-t border-slate-100">
-            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
-              Wicket Streak
-            </span>
-            <div className="flex items-center justify-between mt-1">
-              <span className="text-sm font-bold text-slate-900">
-                4 Matches with wickets
-              </span>
-              <span className="text-lg">🔥</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Card 3: CONTRIBUTION MOMENTUM */}
-        <div className="p-6 rounded-3xl border border-slate-200/80 bg-white shadow-xs flex flex-col justify-between space-y-4">
-          <div>
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <span className="text-sm">📈</span>
-                <span className="text-xs font-black uppercase tracking-wider text-slate-900">
-                  Contribution Momentum
+              <div className="flex items-baseline justify-between mt-3">
+                <span className="text-2xl font-black text-slate-950 font-mono">
+                  {totalRuns} <span className="text-xs font-semibold text-slate-500 font-sans">Total Runs</span>
                 </span>
+                <span className="text-xs font-bold text-emerald-600 font-mono bg-emerald-50 px-2 py-0.5 rounded-full">
+                  {totalMatches} Matches
+                </span>
+              </div>
+
+              {/* Curved Chart: Chronological (Oldest Left, Latest Right) */}
+              <div className="pt-2">
+                <RunsTrendChart dates={dates} runs={runsArray} />
               </div>
             </div>
 
-            <div className="mt-3">
-              <span className="text-2xl font-black text-emerald-600 font-mono">
-                {totalContribution > 0 ? `+${totalContribution}` : totalContribution}{" "}
-                <span className="text-xs font-semibold text-slate-500 font-sans">Total Contribution</span>
+            <div className="grid grid-cols-2 gap-2 pt-3 border-t border-slate-100 text-xs">
+              <div>
+                <span className="text-[10px] text-slate-400 font-bold uppercase block">
+                  Best Performance
+                </span>
+                <span className="text-lg font-black text-emerald-600 font-mono">
+                  {bestPerformanceStat?.runsScored ?? 0}
+                </span>
+                <span className="text-[11px] text-slate-500 block">Runs</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-slate-400 font-bold uppercase block">
+                  Latest Performance
+                </span>
+                <span className="text-lg font-black text-slate-900 font-mono">
+                  {latestStat?.runsScored ?? 0}
+                </span>
+                <span className="text-[11px] text-slate-500 block">Runs</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 2: WICKETS (MATCH IMPACT) */}
+          <div className="p-6 rounded-3xl border border-slate-200/80 bg-white shadow-xs flex flex-col justify-between space-y-4">
+            <div>
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">⚡</span>
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-900">
+                    Wickets (Match Impact)
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-3">
+                <span className="text-2xl font-black text-purple-700 font-mono">
+                  {totalWickets} <span className="text-xs font-semibold text-slate-500 font-sans">Total Wickets</span>
+                </span>
+              </div>
+
+              {/* Sequence Circles Flow */}
+              <div className="flex items-center justify-between gap-1 pt-6 pb-2 overflow-x-auto">
+                {wicketMatches.slice(-4).map((m, idx, arr) => (
+                  <div key={idx} className="flex items-center gap-1.5 shrink-0">
+                    <div className="flex flex-col items-center">
+                      <div className="h-12 w-12 rounded-full bg-purple-100 text-purple-700 font-black text-lg flex items-center justify-center border-2 border-purple-200 shadow-2xs">
+                        {m.wickets}
+                      </div>
+                      <span className="text-[9px] font-bold text-slate-600 mt-1">
+                        {m.match.matchDate.split(",")[0].slice(0, 6)}
+                      </span>
+                      <span className="text-[8px] text-purple-600 font-medium">
+                        {m.wickets} Wickets
+                      </span>
+                    </div>
+                    {idx < arr.length - 1 && (
+                      <span className="text-purple-400 font-black text-sm mb-4">▶</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-slate-100">
+              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">
+                Wicket Impact
+              </span>
+              <div className="flex items-center justify-between mt-1">
+                <span className="text-sm font-bold text-slate-900">
+                  {wicketMatches.length} Matches with wickets
+                </span>
+                <span className="text-lg">🔥</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 3: CONTRIBUTION MOMENTUM */}
+          <div className="p-6 rounded-3xl border border-slate-200/80 bg-white shadow-xs flex flex-col justify-between space-y-4">
+            <div>
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">📈</span>
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-900">
+                    Contribution Momentum
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-3">
+                <span className="text-2xl font-black text-emerald-600 font-mono">
+                  {totalContribution > 0 ? `+${totalContribution}` : totalContribution}{" "}
+                  <span className="text-xs font-semibold text-slate-500 font-sans">Total Contribution</span>
+                </span>
+              </div>
+
+              {/* Gradient Area Chart: Chronological (Oldest Left, Latest Right) */}
+              <div className="pt-2">
+                <ContributionMomentumChart dates={dates} contributions={contributionsArray} />
+              </div>
+            </div>
+
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+              <span className="text-xs text-slate-500 font-medium">Career Contribution</span>
+              <span className="text-xs font-black text-emerald-600 flex items-center gap-0.5">
+                <span>{totalContribution >= 0 ? "Positive Net" : "Negative Net"}</span>
               </span>
             </div>
-
-            {/* Gradient Area Chart */}
-            <div className="pt-2">
-              <ContributionMomentumChart dates={dates} contributions={contributionsArray} />
-            </div>
-          </div>
-
-          <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-            <span className="text-xs text-slate-500 font-medium">Momentum</span>
-            <span className="text-xs font-black text-emerald-600 flex items-center gap-0.5">
-              <span>Improving</span>
-              <span>^</span>
-            </span>
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="p-8 rounded-3xl border border-dashed border-slate-300 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs text-center space-y-3">
+          <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-500 mx-auto flex items-center justify-center">
+            <TrendingUp className="w-6 h-6" />
+          </div>
+          <h3 className="text-base font-bold text-slate-900 dark:text-white">
+            Minimum 1 match data required
+          </h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
+            Runs Trend, Wicket Sequences, and Contribution Momentum charts require at least 1 completed match scorecard to compute trends.
+          </p>
+        </div>
+      )}
 
       {/* Tactical Profile & Batting Synergy */}
-      <div className="p-6 rounded-3xl border border-purple-200/80 bg-purple-50/40 shadow-xs space-y-4">
-        <div className="flex items-center justify-between pb-2 border-b border-purple-200/60">
-          <div className="flex items-center gap-2">
-            <Shield className="h-4 w-4 text-purple-600" />
-            <span className="text-xs font-black uppercase tracking-wider text-purple-900">
-              Tactical Profile & Batting Synergy
-            </span>
-          </div>
-          <span className="text-[10px] font-bold text-purple-700 bg-white px-2.5 py-0.5 rounded-full border border-purple-200">
-            {tactical.tacticalRole}
-          </span>
-        </div>
-
-        <p className="text-xs text-purple-950 leading-relaxed font-medium">
-          {player.notes && !player.notes.includes("Tournament squad")
-            ? player.notes
-            : tactical.notes}
-        </p>
-
-        {/* Optimal Batting Partner Highlight */}
-        <div className="p-4 rounded-2xl bg-white border border-purple-200/70 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="space-y-0.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-              Optimal Batting Partner
-            </span>
-            <div className="text-xs font-bold text-slate-900 flex items-center gap-2">
-              <span>Partner: {tactical.optimalPartner}</span>
-              <span className="text-purple-600 font-mono font-black text-xs">
-                (+{tactical.netSkinAvg} Net Skin Avg)
+      {hasMatchData ? (
+        <div className="p-6 rounded-3xl border border-purple-200/80 bg-purple-50/40 shadow-xs space-y-4">
+          <div className="flex items-center justify-between pb-2 border-b border-purple-200/60">
+            <div className="flex items-center gap-2">
+              <Shield className="h-4 w-4 text-purple-600" />
+              <span className="text-xs font-black uppercase tracking-wider text-purple-900">
+                Tactical Profile & Batting Synergy
               </span>
             </div>
+            <span className="text-[10px] font-bold text-purple-700 bg-white px-2.5 py-0.5 rounded-full border border-purple-200">
+              {tactical.tacticalRole}
+            </span>
           </div>
-          <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs shrink-0 self-start sm:self-auto font-mono">
-            Synergy Uplift: +{tactical.synergyUplift} Runs
-          </span>
-        </div>
 
-        <div className="flex flex-wrap gap-2 pt-1">
-          <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white text-emerald-700 border border-emerald-200 shadow-2xs">
-            Optimal Batting Partner: {tactical.optimalPartner} — +{tactical.netSkinAvg} Net Skin Avg with +{tactical.synergyUplift} synergy uplift
-          </span>
-          <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white text-purple-700 border border-purple-200 shadow-2xs">
-            ⚡ Elite Boundary Threat in Skin Overs
-          </span>
-          <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white text-sky-700 border border-sky-200 shadow-2xs">
-            🎯 Death Overs Containment Specialist
-          </span>
-        </div>
-      </div>
+          <p className="text-xs text-purple-950 leading-relaxed font-medium">
+            {player.notes && !player.notes.includes("Tournament squad")
+              ? player.notes
+              : tactical.notes}
+          </p>
 
-      {/* Match History Table (Exact replica of media_1789207004196.jpg) */}
+          {/* Optimal Batting Partner Highlight */}
+          <div className="p-4 rounded-2xl bg-white border border-purple-200/70 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="space-y-0.5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                Optimal Batting Partner
+              </span>
+              <div className="text-xs font-bold text-slate-900 flex items-center gap-2">
+                <span>Partner: {tactical.optimalPartner}</span>
+                <span className="text-purple-600 font-mono font-black text-xs">
+                  (+{tactical.netSkinAvg} Net Skin Avg)
+                </span>
+              </div>
+            </div>
+            <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs shrink-0 self-start sm:self-auto font-mono">
+              Synergy Uplift: +{tactical.synergyUplift} Runs
+            </span>
+          </div>
+
+          <div className="flex flex-wrap gap-2 pt-1">
+            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white text-emerald-700 border border-emerald-200 shadow-2xs">
+              Optimal Batting Partner: {tactical.optimalPartner} — +{tactical.netSkinAvg} Net Skin Avg with +{tactical.synergyUplift} synergy uplift
+            </span>
+            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white text-purple-700 border border-purple-200 shadow-2xs">
+              ⚡ Elite Boundary Threat in Skin Overs
+            </span>
+            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white text-sky-700 border border-sky-200 shadow-2xs">
+              🎯 Death Overs Containment Specialist
+            </span>
+          </div>
+        </div>
+      ) : (
+        <div className="p-6 rounded-3xl border border-dashed border-purple-300 dark:border-purple-800 bg-purple-50/30 dark:bg-purple-950/20 text-center space-y-2">
+          <Shield className="w-6 h-6 text-purple-600 mx-auto" />
+          <h3 className="text-sm font-bold text-purple-950 dark:text-purple-200">
+            Minimum 1 match data required
+          </h3>
+          <p className="text-xs text-purple-800 dark:text-purple-300 max-w-md mx-auto">
+            Tactical Profile, Optimal Batting Partner Synergy, and Skin Net Ratings will be dynamically computed after {player.canonicalName} logs their first match.
+          </p>
+        </div>
+      )}
+
+      {/* Match History Table (In-line sortable, latest at top by default) */}
       <div className="p-6 rounded-3xl border border-slate-200/80 bg-white shadow-xs space-y-4 overflow-hidden">
         <div className="flex items-center justify-between pb-3 border-b border-slate-100">
           <div className="flex items-center gap-2">
@@ -598,139 +643,11 @@ export default async function PlayerProfilePage({ params }: Props) {
             </h2>
           </div>
           <span className="text-xs text-slate-400 font-semibold font-mono">
-            {player.stats.length} Matches Played
+            {totalMatches} {totalMatches === 1 ? "Match" : "Matches"} Played
           </span>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-slate-100 text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                <th className="py-2.5 px-3">Date</th>
-                <th className="py-2.5 px-3">Match</th>
-                <th className="py-2.5 px-3 text-center">RS</th>
-                <th className="py-2.5 px-3 text-center">OUT</th>
-                <th className="py-2.5 px-3 text-center">OB</th>
-                <th className="py-2.5 px-3 text-center">RC</th>
-                <th className="py-2.5 px-3 text-center">WKTS</th>
-                <th className="py-2.5 px-3 text-center">ECON</th>
-                <th className="py-2.5 px-3 text-center">C</th>
-                <th className="py-2.5 px-3 text-right">POTM</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 text-xs">
-              {player.stats.map((s) => {
-                const dateParts = s.match.matchDate.split(",")[0].trim().split(" ");
-                const day = dateParts[0] || "01";
-                const monthYear = dateParts.slice(1).join(" ") || "JUL 2026";
-                const isPotm = s.isPotm;
-
-                return (
-                  <tr
-                    key={s.id}
-                    className={`hover:bg-slate-50/80 transition ${
-                      isPotm ? "bg-amber-50/40" : ""
-                    }`}
-                  >
-                    {/* Date pill box */}
-                    <td className="py-3 px-3">
-                      <div className="h-11 w-14 rounded-xl border border-slate-200 bg-white flex flex-col items-center justify-center shadow-2xs">
-                        <span className="text-sm font-black text-slate-900 leading-none">
-                          {day}
-                        </span>
-                        <span className="text-[9px] font-bold text-slate-400 uppercase leading-tight mt-0.5">
-                          {monthYear}
-                        </span>
-                      </div>
-                    </td>
-
-                    {/* Match Name & Badges */}
-                    <td className="py-3 px-3">
-                      <div className="space-y-0.5">
-                        <div className="flex items-center gap-1.5">
-                          <span className="font-bold text-slate-900">
-                            {s.match.homeTeam && s.match.awayTeam
-                              ? `${s.match.homeTeam.name} vs ${s.match.awayTeam.name}`
-                              : "Spawtz League Match"}
-                          </span>
-                          {s.match.scorecardUrl && (
-                            <a
-                              href={s.match.scorecardUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="text-slate-400 hover:text-slate-700 transition"
-                              title="View Scorecard"
-                            >
-                              <FileText className="h-3.5 w-3.5" />
-                            </a>
-                          )}
-                        </div>
-                        {isPotm && (
-                          <span className="text-[11px] font-bold text-amber-600 block">
-                            ★ Player of the match!
-                          </span>
-                        )}
-                        {!isPotm && s.performanceNote && (
-                          <span className="text-[10px] text-slate-500 block">
-                            {s.performanceNote}
-                          </span>
-                        )}
-                      </div>
-                    </td>
-
-                    {/* RS */}
-                    <td className="py-3 px-3 text-center font-mono font-bold text-emerald-600 text-sm">
-                      {s.runsScored}
-                    </td>
-
-                    {/* OUT */}
-                    <td className="py-3 px-3 text-center font-mono text-slate-600">
-                      0
-                    </td>
-
-                    {/* OB */}
-                    <td className="py-3 px-3 text-center font-mono text-slate-600">
-                      {s.oversBowled.toFixed(1)}
-                    </td>
-
-                    {/* RC */}
-                    <td className="py-3 px-3 text-center font-mono text-slate-600">
-                      {s.runsConceded}
-                    </td>
-
-                    {/* WKTS */}
-                    <td className="py-3 px-3 text-center">
-                      <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-purple-100 text-purple-700 font-mono font-bold text-xs">
-                        {s.wickets}
-                      </span>
-                    </td>
-
-                    {/* ECON */}
-                    <td className="py-3 px-3 text-center font-mono text-slate-600">
-                      {s.economy.toFixed(2)}
-                    </td>
-
-                    {/* Contribution */}
-                    <td className="py-3 px-3 text-center font-mono font-black text-sm text-emerald-600">
-                      {s.contribution > 0 ? `+${s.contribution}` : s.contribution}
-                    </td>
-
-                    {/* POTM */}
-                    <td className="py-3 px-3 text-right">
-                      {isPotm ? (
-                        <span className="text-amber-500 font-black text-base" title="Player of the match">
-                          ★
-                        </span>
-                      ) : (
-                        <span className="text-slate-300 font-mono">—</span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <PlayerMatchHistoryTable matches={matchHistoryItems} />
       </div>
     </div>
   );

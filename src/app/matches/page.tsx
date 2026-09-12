@@ -117,10 +117,10 @@ export default async function MatchesPage() {
               <div className="flex items-center gap-2">
                 <MatchAnalysisButton matchId={m.id} />
                 <Link
-                  href={m.tournamentId === 0 ? "/admin/scorecards/1/review" : "/admin/scorecards/upload-demo-01/review"}
-                  className="font-semibold text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
+                  href={`/matches/${m.id}`}
+                  className="font-semibold text-slate-700 dark:text-slate-300 hover:text-emerald-600 flex items-center gap-1"
                 >
-                  <span>Scorecard Inspection</span>
+                  <span>Analysis Hub</span>
                   <ArrowRight className="h-3 w-3" />
                 </Link>
               </div>

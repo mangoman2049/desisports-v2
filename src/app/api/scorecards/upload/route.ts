@@ -7,6 +7,7 @@ import { resolveAllScorecardPlayers } from "@/lib/name-resolver";
 import { generateAndSaveMatchAnalysis } from "@/lib/match-analyzer";
 import fs from "fs/promises";
 import path from "path";
+import sharp from "sharp";
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,18 +21,36 @@ export async function POST(req: NextRequest) {
     let width = 1600;
     let height = 2844;
     let base64Image = "";
+    const uploadId = `sc-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+    const uploadDir = path.join(process.cwd(), "public", "uploads", "scorecards");
+    await fs.mkdir(uploadDir, { recursive: true });
 
     if (file && !forceSample) {
       const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      base64Image = buffer.toString("base64");
+      const rawBuffer = Buffer.from(bytes);
 
-      // Save file locally in public/uploads/scorecards
-      const filename = `upload-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, "_")}`;
-      const uploadDir = path.join(process.cwd(), "public", "uploads", "scorecards");
-      await fs.mkdir(uploadDir, { recursive: true });
+      // Optimize image with Sharp: Max 1800px, WebP Q75
+      const image = sharp(rawBuffer);
+      const meta = await image.metadata();
+      width = meta.width || 1600;
+      height = meta.height || 2844;
+
+      const optimizedBuffer = await sharp(rawBuffer)
+        .resize({
+          width: 1800,
+          height: 1800,
+          fit: "inside",
+          withoutEnlargement: true,
+        })
+        .webp({ quality: 75 })
+        .toBuffer();
+
+      base64Image = optimizedBuffer.toString("base64");
+
+      // Save optimized WebP file
+      const filename = `${uploadId}.webp`;
       const filePath = path.join(uploadDir, filename);
-      await fs.writeFile(filePath, buffer);
+      await fs.writeFile(filePath, optimizedBuffer);
       imageUrl = `/uploads/scorecards/${filename}`;
     }
 
@@ -51,12 +70,17 @@ export async function POST(req: NextRequest) {
     const { scorecard: reconciledScorecard, resolutions, matchedCount, unreconciledCount } =
       await resolveAllScorecardPlayers(parsed);
 
-    // DUPLICATE SCORECARD CHECK
+    const homeScore = reconciledScorecard.homeInnings.totalRuns || 0;
+    const awayScore = reconciledScorecard.awayInnings.totalRuns || 0;
+
+    // DUPLICATE SCORECARD CHECK - Matching Date/Time and 100% confidence Final Scores
     if (!forceDuplicate) {
       const duplicateCheck = await checkForDuplicateScorecard(
         reconciledScorecard.matchInfo.dateTime,
         reconciledScorecard.homeInnings.teamName,
-        reconciledScorecard.awayInnings.teamName
+        reconciledScorecard.awayInnings.teamName,
+        homeScore,
+        awayScore
       );
 
       if (duplicateCheck.isDuplicate) {
@@ -92,10 +116,42 @@ export async function POST(req: NextRequest) {
       parsedScorecard: reconciledScorecard,
     });
 
+    // Generate comprehensive, auditable JSON file for API/export
+    const auditableData = {
+      auditMetadata: {
+        uploadId: upload.id,
+        createdAt: new Date().toISOString(),
+        originalFilename: file ? file.name : "sample_spawtz_scorecard.jpg",
+        optimizedImageUrl: imageUrl,
+        imageDimensions: { width, height },
+        qualityScore: diagnostics.score,
+        validationScore: reconciledScorecard.validation.confidenceScore,
+        format: "Spawtz 16-Over Indoor Cricket Standard",
+      },
+      matchInfo: reconciledScorecard.matchInfo,
+      result: {
+        winner: homeScore > awayScore ? reconciledScorecard.homeInnings.teamName : reconciledScorecard.awayInnings.teamName,
+        homeTeam: reconciledScorecard.homeInnings.teamName,
+        homeScore,
+        awayTeam: reconciledScorecard.awayInnings.teamName,
+        awayScore,
+        margin: Math.abs(homeScore - awayScore),
+      },
+      nameResolutions: resolutions,
+      homeInnings: reconciledScorecard.homeInnings,
+      awayInnings: reconciledScorecard.awayInnings,
+      diagnostics,
+      tacticalAnalysisSummary: tacticalAnalysis.editorHeadline,
+    };
+
+    const auditableJsonPath = path.join(uploadDir, `${upload.id}.json`);
+    await fs.writeFile(auditableJsonPath, JSON.stringify(auditableData, null, 2), "utf8");
+
     return NextResponse.json({
       success: true,
       uploadId: upload.id,
       imageUrl,
+      auditableJsonUrl: `/api/scorecards/${upload.id}/json`,
       diagnostics,
       parsedScorecard: reconciledScorecard,
       resolutions,

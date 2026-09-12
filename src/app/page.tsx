@@ -36,18 +36,18 @@ export default function HomePage() {
             <span>Scan Scorecard (Admin Flow)</span>
           </Link>
           <Link
-            href="/captain"
+            href="/tournaments"
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow transition"
           >
-            <Shield className="h-4 w-4" />
-            <span>Captain Insights (32 Metrics)</span>
+            <Trophy className="h-4 w-4" />
+            <span>Tournaments & Leaderboards</span>
           </Link>
           <Link
             href="/player/35"
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 text-white font-bold text-xs shadow transition border border-slate-700"
           >
             <Users className="h-4 w-4" />
-            <span>Manish Pandey Profile (V1 Retained + V3)</span>
+            <span>Player Profiles</span>
           </Link>
         </div>
       </div>
@@ -69,10 +69,10 @@ export default function HomePage() {
           </div>
 
           <Link
-            href="/admin/scorecards/new"
+            href="/tournaments/upload"
             className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline pt-2"
           >
-            <span>Launch Admin Flow</span>
+            <span>Scan Scorecard</span>
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
@@ -84,10 +84,10 @@ export default function HomePage() {
               <Users className="h-5 w-5" />
             </div>
             <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-              2. Player Performance & Granular V3 Insights
+              2. Player Performance & Tactical DNA
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-              100% of retained KPIs from desisports.milanchheda.com: contribution score, form chips, match history table, multi-series charts, plus ball-by-ball boundary rates and dismissal profiles.
+              Complete player KPIs: contribution score, form chips, chronological match history table, multi-series charts, ball-by-ball boundary rates, and optimal batting partner synergies.
             </p>
           </div>
 
@@ -95,30 +95,30 @@ export default function HomePage() {
             href="/player/35"
             className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:underline pt-2"
           >
-            <span>View Manish Pandey</span>
+            <span>View Player Profile</span>
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
 
-        {/* Module 3: Captain Command Center */}
+        {/* Module 3: Tournaments & Team DNA */}
         <div className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex flex-col justify-between space-y-4">
           <div className="space-y-3">
             <div className="h-10 w-10 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold">
-              <Shield className="h-5 w-5" />
+              <Trophy className="h-5 w-5" />
             </div>
             <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-              3. Captain Squad Intel & 32 Tactical Insights
+              3. Tournaments, Standings & Match Analyses
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-              Evidence-led combination insights across Batting, Bowling, Pairs, and Match Decisions. Optimal batting order generator, 16-over bowling quotas, and LiteLLM tactical memos.
+              Official tournament standings, squad registrations, Team DNA™ radar ratings, skin-by-skin breakdowns, and sports editor post-match analytical reviews for every fixture.
             </p>
           </div>
 
           <Link
-            href="/captain"
+            href="/tournaments"
             className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-600 dark:text-purple-400 hover:underline pt-2"
           >
-            <span>Enter Captain Area</span>
+            <span>Explore Tournaments</span>
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>

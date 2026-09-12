@@ -15,6 +15,10 @@ import {
   Sparkles,
   ClipboardList,
   Compass,
+  Share2,
+  Printer,
+  ExternalLink,
+  Check,
 } from "lucide-react";
 import { MatchTacticalAnalysis } from "@/lib/match-analyses";
 
@@ -25,6 +29,7 @@ interface Props {
 
 export default function MatchAnalysisModal({ analysis, onClose }: Props) {
   const [activeTab, setActiveTab] = useState<"coach" | "summary">("coach");
+  const [copied, setCopied] = useState(false);
 
   const verdict =
     analysis.matchVerdict?.verdict ||
@@ -135,13 +140,61 @@ export default function MatchAnalysisModal({ analysis, onClose }: Props) {
               </div>
             </div>
 
-            <button
-              onClick={onClose}
-              className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition shrink-0 cursor-pointer"
-              title="Close"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                onClick={async () => {
+                  const matchUrl = `${window.location.origin}/matches/${analysis.matchId}`;
+                  if (navigator.share) {
+                    try {
+                      await navigator.share({
+                        title: `${analysis.matchTitle} — Analysis`,
+                        text: analysis.editorHeadline,
+                        url: matchUrl,
+                      });
+                      return;
+                    } catch {}
+                  }
+                  if (navigator.clipboard) {
+                    await navigator.clipboard.writeText(matchUrl);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer"
+                title="Share Match Analysis"
+              >
+                {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Share2 className="w-3.5 h-3.5 text-slate-500" />}
+                <span className="hidden sm:inline">{copied ? "Copied!" : "Share"}</span>
+              </button>
+
+              <button
+                onClick={() => window.print()}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer"
+                title="Download / Print PDF"
+              >
+                <Printer className="w-3.5 h-3.5 text-slate-500" />
+                <span className="hidden sm:inline">PDF</span>
+              </button>
+
+              <a
+                href={`/matches/${analysis.matchId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+                title="Open Dedicated Match Page"
+              >
+                <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
+                <span className="hidden sm:inline">Open</span>
+              </a>
+
+              <button
+                onClick={onClose}
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer ml-1"
+                title="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
           {/* Navigation Tabs */}

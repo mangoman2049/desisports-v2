@@ -302,17 +302,34 @@ export async function generateMatchAnalysisWithLLM(
  * Grounded deterministic analysis generator matching the exact 11-section prompt
  */
 export function generateDeterministicMatchAnalysis(
-  matchId: number | string,
+  matchId: number | string | undefined,
   scorecard: any
 ): MatchTacticalAnalysis {
-  // If already seeded in MATCH_ANALYSES, retrieve base data
-  const existing = MATCH_ANALYSES[String(matchId)];
-  if (existing && existing.matchVerdict) {
-    return existing;
+  // If matchId is provided AND already seeded in MATCH_ANALYSES, only return it if the teams match!
+  if (matchId !== undefined) {
+    const existing = MATCH_ANALYSES[String(matchId)];
+    if (existing && existing.matchVerdict) {
+      const homeTeam = (scorecard?.homeInnings?.teamName || "").toLowerCase();
+      const awayTeam = (scorecard?.awayInnings?.teamName || "").toLowerCase();
+      const winTeam = (existing.winner || "").toLowerCase();
+      const loseTeam = (existing.loser || "").toLowerCase();
+
+      // Ensure strict match isolation: only use pre-seeded analysis if this scorecard matches
+      const isMatchMatch =
+        !homeTeam ||
+        (winTeam && homeTeam.includes(winTeam.slice(0, 4))) ||
+        (loseTeam && homeTeam.includes(loseTeam.slice(0, 4))) ||
+        (winTeam && awayTeam.includes(winTeam.slice(0, 4))) ||
+        (loseTeam && awayTeam.includes(loseTeam.slice(0, 4)));
+
+      if (isMatchMatch) {
+        return existing;
+      }
+    }
   }
 
-  const home = scorecard.homeInnings || {};
-  const away = scorecard.awayInnings || {};
+  const home = scorecard?.homeInnings || {};
+  const away = scorecard?.awayInnings || {};
   const homeRuns = home.totalRuns || 0;
   const awayRuns = away.totalRuns || 0;
   const isHomeWinner = homeRuns >= awayRuns;
@@ -329,7 +346,7 @@ export function generateDeterministicMatchAnalysis(
   const skinsWonLoser = 4 - skinsWonWinner;
 
   return {
-    matchId,
+    matchId: matchId ?? "preview",
     tournamentName: scorecard.matchInfo?.tournamentName || "Desi Boys Tournament May 2026",
     matchTitle: `${winnerName} vs ${loserName}`,
     date: scorecard.matchInfo?.dateTime || "Recent Match",
@@ -410,62 +427,39 @@ export function generateDeterministicMatchAnalysis(
       },
     ],
     skinsAnalysisDetailed: {
-      pairs: [
-        {
-          pairNumber: 1,
-          winnerPair: "Opening Pair",
-          winnerRuns: 28,
-          winnerDismissals: 1,
-          loserPair: "Opposition Pair 1",
-          loserRuns: 20,
-          loserDismissals: 2,
-          skinMargin: 8,
-          skinWinner: winnerName,
-          analysis: "Strong powerplay execution with aggressive running between wickets.",
-        },
-        {
-          pairNumber: 2,
-          winnerPair: "Middle Pair A",
-          winnerRuns: 25,
-          winnerDismissals: 0,
-          loserPair: "Opposition Pair 2",
-          loserRuns: 16,
-          loserDismissals: 2,
-          skinMargin: 9,
-          skinWinner: winnerName,
-          analysis: "Flawless dismissal mitigation; zero wickets lost across all 4 overs.",
-        },
-        {
-          pairNumber: 3,
-          winnerPair: "Middle Pair B",
-          winnerRuns: 26,
-          winnerDismissals: 1,
-          loserPair: "Opposition Pair 3",
-          loserRuns: 18,
-          loserDismissals: 2,
-          skinMargin: 8,
-          skinWinner: winnerName,
-          analysis: "Exploited opposition backup bowling with sharp 2-run calls into the side nets.",
-        },
-        {
-          pairNumber: 4,
-          winnerPair: "Anchor Pair",
-          winnerRuns: 28,
-          winnerDismissals: 1,
-          loserPair: "Opposition Pair 4",
-          loserRuns: 22,
-          loserDismissals: 2,
-          skinMargin: 6,
-          skinWinner: winnerName,
-          analysis: "Closed out the match by protecting the existing lead with low-risk ground strokes.",
-        },
-      ],
-      skinsStory: `${winnerName} demonstrated sustained superiority across all four partnerships, winning three skins cleanly. The victory was built progressively rather than relying on a solitary burst.`,
+      pairs: [1, 2, 3, 4].map((num) => {
+        const ws = (winnerInnings.skins || [])[num - 1] || {};
+        const ls = (loserInnings.skins || [])[num - 1] || {};
+        const wRuns = ws.totalScore ?? ws.totalRuns ?? (22 + num * 2);
+        const lRuns = ls.totalScore ?? ls.totalRuns ?? (15 + num * 2);
+        const wDismissals = ws.wickets ?? 1;
+        const lDismissals = ls.wickets ?? 2;
+        const margin = wRuns - lRuns;
+        const wPair = ws.batter1Name && ws.batter2Name ? `${ws.batter1Name} & ${ws.batter2Name}` : `Skin ${num} Pair (${winnerName})`;
+        const lPair = ls.batter1Name && ls.batter2Name ? `${ls.batter1Name} & ${ls.batter2Name}` : `Skin ${num} Pair (${loserName})`;
+        const isWWin = margin >= 0;
+
+        return {
+          pairNumber: num,
+          winnerPair: wPair,
+          winnerRuns: wRuns,
+          winnerDismissals: wDismissals,
+          loserPair: lPair,
+          loserRuns: lRuns,
+          loserDismissals: lDismissals,
+          skinMargin: Math.abs(margin),
+          skinWinner: isWWin ? winnerName : loserName,
+          analysis: isWWin
+            ? `${wPair} won Skin ${num} by +${margin} runs, holding dismissals to ${wDismissals}.`
+            : `${lPair} fought back to take Skin ${num} by +${Math.abs(margin)} runs.`,
+        };
+      }),
+      skinsStory: `${winnerName} demonstrated sustained superiority across four partnerships, winning ${skinsWonWinner} skins cleanly through disciplined running.`,
     },
     turningPointDetailed: {
-      matchStateBefore: `${loserName} was trailing by only 4 runs entering the second skin.`,
-      event: `${winnerName}'s bowlers forced consecutive wickets in Over 6 and 7, imposing a -10 run penalty.`,
-      matchStateAfter: `${loserName}'s skin total dropped into negative territory, opening a 17-run chasm.`,
+      matchStateBefore: `${loserName} was trailing entering the second skin.`,
+      event: `${winnerName}'s bowlers forced consecutive wickets in middle overs, imposing penalty runs.`,
+      matchStateAfter: `${loserName}'s skin total dropped into negative territory, opening a decisive cushion.`,
       whyItMattered: "Demoralized the batting side and forced them into panic boundary hitting.",
     },
     fatalMistake: {
@@ -474,17 +468,23 @@ export function generateDeterministicMatchAnalysis(
     },
     playerImpact: [
       {
-        player: isHomeWinner ? home.playerSummaries?.[0]?.name || "Key Batter" : away.playerSummaries?.[0]?.name || "Key Batter",
+        player:
+          (winnerInnings.playerSummaries || []).slice().sort((a: any, b: any) => (b.runsScored || 0) - (a.runsScored || 0))[0]?.name ||
+          (winnerInnings.playerSummaries?.[0]?.name ?? "Key Batter"),
         label: "MATCH WINNER",
-        explanation: "Anchored the highest-scoring skin with disciplined running and boundary hitting.",
+        explanation: "Anchored the team's highest-scoring skin with disciplined running and boundary hitting.",
       },
       {
-        player: isHomeWinner ? home.playerSummaries?.[1]?.name || "Strike Bowler" : away.playerSummaries?.[1]?.name || "Strike Bowler",
+        player:
+          (winnerInnings.playerSummaries || []).slice().sort((a: any, b: any) => (b.wickets || 0) - (a.wickets || 0))[0]?.name ||
+          (winnerInnings.playerSummaries?.[1]?.name ?? "Strike Bowler"),
         label: "PARTNERSHIP BREAKER",
         explanation: "Took multiple wickets in middle overs to break the opposition's momentum.",
       },
       {
-        player: isHomeWinner ? away.playerSummaries?.[0]?.name || "Opp Leader" : home.playerSummaries?.[0]?.name || "Opp Leader",
+        player:
+          (loserInnings.playerSummaries || []).slice().sort((a: any, b: any) => (b.contribution || 0) - (a.contribution || 0))[0]?.name ||
+          (loserInnings.playerSummaries?.[0]?.name ?? "Opp Leader"),
         label: "SILENT CONTRIBUTOR",
         explanation: "Battled hard with positive contribution despite team-wide middle skin collapse.",
       },
@@ -588,7 +588,7 @@ export async function generateAndSaveMatchAnalysis(params: {
 
   // 2. Generate analysis via LiteLLM if available, otherwise deterministic
   const llmResult = await generateMatchAnalysisWithLLM(parsedScorecard);
-  const baseDeterministic = generateDeterministicMatchAnalysis(matchId || 1, parsedScorecard);
+  const baseDeterministic = generateDeterministicMatchAnalysis(matchId, parsedScorecard);
 
   const finalAnalysis: MatchTacticalAnalysis = {
     ...baseDeterministic,
