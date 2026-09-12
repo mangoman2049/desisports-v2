@@ -1,0 +1,176 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  role      String   @default("REVIEWER") // ADMIN, CAPTAIN, REVIEWER
+  createdAt DateTime @default(now())
+}
+
+model Player {
+  id               Int                @id @default(autoincrement())
+  canonicalName    String             @unique
+  battingHand      String?            // Left Hand, Right Hand
+  bowlingStyle     String?            // Right Arm Off Spin, Right Arm Medium, etc.
+  fieldingPosition String?            // Cover, Wicket Keeper, Left Sweeper, etc.
+  captainTags      String?            // JSON: ["Aggressive", "Anchor", "Clutch Bowler"]
+  notes            String?
+  aliases          PlayerAlias[]
+  stats            PlayerMatchStat[]
+  deliveriesFaced  DeliveryEvent[]    @relation("BatterDeliveries")
+  deliveriesBowled DeliveryEvent[]    @relation("BowlerDeliveries")
+  potmMatches      Match[]            @relation("PotmPlayer")
+  skinBatter1      Skin[]             @relation("SkinBatter1")
+  skinBatter2      Skin[]             @relation("SkinBatter2")
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+}
+
+model PlayerAlias {
+  id         Int      @id @default(autoincrement())
+  alias      String   @unique
+  playerId   Int
+  player     Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  confidence Float    @default(1.0)
+  status     String   @default("APPROVED") // PENDING, APPROVED, REVERSED
+  approvedBy String?
+  createdAt  DateTime @default(now())
+}
+
+model Tournament {
+  id        Int      @id @default(autoincrement())
+  name      String
+  startDate DateTime?
+  status    String   @default("ACTIVE")
+  matches   Match[]
+}
+
+model Team {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  code        String?
+  homeMatches Match[]  @relation("HomeTeam")
+  awayMatches Match[]  @relation("AwayTeam")
+}
+
+model Match {
+  id           Int                @id @default(autoincrement())
+  matchDate    String             // e.g. "09 Sep 2026, 20:17"
+  tournamentId Int?
+  tournament   Tournament?        @relation(fields: [tournamentId], references: [id])
+  homeTeamId   Int
+  homeTeam     Team               @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeamId   Int
+  awayTeam     Team               @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  homeScore    Int                @default(0)
+  awayScore    Int                @default(0)
+  homeSkins    Int                @default(0)
+  awaySkins    Int                @default(0)
+  potmPlayerId Int?
+  potmPlayer   Player?            @relation("PotmPlayer", fields: [potmPlayerId], references: [id])
+  status       String             @default("COMPLETED") // YET_TO_PLAY, COMPLETED
+  umpire       String?
+  scorecardUrl String?
+  innings      Innings[]
+  playerStats  PlayerMatchStat[]
+  uploads      ScorecardUpload[]
+  createdAt    DateTime           @default(now())
+}
+
+model Innings {
+  id            Int             @id @default(autoincrement())
+  matchId       Int
+  match         Match           @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  inningsNumber Int             // 1 (Home) or 2 (Away)
+  teamId        Int
+  totalRuns     Int             @default(0)
+  skins         Skin[]
+  deliveries    DeliveryEvent[]
+}
+
+model Skin {
+  id          Int             @id @default(autoincrement())
+  inningsId   Int
+  innings     Innings         @relation(fields: [inningsId], references: [id], onDelete: Cascade)
+  skinNumber  Int             // 1, 2, 3, 4
+  batter1Id   Int?
+  batter2Id   Int?
+  batter1     Player?         @relation("SkinBatter1", fields: [batter1Id], references: [id])
+  batter2     Player?         @relation("SkinBatter2", fields: [batter2Id], references: [id])
+  runs        Int             @default(0)
+  wickets     Int             @default(0)
+  won         Boolean         @default(false)
+  deliveries  DeliveryEvent[]
+}
+
+model DeliveryEvent {
+  id               Int      @id @default(autoincrement())
+  inningsId        Int
+  innings          Innings  @relation(fields: [inningsId], references: [id], onDelete: Cascade)
+  skinId           Int
+  skin             Skin     @relation(fields: [skinId], references: [id], onDelete: Cascade)
+  overNumber       Int      // 1 to 16
+  ballNumber       Int      // 1 to 6+
+  batterId         Int?
+  batter           Player?  @relation("BatterDeliveries", fields: [batterId], references: [id])
+  bowlerId         Int?
+  bowler           Player?  @relation("BowlerDeliveries", fields: [bowlerId], references: [id])
+  runsScored       Int      @default(0)
+  extrasType       String?  // W (Wide), NB (No Ball), LS (Leg side bye)
+  dismissalType    String?  // C (Caught), B (Bowled), RO (Run out), ST (Stumped), LBW, HW, M (Mankad)
+  penaltyRuns      Int      @default(0) // -5 if dismissal
+  rawToken         String?  // e.g. "2", "(R)", "W", "NB", "5"
+  confidence       Float    @default(1.0)
+  flaggedForReview Boolean  @default(false)
+}
+
+model PlayerMatchStat {
+  id              Int      @id @default(autoincrement())
+  matchId         Int
+  match           Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  playerId        Int
+  player          Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  teamId          Int
+  runsScored      Int      @default(0) // RS
+  oversBowled     Float    @default(0.0) // OB
+  runsConceded    Int      @default(0) // RC
+  wickets         Int      @default(0) // Wkts
+  economy         Float    @default(0.0) // Econ
+  contribution    Int      @default(0) // C = RS - RC
+  isPotm          Boolean  @default(false)
+  performanceNote String?  // e.g. "⚡ Excellent economy", "⭐ Excellent batting — not out!"
+}
+
+model ScorecardUpload {
+  id                 String               @id @default(cuid())
+  matchId            Int?
+  match              Match?               @relation(fields: [matchId], references: [id])
+  filename           String
+  imageUrl           String
+  status             String               @default("PENDING_REVIEW") // PENDING_REVIEW, APPROVED, REJECTED
+  qualityScore       Float                @default(1.0)
+  qualityDiagnostics String?              // JSON
+  rawExtraction      String?              // JSON
+  reconciledData     String?              // JSON
+  validationScore    Float                @default(0.0) // 0-100% confidence
+  createdAt          DateTime             @default(now())
+  revisions          ExtractionRevision[]
+}
+
+model ExtractionRevision {
+  id              Int             @id @default(autoincrement())
+  uploadId        String
+  upload          ScorecardUpload @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  reviewerId      String?
+  diffJson        String?
+  validationScore Float
+  approvedAt      DateTime        @default(now())
+}
