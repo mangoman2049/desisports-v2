@@ -1,9 +1,10 @@
 # Multi-stage Dockerfile for DesiSports V2
 FROM node:20-alpine AS base
+RUN apk add --no-cache libc6-compat openssl
+WORKDIR /app
 
 # Step 1: Install dependencies
 FROM base AS deps
-RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
