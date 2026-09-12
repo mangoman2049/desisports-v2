@@ -1,4 +1,8 @@
-import { getSampleScorecardExtraction } from "../src/lib/extractor-service";
+import {
+  getSampleScorecardExtraction,
+  get10SepScorecardExtraction,
+  parseDateFromMatchTitle,
+} from "../src/lib/extractor-service";
 import { validateIndoorCricketScorecard } from "../src/lib/rules-engine";
 import { evaluateQualityGate } from "../src/lib/quality-gate";
 import { checkForDuplicateScorecard } from "../src/lib/duplicate-detector";
@@ -66,7 +70,14 @@ async function runTestSuite() {
     passedAll = false;
   }
 
-  const blurryGate = evaluateQualityGate(800, 600, {
+  const mobileGate = evaluateQualityGate(960, 1280);
+  console.log(`- Mobile photo capture (960x1280) pass: ${mobileGate.overallPass} (Score: ${mobileGate.score}%)`);
+  if (!mobileGate.overallPass || mobileGate.score < 90) {
+    console.error("FAIL: Standard mobile phone photo (960x1280) should pass quality gate with >=90%");
+    passedAll = false;
+  }
+
+  const blurryGate = evaluateQualityGate(500, 400, {
     meanLuminosity: 50,
     specularFraction: 0.15,
     laplacianVariance: 60,
@@ -112,6 +123,35 @@ async function runTestSuite() {
       passedAll = false;
     } else {
       console.log("PASS: Rematch correctly allowed because final scores differed.");
+    }
+
+    // Brand new 10 September match (117-49) -> NOT DUPLICATE!
+    const sep10Sample = get10SepScorecardExtraction();
+    const sep10Report = validateIndoorCricketScorecard(sep10Sample);
+    console.log(`- 10-Sept Scorecard Validation: passed=${sep10Report.passed}, score=${sep10Report.confidenceScore}%`);
+    if (!sep10Report.passed || sep10Sample.homeInnings.totalRuns !== 117 || sep10Sample.awayInnings.totalRuns !== 49) {
+      console.error("FAIL: 10-Sept scorecard does not match 117-49 or validation failed");
+      passedAll = false;
+    }
+
+    const sep10DupCheck = await checkForDuplicateScorecard(
+      sep10Sample.matchInfo.dateTime,
+      sep10Sample.homeInnings.teamName,
+      sep10Sample.awayInnings.teamName,
+      sep10Sample.homeInnings.totalRuns,
+      sep10Sample.awayInnings.totalRuns
+    );
+    console.log(`- 10-Sept Brand New Match Duplicate Check: ${sep10DupCheck.isDuplicate}`);
+    if (sep10DupCheck.isDuplicate) {
+      console.error("FAIL: 10-Sept match falsely flagged as duplicate!");
+      passedAll = false;
+    }
+
+    const parsed12Sep = parseDateFromMatchTitle("12Sep2026_Insportz_2339");
+    console.log(`- Derived date from title: ${parsed12Sep}`);
+    if (parsed12Sep !== "12 September 2026, 23:39") {
+      console.error(`FAIL: Expected '12 September 2026, 23:39', got '${parsed12Sep}'`);
+      passedAll = false;
     }
 
     const nonDupCheck = await checkForDuplicateScorecard(

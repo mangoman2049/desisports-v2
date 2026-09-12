@@ -112,6 +112,7 @@ export interface ParsedScorecard {
     court?: string;
     umpire?: string;
     potm?: string;
+    tournamentId?: number;
   };
   skinsSummary: {
     home: { skins: number[]; total: number; skinsWon: number };

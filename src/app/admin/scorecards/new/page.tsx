@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useRef, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Camera,
@@ -15,6 +15,7 @@ import {
   ArrowRight,
   ShieldAlert,
   ExternalLink,
+  Trophy,
 } from "lucide-react";
 import { analyzeBrowserImage } from "@/lib/quality-gate";
 import { QualityDiagnostics } from "@/types/cricket";
@@ -31,10 +32,22 @@ function getDefaultMatchTitle(): string {
 }
 
 export default function NewScorecardPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-xs text-slate-500">Loading scorecard intake…</div>}>
+      <NewScorecardContent />
+    </Suspense>
+  );
+}
+
+function NewScorecardContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialTournament = searchParams.get("tournamentId") || "0";
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
+  const [tournamentId, setTournamentId] = useState<string>(initialTournament);
   const [matchTitle, setMatchTitle] = useState<string>(getDefaultMatchTitle());
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -48,16 +61,28 @@ export default function NewScorecardPage() {
     existingUploadId?: string;
   } | null>(null);
 
+  // Sync tournamentId if query changes
+  useEffect(() => {
+    const tId = searchParams.get("tournamentId");
+    if (tId) setTournamentId(tId);
+  }, [searchParams]);
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // 1. Immediately flush all previous diagnostics, error messages, and duplicate alerts
+    setQualityDiagnostics(null);
+    setErrorMessage(null);
+    setDuplicateAlert(null);
+
     setSelectedFile(file);
     const objectUrl = URL.createObjectURL(file);
     setPreviewUrl(objectUrl);
-    setErrorMessage(null);
-    setDuplicateAlert(null);
     setAnalyzingQuality(true);
+
+    // 2. Clear input value so selecting the same camera file name triggers onChange reliably
+    e.target.value = "";
 
     try {
       const result = await analyzeBrowserImage(file);
@@ -118,6 +143,7 @@ export default function NewScorecardPage() {
       if (matchTitle) {
         formData.append("matchTitle", matchTitle);
       }
+      formData.append("tournamentId", tournamentId);
 
       const res = await fetch("/api/scorecards/upload", {
         method: "POST",
@@ -153,14 +179,14 @@ export default function NewScorecardPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      {/* Header */}
+      {/* Header with Tournament Context */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/20">
-              Admin Intake Flow
+              Tournament Intake Flow
             </span>
-            <span className="text-xs font-mono text-slate-500">Duplicate Check & Quality Gate Active</span>
+            <span className="text-xs font-mono text-slate-500">Quality Gate & Duplicate Guard Active</span>
           </div>
           <h1 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
             Scan & Reconcile Scorecard
@@ -170,18 +196,33 @@ export default function NewScorecardPage() {
           </p>
         </div>
 
-        <button
-          onClick={handleLoadSample}
-          className="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 transition self-start sm:self-auto"
-        >
-          <Zap className="h-3.5 w-3.5 text-amber-500" />
-          <span>Load 09 Sep Sample Sheet</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-auto">
+          {/* Tournament Context Dropdown */}
+          <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
+            <Trophy className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
+            <select
+              value={tournamentId}
+              onChange={(e) => setTournamentId(e.target.value)}
+              className="bg-transparent font-bold text-slate-900 dark:text-white focus:outline-none cursor-pointer"
+            >
+              <option value="0" className="text-slate-900">Desisports Regular Practice (#0)</option>
+              <option value="1" className="text-slate-900">Desi Boys Tournament May 2026 (#1)</option>
+            </select>
+          </div>
+
+          <button
+            onClick={handleLoadSample}
+            className="flex items-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 transition"
+          >
+            <Zap className="h-3.5 w-3.5 text-amber-500" />
+            <span>Load 09 Sep Sample</span>
+          </button>
+        </div>
       </div>
 
       {/* Duplicate Alert Banner */}
       {duplicateAlert && (
-        <div className="p-4 rounded-xl border border-amber-500/40 bg-amber-50/80 dark:bg-amber-950/30 text-amber-900 dark:text-amber-200 space-y-3">
+        <div className="p-4 rounded-xl border border-amber-500/40 bg-amber-50/80 dark:bg-amber-950/30 text-amber-900 dark:text-amber-200 space-y-3 shadow-sm">
           <div className="flex items-start gap-2.5">
             <ShieldAlert className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
             <div className="space-y-1">
@@ -205,9 +246,9 @@ export default function NewScorecardPage() {
 
             <button
               onClick={() => handleProceedToExtraction(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white transition"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition shadow-sm font-bold"
             >
-              <span>Overwrite / Ingest New Revision</span>
+              <span>Proceed with Upload (New Match / Override)</span>
             </button>
 
             <button
@@ -301,6 +342,7 @@ export default function NewScorecardPage() {
                   setSelectedFile(null);
                   setQualityDiagnostics(null);
                   setDuplicateAlert(null);
+                  setErrorMessage(null);
                 }}
                 className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-medium text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-lg transition"
               >

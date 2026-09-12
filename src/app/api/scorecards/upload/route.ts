@@ -17,6 +17,8 @@ export async function POST(req: NextRequest) {
     const forceSample = formData.get("forceSample") === "true";
     const forceDuplicate = formData.get("forceDuplicate") === "true";
     const matchTitle = (formData.get("matchTitle") as string) || undefined;
+    const tournamentIdRaw = formData.get("tournamentId") as string | null;
+    const tournamentId = tournamentIdRaw ? parseInt(tournamentIdRaw, 10) : 0;
 
     let imageUrl = "/uploads/scorecards/sample-scorecard.jpg";
     let width = 1600;
@@ -51,13 +53,20 @@ export async function POST(req: NextRequest) {
     // Run quality diagnostics
     const diagnostics = evaluateQualityGate(width, height);
 
-    // Extract scorecard using LiteLLM Vision or fallback deterministic engine
+    // Extract scorecard using Vision LLM or fallback deterministic engine
     const parsed = base64Image
-      ? await extractScorecardWithLiteLLM(base64Image)
+      ? await extractScorecardWithLiteLLM(base64Image, {
+          forceSample,
+          matchTitle,
+          tournamentId,
+        })
       : getSampleScorecardExtraction();
 
     if (matchTitle) {
       parsed.matchInfo.title = matchTitle;
+    }
+    if (tournamentId !== undefined) {
+      parsed.matchInfo.tournamentId = tournamentId;
     }
 
     // Reconcile player names across both teams (8 home, 8 away, bowlers)

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import {
-  UploadCloud,
   Shield,
   Users,
   Trophy,
@@ -29,13 +28,6 @@ export default function HomePage() {
 
         <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
           <Link
-            href="/admin/scorecards/new"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow transition"
-          >
-            <UploadCloud className="h-4 w-4" />
-            <span>Scan Scorecard (Admin Flow)</span>
-          </Link>
-          <Link
             href="/tournaments"
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow transition"
           >
@@ -43,7 +35,14 @@ export default function HomePage() {
             <span>Tournaments & Leaderboards</span>
           </Link>
           <Link
-            href="/player/35"
+            href="/matches"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow transition"
+          >
+            <FileCheck className="h-4 w-4" />
+            <span>Matches & Reconciled Cards</span>
+          </Link>
+          <Link
+            href="/players"
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 text-white font-bold text-xs shadow transition border border-slate-700"
           >
             <Users className="h-4 w-4" />
@@ -54,25 +53,25 @@ export default function HomePage() {
 
       {/* 3 Core Pillars Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Module 1: Admin Intake */}
+        {/* Module 1: Tournaments & Practice Leagues */}
         <div className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm flex flex-col justify-between space-y-4">
           <div className="space-y-3">
-            <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
-              <UploadCloud className="h-5 w-5" />
+            <div className="h-10 w-10 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold">
+              <Trophy className="h-5 w-5" />
             </div>
             <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-              1. Admin Scorecard Intake & Maker-Checker
+              1. Tournaments & Regular Practice
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-              Mobile camera capture with immediate quality gate (blur, glare, exposure, resolution). Fixed-template extraction reads ball-by-ball cells, dismissals (R, B, C, ST), and skin totals with fast maker-checker auditing.
+              Explore official championships and weekly regular practice matches. Each tournament scopes fixtures, squad rosters, points tables, and verified scorecards.
             </p>
           </div>
 
           <Link
-            href="/tournaments/upload"
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline pt-2"
+            href="/tournaments"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-purple-600 dark:text-purple-400 hover:underline pt-2"
           >
-            <span>Scan Scorecard</span>
+            <span>Explore Tournaments</span>
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>

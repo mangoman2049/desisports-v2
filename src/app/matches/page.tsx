@@ -1,6 +1,5 @@
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { UploadCloud } from "lucide-react";
 import MatchCard from "@/components/MatchCard";
 
 export default async function MatchesPage() {
@@ -33,11 +32,10 @@ export default async function MatchesPage() {
         </div>
 
         <Link
-          href="/admin/scorecards/new"
-          className="flex items-center gap-2 py-2 px-3 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm transition self-start sm:self-auto"
+          href="/tournaments"
+          className="flex items-center gap-1.5 py-2 px-3 text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg border border-slate-200 dark:border-slate-700 transition self-start sm:self-auto"
         >
-          <UploadCloud className="h-3.5 w-3.5" />
-          <span>Upload New Scorecard</span>
+          <span>View Tournaments</span>
         </Link>
       </div>
 

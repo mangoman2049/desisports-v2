@@ -13,7 +13,7 @@ export function evaluateQualityGate(
     laplacianVariance: number;
   }
 ): QualityDiagnostics {
-  const minRequired = { width: 1000, height: 1200 };
+  const minRequired = { width: 720, height: 960 };
   const optimalRange: [number, number] = [80, 210];
   const blurThreshold = 120; // Laplacian variance threshold
   const glareThreshold = 0.08; // >8% washed out pixels
@@ -25,21 +25,27 @@ export function evaluateQualityGate(
     laplacianVariance: 180,
   };
 
-  const resolutionPassed = width >= minRequired.width && height >= minRequired.height;
+  const totalPixels = width * height;
+  const resolutionPassed =
+    (width >= minRequired.width && height >= minRequired.height) ||
+    (width >= minRequired.height && height >= minRequired.width) ||
+    totalPixels >= 690000;
   const blurPassed = stats.laplacianVariance >= blurThreshold;
   const exposurePassed =
     stats.meanLuminosity >= optimalRange[0] && stats.meanLuminosity <= optimalRange[1];
   const glarePassed = stats.specularFraction <= glareThreshold;
 
-  const aspectRatio = width / (height || 1);
-  // Spawtz portrait sheet is approx 0.55 - 0.85 aspect ratio (w/h)
+  const minDim = Math.min(width, height);
+  const maxDim = Math.max(width, height || 1);
+  const aspectRatio = minDim / maxDim;
+  // Spawtz portrait sheet is approx 0.55 - 0.85 aspect ratio (short/long)
   const perspectivePassed = aspectRatio >= 0.45 && aspectRatio <= 0.95;
 
   const retakePrompts: string[] = [];
 
   if (!resolutionPassed) {
     retakePrompts.push(
-      `Resolution (${width}x${height}) is too low for small digit OCR. Move closer so the scorecard fills the frame (min ${minRequired.width}x${minRequired.height}).`
+      `Resolution (${width}x${height}) is too low for small digit OCR. Move closer so the scorecard fills the frame (min ${minRequired.width}x${minRequired.height} or ~700k pixels).`
     );
   }
 

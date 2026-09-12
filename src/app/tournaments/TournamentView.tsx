@@ -150,7 +150,7 @@ export default function TournamentView({ data }: { data: TournamentData }) {
 
           <div className="flex flex-wrap items-center gap-3">
             <Link
-              href="/admin/scorecards/new"
+              href="/admin/scorecards/new?tournamentId=1"
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold tracking-wide transition border border-white/10"
             >
               <Layers className="w-4 h-4" />
