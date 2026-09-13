@@ -12,6 +12,8 @@ import {
   ArrowRight,
 } from "lucide-react";
 import tournament2Data from "../../../../prisma/tournament_2_data.json";
+import { getTournamentDetails } from "@/lib/tournament-service";
+import MatchCard from "@/components/MatchCard";
 
 export const metadata = {
   title: "DesiBoys Bazooka 4.0 | DesiSports V2",
@@ -19,8 +21,9 @@ export const metadata = {
     "Official squads, registered players, and match schedule for DesiBoys Bazooka 4.0.",
 };
 
-export default function TournamentTwoPage() {
+export default async function TournamentTwoPage() {
   const data = tournament2Data;
+  const dynamicData = await getTournamentDetails(2);
 
   const matchDates = [
     { date: "Fri, 18 Sep 2026", time: "8:00 PM", day: "Friday" },
@@ -34,6 +37,8 @@ export default function TournamentTwoPage() {
     { date: "Fri, 09 Oct 2026", time: "8:00 PM", day: "Finals!" },
   ];
 
+  const hasCompletedMatches = dynamicData.fixtures && dynamicData.fixtures.length > 0;
+
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12">
       {/* Header Banner */}
@@ -43,7 +48,7 @@ export default function TournamentTwoPage() {
             <div className="flex flex-wrap items-center gap-2.5">
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">
                 <Clock className="w-3.5 h-3.5" />
-                Yet to Start
+                {hasCompletedMatches ? "Active Tournament" : "Yet to Start"}
               </span>
               <span className="text-xs text-slate-400 font-mono flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5" />
@@ -59,23 +64,29 @@ export default function TournamentTwoPage() {
             </h1>
 
             <p className="text-sm text-slate-300 max-w-2xl">
-              Upcoming premier championship featuring 4 franchise squads, 11,000 budget cap per team, and official Spawtz 16-over rules.
+              Premier 16-Over Indoor Cricket Tournament featuring 4 franchise squads, Spawtz points structure (1 pt per skin win, 4 pts match win), and high-stakes Bazooka overs.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
             <Link
               href="/admin/scorecards/new?tournamentId=2"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-bold tracking-wide transition border border-white/10"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold tracking-wide transition shadow-lg shadow-purple-900/30"
             >
               <Layers className="w-4 h-4" />
-              <span>Scorecard Upload Gate</span>
+              <span>Upload Bazooka Scorecard</span>
             </Link>
           </div>
         </div>
 
-        {/* Quick Stats Strip */}
-        <div className="mt-6 pt-6 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-3 gap-4 text-xs">
+        {/* Quick Highlights Strip */}
+        <div className="mt-6 pt-6 border-t border-slate-800/80 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+          <div>
+            <div className="text-slate-400">Tournament Format</div>
+            <div className="text-base font-bold text-amber-400 mt-0.5">
+              Bazooka Rules (2x Runs)
+            </div>
+          </div>
           <div>
             <div className="text-slate-400">Registered Players</div>
             <div className="text-xl font-black text-emerald-400 font-mono mt-0.5">
@@ -97,7 +108,150 @@ export default function TournamentTwoPage() {
         </div>
       </div>
 
-      {/* SECTION 1: SQUADS & TEAMS */}
+      {/* SECTION 1: POINTS TABLE (DYNAMIC) */}
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Trophy className="w-5 h-5 text-amber-500" />
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+              Points Table
+            </h2>
+          </div>
+          <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            {hasCompletedMatches
+              ? "Live Standings • 1 pt Skin Win • 4 pts Match Win"
+              : "Pre-Tournament Standings • Matches starting 18 Sep 2026"}
+          </span>
+        </div>
+
+        <div className="overflow-hidden rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/75 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">
+                  <th className="px-4 py-3.5 w-12 text-center">#</th>
+                  <th className="px-4 py-3.5">Team</th>
+                  <th className="px-3 py-3.5 text-center">P</th>
+                  <th className="px-3 py-3.5 text-center">W</th>
+                  <th className="px-3 py-3.5 text-center">L</th>
+                  <th className="px-3 py-3.5 text-center">T</th>
+                  <th className="px-3 py-3.5 text-right">For</th>
+                  <th className="px-3 py-3.5 text-right">Agst</th>
+                  <th className="px-3 py-3.5 text-right">Diff</th>
+                  <th className="px-4 py-3.5 text-right font-black">Pts</th>
+                  <th className="px-4 py-3.5 text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                {dynamicData.standings.map((row) => {
+                  const isTopTwo = row.pos <= 2;
+                  return (
+                    <tr
+                      key={row.team}
+                      className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition"
+                    >
+                      <td className="px-4 py-3 text-center font-mono font-bold text-slate-400">
+                        {row.pos}
+                      </td>
+                      <td className="px-4 py-3 font-bold text-slate-900 dark:text-white">
+                        {row.team}
+                      </td>
+                      <td className="px-3 py-3 text-center font-mono text-slate-600 dark:text-slate-300">
+                        {row.played}
+                      </td>
+                      <td className="px-3 py-3 text-center font-mono text-emerald-600 font-bold">
+                        {row.won}
+                      </td>
+                      <td className="px-3 py-3 text-center font-mono text-rose-600">
+                        {row.lost}
+                      </td>
+                      <td className="px-3 py-3 text-center font-mono text-slate-400">
+                        {row.tied}
+                      </td>
+                      <td className="px-3 py-3 text-right font-mono text-slate-600 dark:text-slate-300">
+                        {row.forRuns}
+                      </td>
+                      <td className="px-3 py-3 text-right font-mono text-slate-600 dark:text-slate-300">
+                        {row.againstRuns}
+                      </td>
+                      <td
+                        className={`px-3 py-3 text-right font-mono font-semibold ${
+                          row.diff.startsWith("+")
+                            ? "text-emerald-600"
+                            : row.diff.startsWith("-")
+                            ? "text-rose-600"
+                            : "text-slate-400"
+                        }`}
+                      >
+                        {row.diff}
+                      </td>
+                      <td className="px-4 py-3 text-right font-mono font-black text-slate-900 dark:text-white text-sm">
+                        {row.points}
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <span
+                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                            isTopTwo
+                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300"
+                              : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+                          }`}
+                        >
+                          {isTopTwo ? "Finals Contender" : "In Contention"}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 2: COMPLETED MATCHES & SCORECARDS (IF ANY) */}
+      {hasCompletedMatches && (
+        <section className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-emerald-600" />
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                Completed Matches & Scorecards
+              </h2>
+            </div>
+            <span className="text-xs text-slate-500 font-mono">
+              {dynamicData.fixtures.length} Match(es) Recorded
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {dynamicData.fixtures.map((fix) => (
+              <MatchCard
+                key={fix.id}
+                id={String(fix.id)}
+                date={fix.date}
+                time="8:00 PM"
+                tournamentName="DesiBoys Bazooka 4.0"
+                stage={fix.stage || "Group Match"}
+                venue={data.venue}
+                team1={{
+                  name: fix.team1,
+                  score: fix.score1,
+                  isWinner: fix.winner1,
+                }}
+                team2={{
+                  name: fix.team2,
+                  score: fix.score2,
+                  isWinner: fix.winner2,
+                }}
+                potm={fix.potm}
+                scorecardUrl={fix.scorecardUrl}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* SECTION 3: SQUADS & TEAMS */}
       <section className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

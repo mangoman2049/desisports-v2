@@ -119,10 +119,10 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
     venue: "Insportz Club, Dubai (Court 1)",
     winner: "VPGR",
     loser: "DesiTitans",
-    scoreSummary: "VPGR 80 def. DesiTitans 41 (+39 run margin, 3-1 skins, 13-3 tournament pts)",
+    scoreSummary: "VPGR 80 def. DesiTitans 41 (+39 run margin, 3-1 skins, 7-1 tournament pts)",
     editorHeadline: "Ankush Goel's 4-Wicket Spell Decimates Titans in Tournament Opener",
     editorSummary:
-      "VPGR opened their tournament campaign with a commanding 39-run victory over DesiTitans, securing 13 tournament points (3 skins × 3 pts + 4 match pts) to Titans' 3 points. Ankush Goel delivered a masterclass in indoor bowling discipline, conceding minus runs while taking 4 wickets. DesiTitans struggled to cope with the back-of-a-length line and conceded 3 run-outs in the middle skins.",
+      "VPGR opened their tournament campaign with a commanding 39-run victory over DesiTitans, securing 7 tournament points (3 skins × 1 pt + 4 match pts) to Titans' 1 point. Ankush Goel delivered a masterclass in indoor bowling discipline, conceding minus runs while taking 4 wickets. DesiTitans struggled to cope with the back-of-a-length line and conceded 3 run-outs in the middle skins.",
     whatWentRightWinner: {
       title: "Tactical Wins for VPGR",
       points: [
@@ -203,7 +203,7 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
           loserDismissals: 1,
           skinMargin: 8,
           skinWinner: "VPGR",
-          analysis: "Abhishek and Ankush displayed textbook indoor calling; zero dismissals built an immediate 8-run lead (3 tournament pts).",
+          analysis: "Abhishek and Ankush displayed textbook indoor calling; zero dismissals built an immediate 8-run lead (1 tournament pt).",
         },
         {
           pairNumber: 2,
@@ -243,7 +243,7 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
         },
       ],
       skinsStory:
-        "VPGR swept all four skins through broad structural superiority, capturing 13 tournament points (3 skins × 3 pts + 4 match win pts) while Titans salvaged 3 points from their solitary skin contest.",
+        "VPGR swept all four skins through broad structural superiority, capturing 7 tournament points (3 skins × 1 pt + 4 match win pts) while Titans salvaged 1 point from their solitary skin contest.",
     },
     turningPointDetailed: {
       matchStateBefore: "Titans trailed 18-26 after Skin 1, remaining well within touching distance.",
@@ -344,10 +344,10 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
     venue: "Insportz Club, Dubai (Court 1)",
     winner: "DesiTigers",
     loser: "DesiDabanggs",
-    scoreSummary: "DesiTigers 113 def. DesiDabanggs 53 (+60 run margin, 4-0 skins, 16-0 tournament pts)",
+    scoreSummary: "DesiTigers 113 def. DesiDabanggs 53 (+60 run margin, 4-0 skins, 8-0 tournament pts)",
     editorHeadline: "Manthan Shah's All-Round Heroics Power Tigers to 60-Run Demolition of Dabanggs",
     editorSummary:
-      "DesiTigers delivered an emphatic statement of intent with a comprehensive 60-run sweep over DesiDabanggs, pocketing maximum 16 tournament points (4 skins × 3 pts + 4 match pts). Tigers captain Manthan Shah earned Player of the Match honors with an immaculate 29-run batting display followed by two wickets. DesiDabanggs imploded under relentless pressure, losing 8 wickets and finishing with just 53 runs.",
+      "DesiTigers delivered an emphatic statement of intent with a comprehensive 60-run sweep over DesiDabanggs, pocketing maximum 8 tournament points (4 skins × 1 pt + 4 match pts). Tigers captain Manthan Shah earned Player of the Match honors with an immaculate 29-run batting display followed by two wickets. DesiDabanggs imploded under relentless pressure, losing 8 wickets and finishing with just 53 runs.",
     whatWentRightWinner: {
       title: "Tactical Wins for DesiTigers",
       points: [
@@ -468,7 +468,7 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
         },
       ],
       skinsStory:
-        "DesiTigers achieved a flawless 16-point clean sweep (4 skins × 3 pts + 4 match pts). The 39-run differential in the first two skins ended the contest before halfway.",
+        "DesiTigers achieved a flawless 8-point clean sweep (4 skins × 3 pts + 4 match pts). The 39-run differential in the first two skins ended the contest before halfway.",
     },
     turningPointDetailed: {
       matchStateBefore: "Match was scoreless at ball 1.",
@@ -569,10 +569,10 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
     venue: "Insportz Club, Dubai (Court 1)",
     winner: "VPGR",
     loser: "DesiDabanggs",
-    scoreSummary: "VPGR 148 def. DesiDabanggs 56 (+92 run margin, 4-0 skins, 16-0 tournament pts)",
+    scoreSummary: "VPGR 148 def. DesiDabanggs 56 (+92 run margin, 4-0 skins, 8-0 tournament pts)",
     editorHeadline: "VPGR Smashes Tournament Record with 148-Run Onslaught Against Dabanggs",
     editorSummary:
-      "In the most lopsided match of the championship, VPGR established a tournament scoring record of 148 runs, sweeping all 16 tournament points (4 skins × 3 pts + 4 match pts). Ankush Goel claimed Player of the Match honors with an astonishing bowling display (3 wickets, economy 1.00) after VPGR's batting pairs posted 40+ runs in two separate skins. DesiDabanggs managed only 56 runs in response.",
+      "In the most lopsided match of the championship, VPGR established a tournament scoring record of 148 runs, sweeping all 8 tournament points (4 skins × 1 pt + 4 match pts). Ankush Goel claimed Player of the Match honors with an astonishing bowling display (3 wickets, economy 1.00) after VPGR's batting pairs posted 40+ runs in two separate skins. DesiDabanggs managed only 56 runs in response.",
     whatWentRightWinner: {
       title: "Tactical Wins for VPGR",
       points: [
@@ -653,7 +653,7 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
           loserDismissals: 1,
           skinMargin: 16,
           skinWinner: "VPGR",
-          analysis: "Abhishek and Ankush set an unreachable 34-run benchmark with zero dismissals (3 tournament pts).",
+          analysis: "Abhishek and Ankush set an unreachable 34-run benchmark with zero dismissals (1 tournament pt).",
         },
         {
           pairNumber: 2,
@@ -693,7 +693,7 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
         },
       ],
       skinsStory:
-        "VPGR swept all four skins with historical margins (+16, +32, +18, +26), securing maximum 16 tournament points and eliminating Dabanggs from final contention.",
+        "VPGR swept all four skins with historical margins (+16, +32, +18, +26), securing maximum 8 tournament points and eliminating Dabanggs from final contention.",
     },
     turningPointDetailed: {
       matchStateBefore: "VPGR was already flying at 34-0 after Skin 1.",
@@ -771,7 +771,7 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
       {
         team: "VPGR",
         traits: ["RECORD BREAKERS", "LETHAL STRIKING", "UNRELENTING INTENSITY"],
-        evidence: "Set tournament record of 148 runs with 16 tournament points swept.",
+        evidence: "Set tournament record of 148 runs with 8 tournament points swept.",
       },
       {
         team: "DesiDabanggs",
@@ -794,10 +794,10 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
     venue: "Insportz Club, Dubai (Court 1)",
     winner: "DesiTigers",
     loser: "DesiTitans",
-    scoreSummary: "DesiTigers 103 def. DesiTitans 69 (+34 run margin, 3-1 skins, 13-3 tournament pts)",
+    scoreSummary: "DesiTigers 103 def. DesiTitans 69 (+34 run margin, 3-1 skins, 7-1 tournament pts)",
     editorHeadline: "Prateek Nahar's 32-Run Masterclass Seals Final Spot for Tigers",
     editorSummary:
-      "DesiTigers guaranteed their spot in the championship final with a composed 34-run victory over DesiTitans, claiming 13 tournament points (3 skins × 3 pts + 4 match pts) to Titans' 3 points. Prateek Nahar earned Player of the Match honors with an unbeaten 32-run masterclass in the final skin. DesiTitans fought admirably in Skins 1 and 3, winning a skin point, but fell away in the middle and death overs.",
+      "DesiTigers guaranteed their spot in the championship final with a composed 34-run victory over DesiTitans, claiming 7 tournament points (3 skins × 1 pt + 4 match pts) to Titans' 1 point. Prateek Nahar earned Player of the Match honors with an unbeaten 32-run masterclass in the final skin. DesiTitans fought admirably in Skins 1 and 3, winning a skin point, but fell away in the middle and death overs.",
     whatWentRightWinner: {
       title: "Tactical Wins for DesiTigers",
       points: [
@@ -914,11 +914,11 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
           loserDismissals: 2,
           skinMargin: 12,
           skinWinner: "DesiTigers",
-          analysis: "Prateek Nahar's POTM performance sealed the victory with 28 runs in the final skin (3 tournament pts).",
+          analysis: "Prateek Nahar's POTM performance sealed the victory with 28 runs in the final skin (1 tournament pt).",
         },
       ],
       skinsStory:
-        "Tigers won 3 out of 4 skins, banking 13 tournament points (3 skins × 3 pts + 4 match pts) while Titans banked a well-deserved 3 points from their Skin 1 triumph.",
+        "Tigers won 3 out of 4 skins, banking 7 tournament points (3 skins × 1 pt + 4 match pts) while Titans banked a well-deserved 3 points from their Skin 1 triumph.",
     },
     turningPointDetailed: {
       matchStateBefore: "Titans led by 2 runs after winning Skin 1 (24-22).",
@@ -1019,10 +1019,10 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
     venue: "Insportz Club, Dubai (Court 1)",
     winner: "DesiDabanggs",
     loser: "DesiTitans",
-    scoreSummary: "DesiDabanggs 76 def. DesiTitans 58 (+18 run margin, 3-1 skins, 13-3 tournament pts)",
+    scoreSummary: "DesiDabanggs 76 def. DesiTitans 58 (+18 run margin, 3-1 skins, 7-1 tournament pts)",
     editorHeadline: "Preraq Mistry's Resurgence Inspires Dabanggs to 3rd-Place Playoff Triumph",
     editorSummary:
-      "DesiDabanggs redeemed a frustrating tournament campaign by capturing 3rd place with an 18-run victory over DesiTitans, claiming 13 tournament points (3 skins × 3 pts + 4 match pts) to Titans' 3 points. Player of the Match Preraq Mistry produced his finest innings of the competition, blasting 28 runs in Skin 1. DesiTitans fought gamely, winning Skin 4, but could not overcome a 15-run deficit from the first two skins.",
+      "DesiDabanggs redeemed a frustrating tournament campaign by capturing 3rd place with an 18-run victory over DesiTitans, claiming 7 tournament points (3 skins × 1 pt + 4 match pts) to Titans' 1 point. Player of the Match Preraq Mistry produced his finest innings of the competition, blasting 28 runs in Skin 1. DesiTitans fought gamely, winning Skin 4, but could not overcome a 15-run deficit from the first two skins.",
     whatWentRightWinner: {
       title: "Tactical Wins for DesiDabanggs",
       points: [
@@ -1103,7 +1103,7 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
           loserDismissals: 1,
           skinMargin: 8,
           skinWinner: "DesiDabanggs",
-          analysis: "Preraq Mistry played his best innings of the tournament, scoring 18 runs to anchor a 28-run skin (3 tournament pts).",
+          analysis: "Preraq Mistry played his best innings of the tournament, scoring 18 runs to anchor a 28-run skin (1 tournament pt).",
         },
         {
           pairNumber: 2,
@@ -1115,7 +1115,7 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
           loserDismissals: 2,
           skinMargin: 7,
           skinWinner: "DesiDabanggs",
-          analysis: "Gagandeep's composed running between wickets guided Dabanggs to a 7-run skin victory (3 tournament pts).",
+          analysis: "Gagandeep's composed running between wickets guided Dabanggs to a 7-run skin victory (1 tournament pt).",
         },
         {
           pairNumber: 3,
@@ -1127,7 +1127,7 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
           loserDismissals: 2,
           skinMargin: 5,
           skinWinner: "DesiDabanggs",
-          analysis: "Captain Darshan Mody controlled the pace, grinding out a 5-run skin victory (3 tournament pts).",
+          analysis: "Captain Darshan Mody controlled the pace, grinding out a 5-run skin victory (1 tournament pt).",
         },
         {
           pairNumber: 4,
@@ -1143,7 +1143,7 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
         },
       ],
       skinsStory:
-        "Dabanggs secured 3rd place by winning the first 3 skins cleanly, accumulating 13 tournament points (3 skins × 3 pts + 4 match pts). Titans earned 3 points from their final skin win.",
+        "Dabanggs secured 3rd place by winning the first 3 skins cleanly, accumulating 7 tournament points (3 skins × 1 pt + 4 match pts). Titans earned 3 points from their final skin win.",
     },
     turningPointDetailed: {
       matchStateBefore: "Dabanggs entered the match on the back of two heavy defeats.",
@@ -1244,10 +1244,10 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
     venue: "Insportz Club, Dubai (Court 1)",
     winner: "DesiTigers",
     loser: "VPGR",
-    scoreSummary: "DesiTigers 111 def. VPGR 94 (+17 run margin, 2-2 skins, 10-6 tournament pts)",
+    scoreSummary: "DesiTigers 111 def. VPGR 94 (+17 run margin, 2-2 skins, 6-2 tournament pts)",
     editorHeadline: "DesiTigers Crowned Champions in 111-94 Epic Final Against VPGR",
     editorSummary:
-      "DesiTigers clinched the Desi Boys Championship with a masterclass 17-run triumph over VPGR in an unforgettable final. In a tactical arm-wrestle that split the skins 2-2, Tigers earned 10 tournament points (2 skins × 3 pts + 4 match pts) while VPGR banked 6 points from their 2 skin victories. Player of the Match Manthan Shah outmaneuvered VPGR with bold pair assignments and clutch bowling in death overs.",
+      "DesiTigers clinched the Desi Boys Championship with a masterclass 17-run triumph over VPGR in an unforgettable final. In a tactical arm-wrestle that split the skins 2-2, Tigers earned 6 tournament points (2 skins × 1 pt + 4 match pts) while VPGR banked 6 points from their 2 skin victories. Player of the Match Manthan Shah outmaneuvered VPGR with bold pair assignments and clutch bowling in death overs.",
     whatWentRightWinner: {
       title: "Tactical Wins for DesiTigers",
       points: [
@@ -1368,7 +1368,7 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
         },
       ],
       skinsStory:
-        "The skins were fiercely split 2-2, with Tigers banking 10 tournament points (2 skins × 3 pts + 4 match pts) and VPGR taking 6 points. Tigers' 13-run blitz in Skin 2 proved the difference in the championship race.",
+        "The skins were fiercely split 2-2, with Tigers banking 6 tournament points (2 skins × 1 pt + 4 match pts) and VPGR taking 6 points. Tigers' 13-run blitz in Skin 2 proved the difference in the championship race.",
     },
     turningPointDetailed: {
       matchStateBefore: "Tigers held a narrow 28-24 lead after an intense Skin 1.",
@@ -1470,7 +1470,7 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
     venue: "Insportz Club, Dubai (Court 2)",
     winner: "Away Team",
     loser: "Home Team",
-    scoreSummary: "Away Team 120 def. Home Team 63 (+57 run margin, 4-0 skins, 16-0 tournament pts)",
+    scoreSummary: "Away Team 120 def. Home Team 63 (+57 run margin, 4-0 skins, 8-0 tournament pts)",
     editorHeadline:
       "Away Team's 4-0 Skin Blitz and Dismissal Pressure Smothers Home Team in 57-Run Rout",
     editorSummary:
@@ -1555,7 +1555,7 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
           loserDismissals: 1,
           skinMargin: 7,
           skinWinner: "Away Team",
-          analysis: "Deepak (16) and Yash (18) established immediate command with 34 runs and zero dismissals (3 tournament pts).",
+          analysis: "Deepak (16) and Yash (18) established immediate command with 34 runs and zero dismissals (1 tournament pt).",
         },
         {
           pairNumber: 2,
@@ -1579,7 +1579,7 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
           loserDismissals: 1,
           skinMargin: 5,
           skinWinner: "Away Team",
-          analysis: "Home Team fought back with 29 runs, but Sahil and Sunny matched and surpassed them with 34 (3 tournament pts).",
+          analysis: "Home Team fought back with 29 runs, but Sahil and Sunny matched and surpassed them with 34 (1 tournament pt).",
         },
         {
           pairNumber: 4,
@@ -1591,11 +1591,11 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
           loserDismissals: 2,
           skinMargin: 9,
           skinWinner: "Away Team",
-          analysis: "Away Team closed out the 4-0 skin sweep by holding Ankush and Tejas to 10 runs (3 tournament pts).",
+          analysis: "Away Team closed out the 4-0 skin sweep by holding Ankush and Tejas to 10 runs (1 tournament pt).",
         },
       ],
       skinsStory:
-        "Away Team swept all four skins cleanly, claiming maximum 16 tournament points (4 skins × 3 pts + 4 match pts). The 36-run blowout in Skin 2 broke Home Team's back, while consistent 34-run returns in Skins 1 and 3 sealed a 57-run victory.",
+        "Away Team swept all four skins cleanly, claiming maximum 8 tournament points (4 skins × 1 pt + 4 match pts). The 36-run blowout in Skin 2 broke Home Team's back, while consistent 34-run returns in Skins 1 and 3 sealed a 57-run victory.",
     },
     turningPointDetailed: {
       matchStateBefore: "Away Team led by 7 runs (34-27) after a competitive Skin 1.",
@@ -1677,7 +1677,7 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
         "Never bowl consecutive overs with the same bowler; rotate strike bowlers at the start of each skin.",
         "Enforce a 'zero-risk single' rule following any -5 penalty dismissal.",
         "Target side-net drop zones on deliveries 1-3 to build early skin momentum.",
-        "Audit Spawtz tournament points carefully; salvage skin points (3 pts each) when the match total is out of reach.",
+        "Audit Spawtz tournament points carefully; salvage skin points (1 pt each) when the match total is out of reach.",
       ],
     },
     teamDnaAssessment: [
@@ -1693,6 +1693,6 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
       },
     ],
     finalHardHittingVerdict:
-      "Away Team demonstrated complete mastery of indoor cricket fundamentals; Home Team's inability to prevent consecutive dismissals cost them 16 tournament points.",
+      "Away Team demonstrated complete mastery of indoor cricket fundamentals; Home Team's inability to prevent consecutive dismissals cost them 8 tournament points.",
   },
 };

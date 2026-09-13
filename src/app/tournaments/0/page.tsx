@@ -255,17 +255,17 @@ export default async function TournamentZeroPage() {
         </div>
       </section>
 
-      {/* SECTION 3: PRACTICE PERFORMERS POINTS TABLE (ALL 16 PLAYERS) */}
+      {/* SECTION 3: PRACTICE PLAYER PERFORMANCE BREAKDOWN (ALL 16 PLAYERS - NO TEAMS POINTS TABLE) */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Trophy className="w-5 h-5 text-emerald-600" />
             <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-              Practice Performers Points Table ({practiceStandingsData.length} Players)
+              Practice Player Performance Breakdown ({practiceStandingsData.length} Players)
             </h2>
           </div>
           <span className="text-xs text-slate-500 font-mono">
-            All 16 Players from 09-Sept • Ranked by Net Contribution
+            All 16 Players from 09-Sept • Ranked by Net Contribution (No Teams Points Table)
           </span>
         </div>
 

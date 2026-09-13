@@ -13,7 +13,7 @@ import path from "path";
 import tournament1Data from "../prisma/tournament_1_data.json";
 import { validateOcrSanity } from "./validate-ocr-sanity";
 import sharp from "sharp";
-import { resolveAllScorecardPlayers } from "../src/lib/name-resolver";
+import { resolveAllScorecardPlayers, resolvePlayerName } from "../src/lib/name-resolver";
 
 async function runTestSuite() {
   console.log("==================================================");
@@ -471,10 +471,22 @@ async function runTestSuite() {
     passedAll = false;
   }
 
-  // Test 16: Tactical Prompt Isolation & Anti-Presentism / Spawtz Points Rules
-  console.log("\n[Test 16] Tactical Prompt Isolation & Anti-Presentism / Spawtz Points Rules:");
+  // Test 16: Tactical Prompt Isolation, Points Config, Author, & Bazooka Rules
+  console.log("\n[Test 16] Tactical Prompt Isolation, Points Config, Author, & Bazooka Rules:");
   try {
-    const { INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT } = await import("../src/lib/tactical-prompt");
+    const { INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT, TOURNAMENT_POINTS_CONFIG } = await import(
+      "../src/lib/tactical-prompt"
+    );
+
+    const hasPointsConfig =
+      TOURNAMENT_POINTS_CONFIG &&
+      TOURNAMENT_POINTS_CONFIG.SKIN_WIN_POINTS === 1 &&
+      TOURNAMENT_POINTS_CONFIG.MATCH_WIN_POINTS === 4 &&
+      TOURNAMENT_POINTS_CONFIG.TOTAL_POINTS_AVAILABLE === 8;
+
+    const hasAuthor =
+      INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("Author: Manish Pandey (manishp15@iimb.ac.in)") &&
+      INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("Last Updated:");
 
     const hasAntiPresentism =
       INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("ANTI-PRESENTISM") &&
@@ -482,9 +494,14 @@ async function runTestSuite() {
       INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("ZERO foresight");
 
     const hasSpawtzPoints =
-      INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("SKIN WIN = 3 POINTS") &&
+      INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("SKIN WIN = 1 POINT") &&
       INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("MATCH WIN = 4 POINTS") &&
-      INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("16 POINTS");
+      INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("8 POINTS");
+
+    const hasBazookaRules =
+      INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("BAZOOKA TOURNAMENT RULES") &&
+      INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("DOUBLED") &&
+      INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("HEAVIER PENALTY");
 
     const hasIndoorCricketRules =
       INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("-5 RUN PENALTY") &&
@@ -495,16 +512,27 @@ async function runTestSuite() {
       INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("SQUAD INTEGRITY & CANONICAL NAMES") &&
       INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("canonical database names");
 
+    console.log(`- TOURNAMENT_POINTS_CONFIG (1 pt skin, 4 pt match, 8 total): ${hasPointsConfig ? "VERIFIED" : "MISSING"}`);
+    console.log(`- Author Metadata (Manish Pandey - manishp15@iimb.ac.in): ${hasAuthor ? "VERIFIED" : "MISSING"}`);
     console.log(`- Anti-Presentism / Chronological Timeline: ${hasAntiPresentism ? "VERIFIED" : "MISSING"}`);
-    console.log(`- Spawtz Tournament Points Structure (3/4/16): ${hasSpawtzPoints ? "VERIFIED" : "MISSING"}`);
+    console.log(`- Spawtz Points Structure (1 pt skin / 4 pt match / 8 total): ${hasSpawtzPoints ? "VERIFIED" : "MISSING"}`);
+    console.log(`- Bazooka Tournament Rules (2x runs, heavy penalties, captaincy): ${hasBazookaRules ? "VERIFIED" : "MISSING"}`);
     console.log(`- Indoor Cricket Rules (-5 penalty, 16 overs, 4 skins): ${hasIndoorCricketRules ? "VERIFIED" : "MISSING"}`);
     console.log(`- Squad Integrity & Canonical Names: ${hasSquadIntegrity ? "VERIFIED" : "MISSING"}`);
 
-    if (!hasAntiPresentism || !hasSpawtzPoints || !hasIndoorCricketRules || !hasSquadIntegrity) {
+    if (
+      !hasPointsConfig ||
+      !hasAuthor ||
+      !hasAntiPresentism ||
+      !hasSpawtzPoints ||
+      !hasBazookaRules ||
+      !hasIndoorCricketRules ||
+      !hasSquadIntegrity
+    ) {
       console.error("FAIL: Tactical Prompt module missing required indoor cricket tactical principles!");
       passedAll = false;
     } else {
-      console.log("PASS: Tactical Prompt module isolated and fully verified with anti-presentism and Spawtz points.");
+      console.log("PASS: Tactical Prompt module fully verified with configurable points, author, and Bazooka rules.");
     }
   } catch (err) {
     console.error("FAIL: Test 16 encountered error:", err);
@@ -608,6 +636,213 @@ async function runTestSuite() {
     passedAll = false;
   }
 
+  // Test 19: Dynamic Tournament Points Table Calculation & Tournament 0 Guard
+  console.log("\n[Test 19] Dynamic Tournament Points Table Calculation & Tournament 0 Guard:");
+  try {
+    const { getTournamentDetails, computeStandingsFromMatches } = await import(
+      "../src/lib/tournament-service"
+    );
+
+    // Check Standings computation math with 1 pt skin model
+    const testMatches = [
+      {
+        homeTeam: { name: "Team A" },
+        awayTeam: { name: "Team B" },
+        homeScore: 100,
+        awayScore: 80,
+        homeSkins: 3,
+        awaySkins: 1,
+        status: "COMPLETED",
+      },
+    ];
+
+    const testStandings = computeStandingsFromMatches(["Team A", "Team B"], testMatches);
+    const teamA = testStandings.find((t) => t.team === "Team A")!;
+    const teamB = testStandings.find((t) => t.team === "Team B")!;
+
+    // Team A: 1 win * 4 pts + 3 skins * 1 pt = 7 pts
+    // Team B: 0 wins * 4 pts + 1 skin * 1 pt = 1 pt
+    console.log(
+      `- Simulated Match: Team A pts=${teamA.points} (expected 7), Team B pts=${teamB.points} (expected 1)`
+    );
+    if (teamA.points !== 7 || teamB.points !== 1) {
+      console.error(
+        `FAIL: computeStandingsFromMatches points math incorrect! Got Team A=${teamA.points}, Team B=${teamB.points}`
+      );
+      passedAll = false;
+    }
+
+    // Check Tournament 1 dynamic standings
+    const t1Details = await getTournamentDetails(1);
+    console.log(`- Tournament 1 dynamic teams count: ${t1Details.standings.length}`);
+    console.log(
+      `- Tournament 1 leader: ${t1Details.standings[0]?.team} with ${t1Details.standings[0]?.points} points`
+    );
+    if (t1Details.standings.length !== 4 || t1Details.standings[0]?.points !== 22) {
+      console.error(`FAIL: Tournament 1 standings failed dynamic computation!`);
+      passedAll = false;
+    }
+
+    // Check Tournament 0 strict NO TEAMS POINTS TABLE guard
+    const t0Details = await getTournamentDetails(0);
+    console.log(
+      `- Tournament 0 hasPointsTable: ${t0Details.hasPointsTable}, standings count: ${t0Details.standings.length}`
+    );
+    if (t0Details.hasPointsTable !== false || t0Details.standings.length !== 0) {
+      console.error(`FAIL: Tournament 0 must strictly have NO Teams Points Table!`);
+      passedAll = false;
+    } else {
+      console.log("PASS: Tournament points table plumbing and Tournament 0 guard strictly verified.");
+    }
+  } catch (err) {
+    console.error("FAIL: Test 19 encountered error:", err);
+    passedAll = false;
+  }
+
+  // Test 20: Scorecard Approval Pipeline & Dynamic Standings Ingestion
+  console.log(
+    "\n[Test 20] Scorecard Approval Pipeline & Dynamic Standings Ingestion (Match & 16 PlayerMatchStats):"
+  );
+  try {
+    const sample = getSampleScorecardExtraction();
+
+    // 1. Ensure test teams exist
+    const homeTeam = await prisma.team.upsert({
+      where: { name: "Desi Tigers" },
+      update: {},
+      create: { name: "Desi Tigers", code: "DTG" },
+    });
+    const awayTeam = await prisma.team.upsert({
+      where: { name: "Desi Titans" },
+      update: {},
+      create: { name: "Desi Titans", code: "DTT" },
+    });
+
+    // 2. Create test Match in Tournament 2
+    const testMatch = await prisma.match.create({
+      data: {
+        tournamentId: 2,
+        matchDate: "18 Sep 2026, 20:00",
+        homeTeamId: homeTeam.id,
+        awayTeamId: awayTeam.id,
+        homeScore: 95,
+        awayScore: 70,
+        homeSkins: 3,
+        awaySkins: 1,
+        status: "COMPLETED",
+        scorecardUrl: "/matches/test-approval",
+      },
+    });
+
+    // 3. Persist 16 PlayerMatchStat rows (8 home, 8 away)
+    const homePlayers = sample.homeInnings.playerSummaries.slice(0, 8);
+    const awayPlayers = sample.awayInnings.playerSummaries.slice(0, 8);
+
+    let createdStatsCount = 0;
+    for (const p of homePlayers) {
+      const resolved = await resolvePlayerName(p.name);
+      let playerId = resolved.matchedPlayerId;
+      if (!playerId || playerId === 0) {
+        const player = await prisma.player.upsert({
+          where: { canonicalName: p.name },
+          update: {},
+          create: {
+            canonicalName: p.name,
+            battingHand: "Right Hand",
+            bowlingStyle: "Right Arm Medium",
+            fieldingPosition: "Cover",
+          },
+        });
+        playerId = player.id;
+      }
+
+      await prisma.playerMatchStat.create({
+        data: {
+          matchId: testMatch.id,
+          playerId: playerId,
+          teamId: homeTeam.id,
+          runsScored: p.runsScored,
+          timesOut: 1,
+          oversBowled: p.oversBowled,
+          runsConceded: p.runsConceded,
+          wickets: p.wickets,
+          economy: p.economy,
+          contribution: p.contribution,
+          isPotm: false,
+        },
+      });
+      createdStatsCount++;
+    }
+
+    for (const p of awayPlayers) {
+      const resolved = await resolvePlayerName(p.name);
+      let playerId = resolved.matchedPlayerId;
+      if (!playerId || playerId === 0) {
+        const player = await prisma.player.upsert({
+          where: { canonicalName: p.name },
+          update: {},
+          create: {
+            canonicalName: p.name,
+            battingHand: "Right Hand",
+            bowlingStyle: "Right Arm Medium",
+            fieldingPosition: "Cover",
+          },
+        });
+        playerId = player.id;
+      }
+
+      await prisma.playerMatchStat.create({
+        data: {
+          matchId: testMatch.id,
+          playerId: playerId,
+          teamId: awayTeam.id,
+          runsScored: p.runsScored,
+          timesOut: 1,
+          oversBowled: p.oversBowled,
+          runsConceded: p.runsConceded,
+          wickets: p.wickets,
+          economy: p.economy,
+          contribution: p.contribution,
+          isPotm: p.name === "YASH",
+        },
+      });
+      createdStatsCount++;
+    }
+
+    console.log(`- Created PlayerMatchStat entries for newly approved match: ${createdStatsCount} / 16`);
+
+    // 4. Verify that Tournament 2 dynamic standings immediately reflect this approved match
+    const { getTournamentDetails } = await import("../src/lib/tournament-service");
+    const t2Dynamic = await getTournamentDetails(2);
+    const tigersRow = t2Dynamic.standings.find((s) => s.team === "Desi Tigers")!;
+    const titansRow = t2Dynamic.standings.find((s) => s.team === "Desi Titans")!;
+
+    // Tigers: 1 win * 4 pts + 3 skins * 1 pt = 7 pts
+    // Titans: 0 wins * 4 pts + 1 skin * 1 pt = 1 pt
+    console.log(`- T2 Live Standings after Approval: Desi Tigers pts=${tigersRow?.points}, Desi Titans pts=${titansRow?.points}`);
+
+    const passApproval =
+      createdStatsCount === 16 &&
+      tigersRow?.points === 7 &&
+      titansRow?.points === 1 &&
+      tigersRow?.won === 1 &&
+      titansRow?.lost === 1;
+
+    // Clean up test match & stats
+    await prisma.playerMatchStat.deleteMany({ where: { matchId: testMatch.id } });
+    await prisma.match.delete({ where: { id: testMatch.id } });
+
+    if (!passApproval) {
+      console.error("FAIL: Scorecard approval and live dynamic points recomputation failed!");
+      passedAll = false;
+    } else {
+      console.log("PASS: Scorecard approval pipeline, 16-player persistence, and live dynamic points flow verified.");
+    }
+  } catch (err) {
+    console.error("FAIL: Test 20 encountered error:", err);
+    passedAll = false;
+  }
+
   await prisma.$disconnect();
 
   if (!passedAll) {
@@ -615,7 +850,7 @@ async function runTestSuite() {
     process.exit(1);
   } else {
     console.log("\n==================================================");
-    console.log("✅ ALL 18 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
+    console.log("✅ ALL 20 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
     console.log("==================================================");
     process.exit(0);
   }

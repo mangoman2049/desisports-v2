@@ -1,4 +1,4 @@
-import tournamentData from "../../../../prisma/tournament_1_data.json";
+import { getTournamentDetails } from "@/lib/tournament-service";
 import TournamentView from "../TournamentView";
 
 export const metadata = {
@@ -7,10 +7,13 @@ export const metadata = {
     "Official Spawtz 16-Over Indoor Cricket standings, squads, statistics, and scorecards for Desi Boys Tournament May 2026.",
 };
 
-export default function TournamentOnePage() {
+export default async function TournamentOnePage() {
+  const data = await getTournamentDetails(1);
+
   return (
     <div className="py-2">
-      <TournamentView data={tournamentData as any} />
+      <TournamentView data={data as any} />
     </div>
   );
 }
+

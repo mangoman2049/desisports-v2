@@ -88,6 +88,7 @@ export interface PlayerSummaryRow {
   wickets: number; // Wkts
   economy: number; // Econ
   contribution: number; // C = RS - RC
+  timesOut?: number;
   resolvedPlayerId?: number;
   canonicalName?: string;
   matchType?: string;

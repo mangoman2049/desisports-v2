@@ -80,6 +80,9 @@ interface TournamentData {
   topContributors: PlayerStatItem[];
   fixtures: FixtureItem[];
   squads: SquadItem[];
+  champions?: string;
+  runnerUp?: string;
+  mvp?: { name: string; points: number } | null;
 }
 
 export default function TournamentView({ data }: { data: TournamentData }) {
@@ -88,36 +91,21 @@ export default function TournamentView({ data }: { data: TournamentData }) {
   const [selectedSquad, setSelectedSquad] = useState<SquadItem | null>(null);
   const [scorecardZoom, setScorecardZoom] = useState(1);
 
-  // Group stage filtered stats if user chooses to exclude finals
-  const runGettersDisplay = includeFinals
-    ? data.topRunGetters
-    : [
-        { rank: "🥇", playerId: "53", name: "Sajid Merchant", value: "67", avatar: data.topRunGetters[1]?.avatar || null },
-        { rank: "2", playerId: "27", name: "Himanshu Kalyani", value: "62", avatar: data.topRunGetters[2]?.avatar || null },
-        { rank: "3", playerId: "30", name: "Kalrav Shah", value: "58", avatar: data.topRunGetters[3]?.avatar || null },
-        { rank: "4", playerId: "45", name: "Prateek Nahar", value: "52", avatar: data.topRunGetters[0]?.avatar || null },
-        { rank: "5", playerId: "25", name: "Harshal joshi", value: "44", avatar: null },
-      ];
+  const runGettersDisplay = data.topRunGetters || [];
+  const wicketTakersDisplay = data.topWicketTakers || [];
+  const contributorsDisplay = data.topContributors || [];
 
-  const wicketTakersDisplay = includeFinals
-    ? data.topWicketTakers
-    : [
-        { rank: "🥇", playerId: "5", name: "Ankush Goel", value: "10", avatar: null },
-        { rank: "2", playerId: "25", name: "Harshal joshi", value: "8", avatar: null },
-        { rank: "3", playerId: "36", name: "Manthan Shah", value: "7", avatar: data.topWicketTakers[2]?.avatar || null },
-        { rank: "4", playerId: "60", name: "Tejas Shah", value: "7", avatar: null },
-        { rank: "5", playerId: "53", name: "Sajid Merchant", value: "6", avatar: data.topWicketTakers[4]?.avatar || null },
-      ];
-
-  const contributorsDisplay = includeFinals
-    ? data.topContributors
-    : [
-        { rank: "🥇", playerId: "5", name: "Ankush Goel", value: "48", avatar: null },
-        { rank: "2", playerId: "25", name: "Harshal joshi", value: "39", avatar: null },
-        { rank: "3", playerId: "45", name: "Prateek Nahar", value: "38", avatar: data.topContributors[1]?.avatar || null },
-        { rank: "4", playerId: "27", name: "Himanshu Kalyani", value: "37", avatar: data.topContributors[3]?.avatar || null },
-        { rank: "5", playerId: "53", name: "Sajid Merchant", value: "35", avatar: data.topContributors[4]?.avatar || null },
-      ];
+  const championsName = data.champions || (data.standings && data.standings.length > 0 ? data.standings[0].team : "TBD");
+  const runnerUpName = data.runnerUp || (data.standings && data.standings.length > 1 ? data.standings[1].team : "TBD");
+  const mvpText = data.mvp
+    ? `${data.mvp.name} (${data.mvp.points > 0 ? "+" : ""}${data.mvp.points} pts)`
+    : data.topContributors && data.topContributors.length > 0
+    ? `${data.topContributors[0].name} (${data.topContributors[0].value} pts)`
+    : "TBD";
+  const topRunGetterText =
+    data.topRunGetters && data.topRunGetters.length > 0
+      ? `${data.topRunGetters[0].name} (${data.topRunGetters[0].value} runs)`
+      : "TBD";
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12">
@@ -165,20 +153,20 @@ export default function TournamentView({ data }: { data: TournamentData }) {
             <div className="text-slate-400">Champions</div>
             <div className="text-base font-bold text-amber-400 flex items-center gap-1.5 mt-0.5">
               <Trophy className="w-4 h-4" />
-              <span>DesiTigers</span>
+              <span>{championsName}</span>
             </div>
           </div>
           <div>
             <div className="text-slate-400">Runner-Up</div>
-            <div className="text-base font-bold text-slate-200 mt-0.5">VPGR</div>
+            <div className="text-base font-bold text-slate-200 mt-0.5">{runnerUpName}</div>
           </div>
           <div>
             <div className="text-slate-400">Tournament MVP</div>
-            <div className="text-base font-bold text-emerald-400 mt-0.5">Ankush Goel (48 pts)</div>
+            <div className="text-base font-bold text-emerald-400 mt-0.5">{mvpText}</div>
           </div>
           <div>
             <div className="text-slate-400">Top Run-Getter</div>
-            <div className="text-base font-bold text-blue-400 mt-0.5">Prateek Nahar (74 runs)</div>
+            <div className="text-base font-bold text-blue-400 mt-0.5">{topRunGetterText}</div>
           </div>
         </div>
       </div>
