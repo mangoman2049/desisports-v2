@@ -1156,6 +1156,67 @@ async function runTestSuite() {
     passedAll = false;
   }
 
+  // Test 28: Trigger Points Plumbing & Google Analytics Integration
+  console.log("\n[Test 28] Trigger Points Plumbing & Google Analytics Integration (G-SH3KLTD7S2):");
+  try {
+    const layoutContent = fs.readFileSync(path.join(__dirname, "../src/app/layout.tsx"), "utf-8");
+    const { GA_TRACKING_ID, trackCTA, trackPersonaEvent, trackPageView } = await import("../src/lib/analytics");
+    const {
+      getOrGenerateMatchAnalysis,
+      getOrUpdateTournamentTeamDNA,
+      updatePlayerTacticalInsightsOnMatchComplete,
+    } = await import("../src/lib/tactical-trigger-service");
+
+    // 1. Verify Google Analytics tracking ID & setup
+    const gaIdValid = GA_TRACKING_ID === "G-SH3KLTD7S2";
+    const scriptInjected =
+      layoutContent.includes("googletagmanager.com/gtag/js?id=G-SH3KLTD7S2") &&
+      layoutContent.includes("gtag('config', 'G-SH3KLTD7S2')");
+    const providerWrapped = layoutContent.includes("<AnalyticsProvider>");
+
+    console.log(`- GA Tracking ID configured (G-SH3KLTD7S2): ${gaIdValid ? "PASS" : "FAIL"}`);
+    console.log(`- Layout gtag script injection: ${scriptInjected ? "PASS" : "FAIL"}`);
+    console.log(`- Layout <AnalyticsProvider> wrapper: ${providerWrapped ? "PASS" : "FAIL"}`);
+
+    // 2. Verify Trigger Point 1: Match Tactical Analysis (Cached / DB-backed, Zero Token Burn on read)
+    const matchAnalysis = await getOrGenerateMatchAnalysis(1);
+    const matchAnalysisValid = !!(matchAnalysis && matchAnalysis.matchVerdict);
+    console.log(`- Trigger Point 1 (Match Tactical Analysis cached read): ${matchAnalysisValid ? "PASS" : "FAIL"}`);
+
+    // 3. Verify Trigger Point 2: Team DNA (Pre-Tournament vs In-Tournament caching)
+    const team12DNA = await getOrUpdateTournamentTeamDNA(2, 12);
+    const team12Valid = !!(team12DNA && team12DNA.teamName.includes("Desi Dabanggs") && team12DNA.mode);
+    console.log(`- Trigger Point 2 (Team DNA Lifecycle Mode: "${team12DNA?.mode}"): ${team12Valid ? "PASS" : "FAIL"}`);
+
+    // 4. Verify Trigger Point 3: Player Tactical Insights (Selective update for participating players only)
+    let testPlayer = await prisma.player.findFirst({
+      where: { canonicalName: "Manish Pandey" },
+    });
+    if (!testPlayer) {
+      testPlayer = await prisma.player.findFirst();
+    }
+
+    let playerTriggerValid = false;
+    if (testPlayer) {
+      const res = await updatePlayerTacticalInsightsOnMatchComplete(1, [testPlayer.id]);
+      const reloadedPlayer = await prisma.player.findUnique({
+        where: { id: testPlayer.id },
+      });
+      playerTriggerValid = res.updatedCount === 1 && !!reloadedPlayer?.captainTags;
+    }
+    console.log(`- Trigger Point 3 (Player Tactical Insights updated selectively): ${playerTriggerValid ? "PASS" : "FAIL"}`);
+
+    if (!gaIdValid || !scriptInjected || !providerWrapped || !matchAnalysisValid || !team12Valid || !playerTriggerValid) {
+      console.error("FAIL: Trigger Points or Google Analytics test assertions failed!");
+      passedAll = false;
+    } else {
+      console.log("PASS: Trigger Points plumbing and Google Analytics tracking verified with zero token burn.");
+    }
+  } catch (err) {
+    console.error("FAIL: Test 28 encountered error:", err);
+    passedAll = false;
+  }
+
   await prisma.$disconnect();
 
   if (!passedAll) {
@@ -1163,7 +1224,7 @@ async function runTestSuite() {
     process.exit(1);
   } else {
     console.log("\n==================================================");
-    console.log("✅ ALL 27 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
+    console.log("✅ ALL 28 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
     console.log("==================================================");
     process.exit(0);
   }

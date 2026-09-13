@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { generateCaptainInsights } from "@/lib/captain-insights";
 import { CaptainInsightMetric } from "@/types/cricket";
+import { trackCTA, trackPersonaEvent } from "@/lib/analytics";
 
 export default function CaptainInsightsPage() {
   const [selectedTournament, setSelectedTournament] = useState("Desi Boys Tournament May 2026");
@@ -46,6 +47,10 @@ export default function CaptainInsightsPage() {
   const currentBrief = tacticalBrief || dashboard.aiTacticalBrief;
 
   const handleGenerateAiBrief = async () => {
+    trackCTA("captain_generate_brief", "CAPTAIN", {
+      teamName: selectedTeam,
+      tournamentName: selectedTournament,
+    });
     setGeneratingBrief(true);
     try {
       const res = await fetch("/api/captain/ai-brief", {
@@ -64,6 +69,10 @@ export default function CaptainInsightsPage() {
       const data = await res.json();
       if (data.brief) {
         setTacticalBrief(data.brief);
+        trackPersonaEvent("captain_brief_generated", "CAPTAIN", {
+          teamName: selectedTeam,
+          tournamentName: selectedTournament,
+        });
       }
     } catch {
       // Fallback

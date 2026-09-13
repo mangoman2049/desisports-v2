@@ -28,6 +28,7 @@ import {
   getNextUpcomingFixture,
   FixtureOption,
 } from "@/lib/tournament-fixtures";
+import { trackCTA } from "@/lib/analytics";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -240,6 +241,11 @@ function NewScorecardContent() {
     setFixtureMismatchAlert(null);
 
     setSelectedFile(file);
+    trackCTA("scorecard_file_selected", "REVIEWER", {
+      fileName: file.name,
+      fileSize: file.size,
+      tournamentId,
+    });
     try {
       const objectUrl = URL.createObjectURL(file);
       setPreviewUrl(objectUrl);
@@ -343,6 +349,7 @@ function NewScorecardContent() {
   };
 
   const handleLoadSample = async () => {
+    trackCTA("scorecard_load_sample", "REVIEWER", { tournamentId });
     setPreviewUrl("/uploads/scorecards/sample-scorecard.jpg");
     setAnalyzingQuality(true);
     setErrorMessage(null);
@@ -408,6 +415,16 @@ function NewScorecardContent() {
     forceMismatch = false,
     autoApprove = false
   ) => {
+    trackCTA(
+      autoApprove ? "scorecard_fast_track_commit" : "scorecard_proceed_review",
+      "REVIEWER",
+      {
+        tournamentId,
+        fixtureId: selectedFixture?.id,
+        forceDuplicate,
+        forceMismatch,
+      }
+    );
     setExtracting(true);
     setErrorMessage(null);
     setFixtureMismatchAlert(null);

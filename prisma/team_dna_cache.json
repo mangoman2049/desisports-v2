@@ -1,0 +1,165 @@
+{
+  "t2_team12": {
+    "teamId": 12,
+    "teamName": "Desi Dabanggs",
+    "captain": "Ritesh Mehta",
+    "mode": "PRE-TOURNAMENT / HYPOTHESIS MODE",
+    "statement": "Early indication: a high-floor, rotation-centric squad anchored by elite indoor experience and calm match management. Their core strength lies in relentless running between wickets and defensive bowling, while their main test will be matching the pure boundary power of rival top orders.",
+    "identity": {
+      "primary": "High-Floor Strike Rotation & Tactical Discipline",
+      "secondary": "Pressure Absorption & Multi-Option Bowling",
+      "confidence": "EARLY INDICATION",
+      "explanation": "Desi Dabanggs are built to minimize unforced errors. With proven tournament winners like Abhishek Agarwal and Kalrav Shah alongside new captain Ritesh Mehta, Dabanggs play high-percentage indoor cricket. They rely on constant 2s and 3s rather than home-run swings, keeping opposition bowlers under continual clock and fielding pressure."
+    },
+    "definingCharacteristics": [
+      {
+        "title": "Mastery of Indoor Running Lanes",
+        "evidence": "Abhishek Agarwal and Kalrav Shah historically boast among the highest run-rotation percentages and lowest dot-ball rates in the league.",
+        "meaning": "Dabanggs keep the scoreboard ticking even when boundaries are cut off by defensive field placements."
+      },
+      {
+        "title": "Wicket Preservation Under Pressure",
+        "evidence": "Dabanggs' veteran core rarely concedes multiple dismissals in the same over, immediately resetting after a wicket.",
+        "meaning": "Skin collapses are extremely rare; their lowest skin outputs remain competitive."
+      },
+      {
+        "title": "Diverse Bowling Options",
+        "evidence": "Roster includes 7+ capable bowlers with contrasting trajectories (medium pace, seam, off-spin).",
+        "meaning": "Captain Ritesh Mehta has tactical flexibility to match bowling styles against specific opposing pair weaknesses."
+      }
+    ],
+    "strengths": [
+      {
+        "strength": "High-Pressure Composure",
+        "evidence": "Core veterans have played multiple knockout playoffs with proven clutch temperament.",
+        "why": "Dabanggs do not panic when trailing by 15-20 runs entering the final skin."
+      },
+      {
+        "strength": "Dot-Ball Minimization",
+        "evidence": "Heavy reliance on tip-and-run tactics to mid-on and mid-off pockets.",
+        "why": "Forces opponents into hurried throws and overthrows, manufacturing bonus runs."
+      },
+      {
+        "strength": "Balanced Bowling Rotation",
+        "evidence": "No drop-off between primary and secondary bowling pairs across 16 overs.",
+        "why": "Prevents opponents from targeting a single 'weak over' to blow a skin open."
+      }
+    ],
+    "weaknesses": [
+      {
+        "type": "KNOWN WEAKNESS",
+        "weakness": "Ceiling Limitations in Boundary Shootouts",
+        "evidence": "Batting style prioritizes physical running over 6-zone and 4-zone net strikes.",
+        "why": "If an opponent catches fire and posts 45+ in a skin, Dabanggs struggle to match that sheer run velocity without taking unnatural risks."
+      },
+      {
+        "type": "POTENTIAL RISK",
+        "weakness": "New Captaincy Tactical Coordination",
+        "evidence": "Ritesh Mehta assumes leadership with several incoming players (Daman Singh, Harshad Jariwala, Kamal Jeet Singh).",
+        "why": "On-field field placement adjustments and bowling orders will take an inning or two to fully crystallize."
+      },
+      {
+        "type": "POTENTIAL RISK",
+        "weakness": "Susceptibility to Express Pace Bowlers",
+        "evidence": "Aggressive, tight-line fast bowlers can crowd the front crease and disrupt delicate tip-and-run calling.",
+        "why": "Can lead to hesitation and tight run-out chances."
+      }
+    ],
+    "likelyPairings": [
+      {
+        "pair": "Abhishek Agarwal & Kalrav Shah",
+        "confidence": "HIGH CONFIDENCE",
+        "evidence": "One of the most proven, high-chemistry indoor partnerships with complimentary right-hand running instincts.",
+        "role": "Anchor / Engine Room (Skin 2 or 3)",
+        "why": "Combines Abhishek's ice-cold temperament with Kalrav's quick strike turnover; almost impossible to bowl maiden overs against.",
+        "concern": "Heavy reliance on physical exertion in the middle overs can cause fatigue in warm venue conditions."
+      },
+      {
+        "pair": "Ritesh Mehta & Harsh Ramnani",
+        "confidence": "EARLY INDICATION",
+        "evidence": "Captain-led partnership designed to steady the ship and control skin tempo.",
+        "role": "Opening Stabilizer (Skin 1)",
+        "why": "Establishes a methodical rhythm and probes opposition bowling discipline early.",
+        "concern": "Must ensure run rate does not lag below 6 runs per over in the first 8 balls."
+      }
+    ],
+    "pairingOptions": {
+      "bestKnown": {
+        "pair": "Abhishek Agarwal & Kalrav Shah",
+        "reason": "Decades of combined indoor instincts, unmatched running chemistry.",
+        "confidence": "HIGH CONFIDENCE"
+      },
+      "bestBalanced": {
+        "pair": "Abhishek Agarwal & Ritesh Mehta",
+        "reason": "Leadership stability and defensive poise across all 16 balls.",
+        "confidence": "MEDIUM CONFIDENCE"
+      },
+      "highestCeiling": {
+        "pair": "Kalrav Shah & Harsh Ramnani",
+        "reason": "Potential for aggressive net hunting if momentum is on their side.",
+        "confidence": "EARLY INDICATION"
+      },
+      "lowestRisk": {
+        "pair": "Abhishek Agarwal & Kalrav Shah",
+        "reason": "Consistently lowest dismissal rate in competitive tournament play.",
+        "confidence": "HIGH CONFIDENCE"
+      },
+      "experimental": {
+        "pair": "Daman Singh & Harshad Jariwala",
+        "reason": "Fresh pairing with high athleticism and physical running potential.",
+        "confidence": "INSUFFICIENT EVIDENCE"
+      }
+    },
+    "bazookaTactics": {
+      "likelyPair": "Abhishek Agarwal & Kalrav Shah",
+      "confidence": "MEDIUM CONFIDENCE",
+      "why": "Their microscopic dismissal rate makes them the safest vehicle for Bazooka overs; doubling physical runs without risking -5 penalties guarantees net gain.",
+      "when": "Likely invoked in Skin 2 or 3 to lock down an insurmountable skin win.",
+      "risk": "If an unexpected direct hit occurs during Bazooka, the -10 swing hurts a team that scores through accumulation rather than quick boundaries."
+    },
+    "bowlingIdentity": {
+      "wicketTaking": [
+        "Harsh Ramnani",
+        "Kalrav Shah"
+      ],
+      "control": [
+        "Ritesh Mehta",
+        "Saurabh Ranjan"
+      ],
+      "disciplineRisks": [
+        "Secondary pace options overstepping front crease"
+      ],
+      "order": "Tight seam up front, controlled spin/changeups in middle overs, death specialists in overs 15-16.",
+      "core": "Kalrav Shah, Harsh Ramnani, Ritesh Mehta, Saurabh Ranjan",
+      "keyQuestion": "Can Dabanggs maintain bowling discipline in the final 2 balls of overs where batsmen take aggressive Bazooka risks?"
+    },
+    "teamDependency": {
+      "level": "MODERATELY DEPENDENT",
+      "description": "Moderately dependent on Abhishek Agarwal and Kalrav Shah to carry the bulk of the net run scoring load.",
+      "implication": "If the Abhishek/Kalrav pair is restricted to an average score, Dabanggs need pairs 3 and 4 to step up with positive differentials."
+    },
+    "captainsWatchlist": [
+      "Verify that fielders hit the stumps directly from backward point and midwicket on early tip-and-run attempts.",
+      "Protect the team's Bazooka deployment for the exact moment Abhishek and Kalrav feel settled in rhythm.",
+      "Ensure batting pairs call early: 'YES', 'NO', 'WAIT' with zero hesitation to eliminate run-out risk.",
+      "Keep extras (wides and legsides) to under 8 runs total per match."
+    ],
+    "whatToWatchFor": [
+      {
+        "hypothesis": "Dabanggs will concede the lowest number of extras (wides + no balls) in Tournament 2.",
+        "confirm": "Conceding fewer than 6 bowling extras per game across the first two rounds.",
+        "disprove": "Bowlers spraying 10+ extras in an opening match under tight umpire scrutiny."
+      },
+      {
+        "hypothesis": "Abhishek Agarwal & Kalrav Shah will win their batting skin in 75%+ of tournament fixtures.",
+        "confirm": "Outscoring their opposition pair in the first two matches by 10+ net runs.",
+        "disprove": "Being held to under 20 net runs in either of the opening fixtures."
+      }
+    ],
+    "evolutionNotice": "Current Team DNA is based strictly on historical tournament evidence, player archetypes, and pre-tournament combination models. No residual match scores from May 2026 are assumed. As Bazooka 4.0 matches commence, live ball-by-ball analysis will update every dimension.",
+    "finalSummary": {
+      "oneLine": "A ruthless accumulation machine whose indoor experience and composure make them extremely difficult to beat in close skins.",
+      "captainsQuestion": "If I were Ritesh Mehta, I would want to see whether our secondary pairs can create 30+ run skins to relieve pressure on our veteran engine room."
+    }
+  }
+}

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Share2, Check, MessageCircle, Copy } from "lucide-react";
+import { trackCTA } from "@/lib/analytics";
 
 interface ShareButtonProps {
   title?: string;
@@ -27,6 +28,7 @@ export default function ShareButton({
 
   const handleShare = async () => {
     const shareUrl = getShareUrl();
+    trackCTA("share_button_click", "VISITOR", { url: shareUrl });
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
         await navigator.share({
@@ -34,6 +36,7 @@ export default function ShareButton({
           text,
           url: shareUrl,
         });
+        trackCTA("share_native_success", "VISITOR", { url: shareUrl });
         return;
       } catch (err) {
         // User cancelled or share unsupported, fallback to dropdown
@@ -44,6 +47,7 @@ export default function ShareButton({
 
   const handleCopy = async () => {
     const shareUrl = getShareUrl();
+    trackCTA("share_copy_link", "VISITOR", { url: shareUrl });
     try {
       await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
@@ -58,6 +62,7 @@ export default function ShareButton({
 
   const handleWhatsApp = () => {
     const shareUrl = getShareUrl();
+    trackCTA("share_whatsapp", "VISITOR", { url: shareUrl });
     const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(
       `${text} ${shareUrl}`
     )}`;

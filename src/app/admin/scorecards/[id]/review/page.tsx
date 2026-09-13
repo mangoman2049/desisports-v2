@@ -19,6 +19,7 @@ import {
 import { ParsedScorecard, BallExtraction } from "@/types/cricket";
 import { validateIndoorCricketScorecard } from "@/lib/rules-engine";
 import { getSampleScorecardExtraction } from "@/lib/extractor-service";
+import { trackCTA, trackPersonaEvent } from "@/lib/analytics";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -375,6 +376,7 @@ function MakerCheckerReviewContent() {
   };
 
   const handleApprove = async () => {
+    trackCTA("scorecard_approve_commit", "REVIEWER", { uploadId });
     setSubmitting(true);
     setApprovalError(null);
     try {
@@ -388,6 +390,10 @@ function MakerCheckerReviewContent() {
         throw new Error(data.error || `Failed to commit scorecard (Status: ${res.status})`);
       }
       setApprovedSuccess(true);
+      trackPersonaEvent("scorecard_approved", "REVIEWER", {
+        uploadId,
+        matchId: data.matchId,
+      });
       const destination = data.matchId ? `/matches/${data.matchId}` : "/matches";
       setTimeout(() => {
         router.refresh();
@@ -443,7 +449,10 @@ function MakerCheckerReviewContent() {
 
         <div className="flex items-center gap-2">
           <button
-            onClick={() => loadScorecardData(true)}
+            onClick={() => {
+              trackCTA("scorecard_flush_reload", "REVIEWER", { uploadId });
+              loadScorecardData(true);
+            }}
             className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer"
             title="Flush session cache and reload fresh extraction from server"
           >

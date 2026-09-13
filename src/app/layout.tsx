@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
+import AnalyticsProvider from "@/components/AnalyticsProvider";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://desisports.milanchheda.com"),
@@ -64,11 +66,28 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Google tag (gtag.js) */}
+        <Script
+          strategy="afterInteractive"
+          src="https://www.googletagmanager.com/gtag/js?id=G-SH3KLTD7S2"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-SH3KLTD7S2');
+          `}
+        </Script>
+      </head>
       <body className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 antialiased selection:bg-emerald-500 selection:text-white">
-        <Navigation />
-        <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
-          {children}
-        </main>
+        <AnalyticsProvider>
+          <Navigation />
+          <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+            {children}
+          </main>
+        </AnalyticsProvider>
       </body>
     </html>
   );

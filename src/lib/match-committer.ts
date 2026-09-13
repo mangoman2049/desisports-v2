@@ -3,6 +3,11 @@ import { ParsedScorecard } from "@/types/cricket";
 import { validateIndoorCricketScorecard } from "@/lib/rules-engine";
 import { resolvePlayerName } from "@/lib/name-resolver";
 import { revalidateCricketCache } from "@/lib/cache-revalidator";
+import {
+  getOrGenerateMatchAnalysis,
+  getOrUpdateTournamentTeamDNA,
+  updatePlayerTacticalInsightsOnMatchComplete,
+} from "@/lib/tactical-trigger-service";
 
 /**
  * Commits an approved or auto-approved scorecard into the database as a permanent Match,
@@ -160,6 +165,7 @@ export async function commitScorecardAsApprovedMatch(params: {
   }
 
   let potmPlayerId: number | null = null;
+  const participatingPlayerIds: number[] = [];
 
   // 6. Persist Player records & PlayerMatchStat rows for all players
   for (const p of allSummaries) {
@@ -208,6 +214,10 @@ export async function commitScorecardAsApprovedMatch(params: {
         });
       }
       playerId = player.id;
+    }
+
+    if (playerId) {
+      participatingPlayerIds.push(playerId);
     }
 
     if (rawName === bestPerformerName) {
@@ -276,6 +286,28 @@ export async function commitScorecardAsApprovedMatch(params: {
         data: { potmPlayerId },
       });
     } catch {}
+  }
+
+  // Trigger Points for the 3 Isolated Prompts (Strictly Event-Driven upon Match Approval)
+  try {
+    // 1. Match Tactical Analysis: Generated & stored ONCE into Match.tacticalAnalysis
+    await getOrGenerateMatchAnalysis(match.id, parsedScorecard);
+
+    // 2. Player Tactical Insights: Updated ONLY for the participating players in this match
+    if (participatingPlayerIds.length > 0) {
+      await updatePlayerTacticalInsightsOnMatchComplete(
+        match.id,
+        Array.from(new Set(participatingPlayerIds))
+      );
+    }
+
+    // 3. Evolving Team DNA: Updated for participating teams in this tournament
+    if (tournamentId > 0) {
+      await getOrUpdateTournamentTeamDNA(tournamentId, homeTeam.id, { onMatchApproved: match.id });
+      await getOrUpdateTournamentTeamDNA(tournamentId, awayTeam.id, { onMatchApproved: match.id });
+    }
+  } catch (triggerErr) {
+    console.warn("[match-committer] Tactical trigger execution warning:", triggerErr);
   }
 
   // Purge any stale cache across matches, tournaments, players, and leaderboards
