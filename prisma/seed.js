@@ -1,5 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const tournament1Data = require("./tournament_1_data.json");
+const tournament2Data = require("./tournament_2_data.json");
 const prisma = new PrismaClient();
 
 async function main() {
@@ -80,6 +81,9 @@ async function main() {
   const awayTeam = await prisma.team.create({
     data: { id: 6, name: "Away Team", code: "AWY" },
   });
+  const desiChallengers = await prisma.team.create({
+    data: { id: 7, name: "Desi Challengers", code: "DCH" },
+  });
 
   // 1. Seed Manish Pandey (ID 35)
   await prisma.player.create({
@@ -110,7 +114,7 @@ async function main() {
     },
   });
 
-  // 3. Extract and Seed ALL Unique Players from tournament_1_data.json with exact IDs!
+  // 3. Extract and Seed ALL Unique Players from tournament_1_data.json and tournament_2_data.json with exact IDs!
   const playerMap = new Map();
   tournament1Data.squads.forEach((squad) => {
     squad.players.forEach((p) => {
@@ -124,6 +128,23 @@ async function main() {
           batting: p.batting || "Right Hand",
           bowling: p.bowling || "Right Arm Medium",
           fielding: p.fielding || "Cover",
+        });
+      }
+    });
+  });
+
+  tournament2Data.squads.forEach((squad) => {
+    squad.players.forEach((p) => {
+      const id = parseInt(p.id, 10);
+      if (!playerMap.has(id) && id !== 35 && id !== 999) {
+        playerMap.set(id, {
+          id: id,
+          canonicalName: p.name,
+          team: squad.team,
+          avatarUrl: p.avatar || null,
+          batting: "Right Hand",
+          bowling: "Right Arm Medium",
+          fielding: p.isCaptain ? "Captain" : "Cover",
         });
       }
     });
@@ -520,7 +541,26 @@ async function main() {
     });
   }
 
-  console.log("Database seeded successfully with all 48 tournament players + 16 practice match players, exact IDs, and grounded stats!");
+  for (const [id, p] of playerMap.entries()) {
+    const pVariants = [p.canonicalName, p.canonicalName.toLowerCase()];
+    const parts = p.canonicalName.trim().split(/\s+/);
+    if (parts.length > 1) {
+      pVariants.push(parts[0]);
+      pVariants.push(parts[0].toLowerCase());
+    }
+    for (const v of pVariants) {
+      const existing = await prisma.playerAlias.findFirst({ where: { alias: v } });
+      if (!existing) {
+        try {
+          await prisma.playerAlias.create({
+            data: { alias: v, playerId: id, confidence: 1.0, status: "APPROVED", approvedBy: "SeedSystem" },
+          });
+        } catch (e) {}
+      }
+    }
+  }
+
+  console.log("Database seeded successfully with all tournament 1 & 2 players, exact IDs, aliases, and grounded stats!");
 }
 
 main()

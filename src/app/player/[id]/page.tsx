@@ -51,14 +51,37 @@ export default async function PlayerProfilePage({ params }: Props) {
     try {
       const fs = await import("fs");
       const path = await import("path");
-      const jsonPath = path.join(process.cwd(), "prisma", "tournament_1_data.json");
-      if (fs.existsSync(jsonPath)) {
-        const t1Data = JSON.parse(fs.readFileSync(jsonPath, "utf-8"));
-        let pName = "";
+      const t1Path = path.join(process.cwd(), "prisma", "tournament_1_data.json");
+      const t2Path = path.join(process.cwd(), "prisma", "tournament_2_data.json");
+
+      let pName = "";
+      let pAvatar: string | null = null;
+      let pRole = "Cover";
+      let pNotes = "Tournament squad registered player.";
+
+      // Check Tournament 2 first
+      if (fs.existsSync(t2Path)) {
+        const t2Data = JSON.parse(fs.readFileSync(t2Path, "utf-8"));
+        for (const squad of t2Data.squads || []) {
+          const matchP = squad.players?.find((sp: any) => String(sp.id) === String(playerId));
+          if (matchP) {
+            pName = matchP.name;
+            pAvatar = matchP.avatar || null;
+            pRole = matchP.isCaptain ? "Captain" : "Cover";
+            pNotes = `Registered player for ${squad.team} in DesiBoys Bazooka 4.0.`;
+            break;
+          }
+        }
+      }
+
+      // Check Tournament 1 if not found
+      if (!pName && fs.existsSync(t1Path)) {
+        const t1Data = JSON.parse(fs.readFileSync(t1Path, "utf-8"));
         for (const squad of t1Data.squads || []) {
           const matchP = squad.players?.find((sp: any) => String(sp.id) === String(playerId));
           if (matchP) {
             pName = matchP.name;
+            pAvatar = matchP.avatar || null;
             break;
           }
         }
@@ -66,34 +89,41 @@ export default async function PlayerProfilePage({ params }: Props) {
           const matchRun = t1Data.topRunGetters?.find((tp: any) => String(tp.playerId) === String(playerId));
           if (matchRun) pName = matchRun.name;
         }
-        if (pName) {
-          player = await prisma.player.upsert({
-            where: { id: playerId },
-            update: {},
-            create: {
-              id: playerId,
-              canonicalName: pName,
-              battingHand: "Right Hand",
-              bowlingStyle: "Right Arm Medium",
-              fieldingPosition: "Cover",
-              notes: "Tournament squad registered player.",
-            },
-            include: {
-              stats: {
-                include: {
-                  match: {
-                    include: {
-                      homeTeam: true,
-                      awayTeam: true,
-                    },
+      }
+
+      if (pName) {
+        player = await prisma.player.upsert({
+          where: { id: playerId },
+          update: {
+            canonicalName: pName,
+            ...(pAvatar ? { avatarUrl: pAvatar } : {}),
+          },
+          create: {
+            id: playerId,
+            canonicalName: pName,
+            battingHand: "Right Hand",
+            bowlingStyle: "Right Arm Medium",
+            fieldingPosition: pRole,
+            captainTags: JSON.stringify(["Tournament Registered"]),
+            fuzzyVariants: JSON.stringify([pName, pName.split(" ")[0]]),
+            notes: pNotes,
+            avatarUrl: pAvatar,
+          },
+          include: {
+            stats: {
+              include: {
+                match: {
+                  include: {
+                    homeTeam: true,
+                    awayTeam: true,
                   },
                 },
               },
-              deliveriesFaced: true,
-              deliveriesBowled: true,
             },
-          });
-        }
+            deliveriesFaced: true,
+            deliveriesBowled: true,
+          },
+        });
       }
     } catch (e) {
       console.error("Fallback player lookup error:", e);
