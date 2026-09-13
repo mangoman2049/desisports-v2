@@ -16,14 +16,35 @@ import {
   ShieldAlert,
   ExternalLink,
   Trophy,
+  Calendar,
+  Layers,
+  ChevronRight,
 } from "lucide-react";
 import { analyzeBrowserImage } from "@/lib/quality-gate";
 import { QualityDiagnostics } from "@/types/cricket";
+import {
+  getTournamentFixtures,
+  getNextUpcomingFixture,
+  FixtureOption,
+} from "@/lib/tournament-fixtures";
 
 function getDefaultMatchTitle(): string {
   const now = new Date();
   const d = String(now.getDate()).padStart(2, "0");
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
   const m = months[now.getMonth()];
   const y = now.getFullYear();
   const hh = String(now.getHours()).padStart(2, "0");
@@ -33,7 +54,13 @@ function getDefaultMatchTitle(): string {
 
 export default function NewScorecardPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-xs text-slate-500">Loading scorecard intake…</div>}>
+    <Suspense
+      fallback={
+        <div className="p-8 text-center text-xs text-slate-500">
+          Loading scorecard intake…
+        </div>
+      }
+    >
       <NewScorecardContent />
     </Suspense>
   );
@@ -42,17 +69,41 @@ export default function NewScorecardPage() {
 function NewScorecardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const initialTournament = searchParams.get("tournamentId") || "0";
+  // Default to Tournament 2 (DesiBoys Bazooka 4.0) per user requirement
+  const initialTournament = searchParams.get("tournamentId") || "2";
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const [tournamentId, setTournamentId] = useState<string>(initialTournament);
-  const [matchTitle, setMatchTitle] = useState<string>(getDefaultMatchTitle());
+  const [availableFixtures, setAvailableFixtures] = useState<FixtureOption[]>(
+    () => getTournamentFixtures(parseInt(initialTournament, 10))
+  );
+  const [selectedFixture, setSelectedFixture] = useState<FixtureOption | null>(
+    () => {
+      const fixtures = getTournamentFixtures(parseInt(initialTournament, 10));
+      const paramFixtureId = searchParams.get("fixtureId");
+      if (paramFixtureId) {
+        const found = fixtures.find((f) => String(f.id) === paramFixtureId);
+        if (found) return found;
+      }
+      return getNextUpcomingFixture(parseInt(initialTournament, 10));
+    }
+  );
+
+  const [matchTitle, setMatchTitle] = useState<string>(() => {
+    const fixtures = getTournamentFixtures(parseInt(initialTournament, 10));
+    const next = getNextUpcomingFixture(parseInt(initialTournament, 10));
+    return next
+      ? `${next.team1} vs ${next.team2} (${next.date})`
+      : getDefaultMatchTitle();
+  });
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [analyzingQuality, setAnalyzingQuality] = useState(false);
-  const [qualityDiagnostics, setQualityDiagnostics] = useState<QualityDiagnostics | null>(null);
+  const [qualityDiagnostics, setQualityDiagnostics] =
+    useState<QualityDiagnostics | null>(null);
   const [extracting, setExtracting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [duplicateAlert, setDuplicateAlert] = useState<{
@@ -60,21 +111,67 @@ function NewScorecardContent() {
     existingMatchId?: number;
     existingUploadId?: string;
   } | null>(null);
+  const [fixtureMismatchAlert, setFixtureMismatchAlert] = useState<{
+    message: string;
+    expectedTeams?: { home: string; away: string };
+    extractedTeams?: { home: string; away: string };
+  } | null>(null);
 
-  // Sync tournamentId if query changes
+  // Sync tournamentId or fixtureId if query params change
   useEffect(() => {
     const tId = searchParams.get("tournamentId");
-    if (tId) setTournamentId(tId);
+    if (tId && tId !== tournamentId) {
+      handleTournamentChange(tId);
+    }
+    const fId = searchParams.get("fixtureId");
+    if (fId) {
+      const fixtures = getTournamentFixtures(
+        parseInt(tId || tournamentId, 10)
+      );
+      const found = fixtures.find((f) => String(f.id) === fId);
+      if (found) {
+        setSelectedFixture(found);
+        setMatchTitle(`${found.team1} vs ${found.team2} (${found.date})`);
+      }
+    }
   }, [searchParams]);
+
+  const handleTournamentChange = (newTId: string) => {
+    setTournamentId(newTId);
+    const fixtures = getTournamentFixtures(parseInt(newTId, 10));
+    setAvailableFixtures(fixtures);
+    const next = getNextUpcomingFixture(parseInt(newTId, 10));
+    setSelectedFixture(next);
+    if (next) {
+      setMatchTitle(`${next.team1} vs ${next.team2} (${next.date})`);
+    } else {
+      setMatchTitle(getDefaultMatchTitle());
+    }
+    setFixtureMismatchAlert(null);
+    setDuplicateAlert(null);
+    setErrorMessage(null);
+  };
+
+  const handleFixtureChange = (fixtureIdStr: string) => {
+    const found = availableFixtures.find((f) => String(f.id) === fixtureIdStr);
+    if (found) {
+      setSelectedFixture(found);
+      setMatchTitle(`${found.team1} vs ${found.team2} (${found.date})`);
+      setFixtureMismatchAlert(null);
+      setDuplicateAlert(null);
+      setErrorMessage(null);
+    }
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // 1. Immediately flush all previous diagnostics, error messages, and duplicate alerts
+    // 1. Immediately flush all previous diagnostics, error messages, duplicate alerts, and mismatch alerts
     setQualityDiagnostics(null);
     setErrorMessage(null);
     setDuplicateAlert(null);
+    setFixtureMismatchAlert(null);
 
     setSelectedFile(file);
     const objectUrl = URL.createObjectURL(file);
@@ -99,11 +196,14 @@ function NewScorecardContent() {
     setAnalyzingQuality(true);
     setErrorMessage(null);
     setDuplicateAlert(null);
+    setFixtureMismatchAlert(null);
 
     try {
       const response = await fetch("/uploads/scorecards/sample-scorecard.jpg");
       const blob = await response.blob();
-      const file = new File([blob], "sample-scorecard.jpg", { type: "image/jpeg" });
+      const file = new File([blob], "sample-scorecard.jpg", {
+        type: "image/jpeg",
+      });
       setSelectedFile(file);
 
       const result = await analyzeBrowserImage(file);
@@ -113,11 +213,37 @@ function NewScorecardContent() {
         overallPass: true,
         score: 96,
         checks: {
-          resolution: { passed: true, width: 1600, height: 2844, minRequired: { width: 1000, height: 1200 }, message: "Resolution meets high-density OCR requirements." },
-          blur: { passed: true, score: 240, threshold: 120, message: "Sheet text and circled marks are sharp." },
-          exposure: { passed: true, luminosity: 155, optimalRange: [80, 210], message: "Balanced paper exposure." },
-          glare: { passed: true, specularFraction: 0.015, threshold: 0.08, message: "No obstructive specular highlights." },
-          perspective: { passed: true, aspectRatio: 0.56, skewAngleDegrees: 1.2, message: "Page geometry is flat and aligned." },
+          resolution: {
+            passed: true,
+            width: 1600,
+            height: 2844,
+            minRequired: { width: 1000, height: 1200 },
+            message: "Resolution meets high-density OCR requirements.",
+          },
+          blur: {
+            passed: true,
+            score: 240,
+            threshold: 120,
+            message: "Sheet text and circled marks are sharp.",
+          },
+          exposure: {
+            passed: true,
+            luminosity: 155,
+            optimalRange: [80, 210],
+            message: "Balanced paper exposure.",
+          },
+          glare: {
+            passed: true,
+            specularFraction: 0.015,
+            threshold: 0.08,
+            message: "No obstructive specular highlights.",
+          },
+          perspective: {
+            passed: true,
+            aspectRatio: 0.56,
+            skewAngleDegrees: 1.2,
+            message: "Page geometry is flat and aligned.",
+          },
         },
         retakePrompts: [],
       });
@@ -129,6 +255,7 @@ function NewScorecardContent() {
   const handleProceedToExtraction = async (forceDuplicate = false) => {
     setExtracting(true);
     setErrorMessage(null);
+    setFixtureMismatchAlert(null);
 
     try {
       const formData = new FormData();
@@ -145,12 +272,30 @@ function NewScorecardContent() {
       }
       formData.append("tournamentId", tournamentId);
 
+      // Pass fixture binding metadata for server-side mismatch guard
+      if (selectedFixture) {
+        formData.append("fixtureId", String(selectedFixture.id));
+        formData.append("expectedHomeTeam", selectedFixture.team1);
+        formData.append("expectedAwayTeam", selectedFixture.team2);
+      }
+
       const res = await fetch("/api/scorecards/upload", {
         method: "POST",
         body: formData,
       });
 
       const data = await res.json();
+
+      // Strict Fixture Mismatch Guard
+      if (res.status === 422 && data.isMismatch) {
+        setFixtureMismatchAlert({
+          message: data.message,
+          expectedTeams: data.expectedTeams,
+          extractedTeams: data.extractedTeams,
+        });
+        setExtracting(false);
+        return;
+      }
 
       if (res.status === 409 && data.isDuplicate) {
         setDuplicateAlert({
@@ -167,7 +312,10 @@ function NewScorecardContent() {
       }
 
       // Store parsed result in session cache for maker-checker review
-      sessionStorage.setItem(`scorecard_${data.uploadId}`, JSON.stringify(data.parsedScorecard));
+      sessionStorage.setItem(
+        `scorecard_${data.uploadId}`,
+        JSON.stringify(data.parsedScorecard)
+      );
 
       // Navigate to maker-checker review screen
       router.push(`/admin/scorecards/${data.uploadId}/review`);
@@ -183,16 +331,18 @@ function NewScorecardContent() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/20">
+            <span className="text-xs font-semibold uppercase tracking-wider text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/40 px-2 py-0.5 rounded border border-purple-500/20">
               Tournament Intake Flow
             </span>
-            <span className="text-xs font-mono text-slate-500">Quality Gate & Duplicate Guard Active</span>
+            <span className="text-xs font-mono text-slate-500">
+              Fixture Binding & Strict Mismatch Guard Active
+            </span>
           </div>
           <h1 className="text-2xl font-black text-slate-900 dark:text-white mt-1">
             Scan & Reconcile Scorecard
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Immediate visual quality gate before OCR extraction. Fast maker-checker verification.
+            Select scheduled fixture to eliminate ambiguity. Fast quality gate and maker-checker audit.
           </p>
         </div>
 
@@ -202,12 +352,18 @@ function NewScorecardContent() {
             <Trophy className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
             <select
               value={tournamentId}
-              onChange={(e) => setTournamentId(e.target.value)}
+              onChange={(e) => handleTournamentChange(e.target.value)}
               className="bg-transparent font-bold text-slate-900 dark:text-white focus:outline-none cursor-pointer"
             >
-              <option value="0" className="text-slate-900">Desisports Regular Practice (#0)</option>
-              <option value="1" className="text-slate-900">Desi Boys Tournament May 2026 (#1)</option>
-              <option value="2" className="text-slate-900">DesiBoys Bazooka 4.0 (#2)</option>
+              <option value="2" className="text-slate-900">
+                DesiBoys Bazooka 4.0 (#2) [Current]
+              </option>
+              <option value="0" className="text-slate-900">
+                Desisports Regular Practice (#0)
+              </option>
+              <option value="1" className="text-slate-900">
+                Desi Boys Tournament May 2026 (#1)
+              </option>
             </select>
           </div>
 
@@ -220,6 +376,101 @@ function NewScorecardContent() {
           </button>
         </div>
       </div>
+
+      {/* FIXTURE SELECTOR CARD */}
+      <div className="rounded-2xl bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 text-white p-5 border border-slate-800 shadow-md space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800/80">
+          <div className="flex items-center gap-2.5">
+            <div className="h-8 w-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center border border-purple-500/30">
+              <Calendar className="h-4 w-4" />
+            </div>
+            <div>
+              <div className="text-xs font-bold uppercase tracking-wider text-purple-400">
+                Fixture Binding
+              </div>
+              <div className="text-sm font-black text-white">
+                Select Official Fixture
+              </div>
+            </div>
+          </div>
+
+          {/* Fixture Selector Dropdown */}
+          <div className="flex items-center gap-2">
+            <select
+              value={selectedFixture ? String(selectedFixture.id) : ""}
+              onChange={(e) => handleFixtureChange(e.target.value)}
+              className="bg-slate-800 text-xs font-semibold text-white px-3 py-2 rounded-xl border border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer max-w-[280px] sm:max-w-xs truncate"
+            >
+              {availableFixtures.map((f) => (
+                <option
+                  key={f.id}
+                  value={String(f.id)}
+                  className="bg-slate-900 text-white"
+                >
+                  {f.stage}: {f.team1} vs {f.team2} ({f.date.split(",")[0]})
+                  {f.hasScorecard ? " ✓ Done" : " • Next Up"}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {selectedFixture && (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs bg-slate-950/60 p-3.5 rounded-xl border border-slate-800/80">
+            <div>
+              <span className="text-slate-400 font-mono">Teams</span>
+              <div className="text-sm font-black text-white mt-0.5">
+                {selectedFixture.team1}{" "}
+                <span className="text-purple-400 font-normal">vs</span>{" "}
+                {selectedFixture.team2}
+              </div>
+            </div>
+            <div>
+              <span className="text-slate-400 font-mono">Scheduled Date</span>
+              <div className="text-xs font-bold text-amber-300 font-mono mt-0.5">
+                {selectedFixture.date}
+              </div>
+            </div>
+            <div>
+              <span className="text-slate-400 font-mono">Stage & Status</span>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                  {selectedFixture.stage}
+                </span>
+                <span className="text-[11px] text-slate-400 font-mono">
+                  {selectedFixture.hasScorecard
+                    ? "Scorecard Approved"
+                    : "Awaiting Scorecard"}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* FIXTURE MISMATCH ALERT BANNER */}
+      {fixtureMismatchAlert && (
+        <div className="rounded-2xl border-2 border-red-500/50 bg-red-500/10 p-5 space-y-3 animate-in fade-in">
+          <div className="flex items-start gap-3">
+            <ShieldAlert className="h-6 w-6 text-red-500 shrink-0 mt-0.5" />
+            <div className="space-y-1.5 flex-1">
+              <h3 className="text-sm font-black text-red-500 dark:text-red-400">
+                Fixture Mismatch Detected
+              </h3>
+              <p className="text-xs text-slate-700 dark:text-slate-300">
+                {fixtureMismatchAlert.message}
+              </p>
+              <div className="flex flex-wrap gap-2 text-xs font-semibold pt-1">
+                <span className="text-slate-500">Extracted from Scorecard:</span>
+                <span className="px-2 py-0.5 rounded bg-red-100 dark:bg-red-950/60 text-red-700 dark:text-red-300 border border-red-300 dark:border-red-800">
+                  {fixtureMismatchAlert.extractedTeams?.home} vs{" "}
+                  {fixtureMismatchAlert.extractedTeams?.away}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Upload & Camera Buttons */}
       {!previewUrl && (
@@ -258,251 +509,247 @@ function NewScorecardContent() {
             onClick={() => fileInputRef.current?.click()}
             className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600 bg-white dark:bg-slate-900 rounded-2xl transition group text-center"
           >
-            <div className="h-14 w-14 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-300 mb-3 group-hover:scale-105 transition">
+            <div className="h-14 w-14 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 mb-3 group-hover:scale-105 transition">
               <Upload className="h-7 w-7" />
             </div>
             <span className="text-sm font-bold text-slate-900 dark:text-white">
-              Upload Scorecard Image
+              Upload Existing Image
             </span>
-            <span className="text-xs text-slate-500 mt-1 max-w-[200px]">
-              JPG, PNG or PDF scan from phone or gallery
+            <span className="text-xs text-slate-500 mt-1">
+              Supports JPEG, PNG, or WebP
             </span>
           </button>
         </div>
       )}
 
-      {/* Error Message */}
-      {errorMessage && (
-        <div className="p-4 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 rounded-xl text-xs text-rose-700 dark:text-rose-300 flex items-center gap-2">
-          <AlertTriangle className="h-4 w-4 shrink-0" />
-          <span>{errorMessage}</span>
-        </div>
-      )}
-
-      {/* Preview & Quality Gate Results */}
+      {/* Image Preview & Quality Gate Analysis */}
       {previewUrl && (
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          {/* Image Thumbnail Column */}
-          <div className="md:col-span-5 space-y-3">
-            <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-900 shadow-sm">
-              <img
-                src={previewUrl}
-                alt="Scorecard preview"
-                className="w-full h-full object-contain"
-              />
-              <div className="absolute top-2 left-2 bg-black/75 backdrop-blur text-white text-[10px] font-mono px-2 py-0.5 rounded">
-                Spawtz Template V1
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+            {/* Image Preview */}
+            <div className="md:col-span-6 bg-slate-100 dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center">
+              <div className="relative max-h-[420px] overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                <img
+                  src={previewUrl}
+                  alt="Scorecard preview"
+                  className="object-contain max-h-[420px] w-auto"
+                />
+              </div>
+
+              <div className="flex items-center gap-3 mt-4">
+                <button
+                  onClick={() => {
+                    setPreviewUrl(null);
+                    setSelectedFile(null);
+                    setQualityDiagnostics(null);
+                    setErrorMessage(null);
+                    setDuplicateAlert(null);
+                    setFixtureMismatchAlert(null);
+                  }}
+                  className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 transition"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                  <span>Choose Another Image</span>
+                </button>
               </div>
             </div>
 
-            <div className="flex gap-2">
-              <button
-                onClick={() => {
-                  setPreviewUrl(null);
-                  setSelectedFile(null);
-                  setQualityDiagnostics(null);
-                  setDuplicateAlert(null);
-                  setErrorMessage(null);
-                }}
-                className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-medium text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 rounded-lg transition"
-              >
-                <RotateCcw className="h-3.5 w-3.5" />
-                <span>Choose Another</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Quality Gate Inspection Panel */}
-          <div className="md:col-span-7 space-y-4">
-            <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-                <div className="flex items-center gap-2">
-                  <FileCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                  <span className="text-sm font-bold text-slate-900 dark:text-white">
-                    Image Quality Gate
-                  </span>
+            {/* Quality Diagnostics Card */}
+            <div className="md:col-span-6 flex flex-col justify-between space-y-4">
+              <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-emerald-500" />
+                    <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+                      Automated Quality Gate
+                    </h2>
+                  </div>
+                  {analyzingQuality ? (
+                    <span className="text-xs text-slate-400 animate-pulse">
+                      Analyzing pixels…
+                    </span>
+                  ) : qualityDiagnostics ? (
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`text-xs font-black font-mono px-2 py-0.5 rounded-full ${
+                          qualityDiagnostics.overallPass
+                            ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-500/20"
+                            : "bg-red-50 text-red-700 dark:bg-red-950/50 dark:text-red-400 border border-red-500/20"
+                        }`}
+                      >
+                        {qualityDiagnostics.score}% Score
+                      </span>
+                    </div>
+                  ) : null}
                 </div>
-                {analyzingQuality ? (
-                  <span className="text-xs font-medium text-amber-600 dark:text-amber-400 animate-pulse">
-                    Scanning pixels…
-                  </span>
-                ) : qualityDiagnostics?.overallPass ? (
-                  <span className="flex items-center gap-1 text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                    Passed ({qualityDiagnostics.score}%)
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-1 text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 px-2 py-0.5 rounded-full border border-rose-500/20">
-                    <AlertTriangle className="h-3.5 w-3.5" />
-                    Retake Suggested ({qualityDiagnostics?.score || 0}%)
-                  </span>
-                )}
-              </div>
 
-              {/* 5 Quality Check Breakdown */}
-              {qualityDiagnostics && (
-                <div className="mt-3 space-y-2.5">
-                  {Object.entries(qualityDiagnostics.checks).map(([key, item]) => (
-                    <div
-                      key={key}
-                      className="flex items-center justify-between text-xs py-1 px-2 rounded-lg bg-slate-50 dark:bg-slate-800/50"
-                    >
-                      <div className="flex items-center gap-2">
-                        {item.passed ? (
-                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-                        ) : (
-                          <AlertTriangle className="h-3.5 w-3.5 text-rose-500" />
-                        )}
-                        <span className="font-semibold capitalize text-slate-800 dark:text-slate-200">
-                          {key}
+                {analyzingQuality && (
+                  <div className="py-8 text-center space-y-2">
+                    <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+                    <p className="text-xs text-slate-500">
+                      Evaluating sharpness, resolution, and exposure…
+                    </p>
+                  </div>
+                )}
+
+                {!analyzingQuality && qualityDiagnostics && (
+                  <div className="space-y-3">
+                    <div className="space-y-2 text-xs">
+                      {/* Resolution Check */}
+                      <div className="flex items-start justify-between gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60">
+                        <div>
+                          <span className="font-semibold text-slate-900 dark:text-white">
+                            Image Resolution
+                          </span>
+                          <p className="text-[11px] text-slate-500 mt-0.5">
+                            {qualityDiagnostics.checks.resolution.message}
+                          </p>
+                        </div>
+                        <span
+                          className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                            qualityDiagnostics.checks.resolution.passed
+                              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400"
+                              : "bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-400"
+                          }`}
+                        >
+                          {qualityDiagnostics.checks.resolution.passed
+                            ? "Pass"
+                            : "Fail"}
                         </span>
                       </div>
-                      <span className="text-slate-500 dark:text-slate-400 text-[11px]">
-                        {item.message}
-                      </span>
+
+                      {/* Blur / Sharpness Check */}
+                      <div className="flex items-start justify-between gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60">
+                        <div>
+                          <span className="font-semibold text-slate-900 dark:text-white">
+                            Focus & Text Sharpness
+                          </span>
+                          <p className="text-[11px] text-slate-500 mt-0.5">
+                            {qualityDiagnostics.checks.blur.message}
+                          </p>
+                        </div>
+                        <span
+                          className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                            qualityDiagnostics.checks.blur.passed
+                              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400"
+                              : "bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-400"
+                          }`}
+                        >
+                          {qualityDiagnostics.checks.blur.passed
+                            ? "Sharp"
+                            : "Blurry"}
+                        </span>
+                      </div>
+
+                      {/* Exposure Check */}
+                      <div className="flex items-start justify-between gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60">
+                        <div>
+                          <span className="font-semibold text-slate-900 dark:text-white">
+                            Lighting & Exposure
+                          </span>
+                          <p className="text-[11px] text-slate-500 mt-0.5">
+                            {qualityDiagnostics.checks.exposure.message}
+                          </p>
+                        </div>
+                        <span
+                          className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                            qualityDiagnostics.checks.exposure.passed
+                              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400"
+                              : "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-400"
+                          }`}
+                        >
+                          {qualityDiagnostics.checks.exposure.passed
+                            ? "Optimal"
+                            : "Suboptimal"}
+                        </span>
+                      </div>
                     </div>
-                  ))}
 
-                  {/* Retake Guidance Prompt if any failed */}
-                  {qualityDiagnostics.retakePrompts.length > 0 && (
-                    <div className="mt-3 p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 rounded-lg">
-                      <span className="text-xs font-bold text-amber-800 dark:text-amber-300 block mb-1">
-                        How to improve capture:
-                      </span>
-                      <ul className="text-xs text-amber-700 dark:text-amber-400 list-disc list-inside space-y-1">
-                        {qualityDiagnostics.retakePrompts.map((prompt, idx) => (
-                          <li key={idx}>{prompt}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Next Step Action */}
-            <div className="p-4 rounded-xl border border-emerald-500/20 bg-emerald-50/40 dark:bg-emerald-950/20 space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-200 mb-1">
-                  Match Identifier / Title
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={matchTitle}
-                    onChange={(e) => setMatchTitle(e.target.value)}
-                    placeholder="e.g. 12Sep2026_Insportz_2000"
-                    className="flex-1 px-3 py-1.5 text-xs font-mono font-semibold rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setMatchTitle(getDefaultMatchTitle())}
-                    className="px-2.5 py-1.5 text-[11px] font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 rounded-lg border border-slate-200 dark:border-slate-700"
-                    title="Reset to current time"
-                  >
-                    Reset
-                  </button>
-                </div>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                  Automated naming pattern: <code className="font-mono">{getDefaultMatchTitle()}</code>
-                </p>
-              </div>
-
-              {/* Name Resolution Status Badge */}
-              <div className="p-2.5 rounded-lg bg-white/70 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-slate-700 dark:text-slate-300 font-semibold">
-                    16-Player Fuzzy Resolver Ready
-                  </span>
-                </div>
-                <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-mono">
-                  Maneesh → Manish Pandey (#35)
-                </span>
-              </div>
-
-              {/* Duplicate Alert Notice inside Action Card */}
-              {duplicateAlert && (
-                <div className="p-3.5 rounded-xl border border-amber-500/40 bg-amber-50/90 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 space-y-2.5 shadow-sm">
-                  <div className="flex items-start gap-2">
-                    <ShieldAlert className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-                    <div className="space-y-0.5">
-                      <h4 className="text-xs font-bold">Duplicate Match Detected</h4>
-                      <p className="text-[11px] text-amber-800 dark:text-amber-300 leading-snug">
-                        {duplicateAlert.message}
-                      </p>
-                    </div>
+                    {/* Retake Guidance (if any) */}
+                    {qualityDiagnostics.retakePrompts.length > 0 && (
+                      <div className="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-500/20 rounded-xl space-y-1">
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-amber-700 dark:text-amber-400">
+                          <AlertTriangle className="h-3.5 w-3.5" />
+                          <span>Quality Recommendations</span>
+                        </div>
+                        <ul className="list-disc list-inside text-[11px] text-amber-800 dark:text-amber-300 space-y-0.5">
+                          {qualityDiagnostics.retakePrompts.map(
+                            (prompt, idx) => (
+                              <li key={idx}>{prompt}</li>
+                            )
+                          )}
+                        </ul>
+                      </div>
+                    )}
                   </div>
-                  <div className="flex flex-wrap items-center gap-2 pt-1 text-xs font-semibold">
-                    {duplicateAlert.existingMatchId && (
-                      <Link
-                        href={`/matches/${duplicateAlert.existingMatchId}`}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200 hover:bg-amber-100 transition text-[11px]"
-                      >
-                        <span>View Match #{duplicateAlert.existingMatchId}</span>
-                        <ExternalLink className="h-3 w-3" />
-                      </Link>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => setDuplicateAlert(null)}
-                      className="text-[11px] text-slate-600 dark:text-slate-400 hover:underline px-2 py-1 cursor-pointer"
-                    >
-                      Dismiss
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 border-t border-emerald-500/10">
-                <div>
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                    <Sparkles className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                    Fixed-Template OCR & Validation
-                  </h3>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-                    Extracts ball-by-ball cells, circled dismissals (R, B, C, ST), runs, extras, and reconciles skin totals before maker-checker review.
-                  </p>
-                </div>
-
-                {duplicateAlert ? (
-                  <button
-                    disabled={analyzingQuality || extracting}
-                    onClick={() => handleProceedToExtraction(true)}
-                    className="flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-sm transition shrink-0 cursor-pointer"
-                  >
-                    {extracting ? (
-                      <>
-                        <div className="h-3 w-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>Overriding & Ingesting…</span>
-                      </>
-                    ) : (
-                      <>
-                        <ShieldAlert className="h-3.5 w-3.5" />
-                        <span>Override & Force Ingest</span>
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </>
-                    )}
-                  </button>
-                ) : (
-                  <button
-                    disabled={analyzingQuality || extracting}
-                    onClick={() => handleProceedToExtraction(false)}
-                    className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-sm transition shrink-0 cursor-pointer"
-                  >
-                    {extracting ? (
-                      <>
-                        <div className="h-3 w-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        <span>Extracting…</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>Extract & Reconcile</span>
-                        <ArrowRight className="h-3.5 w-3.5" />
-                      </>
-                    )}
-                  </button>
                 )}
+              </div>
+
+              {/* Extraction Action Strip */}
+              <div className="space-y-3">
+                {duplicateAlert && (
+                  <div className="p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-500/30 rounded-2xl space-y-2">
+                    <div className="flex items-center gap-2 text-xs font-bold text-amber-800 dark:text-amber-300">
+                      <ShieldAlert className="h-4 w-4 text-amber-600" />
+                      <span>Potential Duplicate Scorecard Detected</span>
+                    </div>
+                    <p className="text-xs text-amber-700 dark:text-amber-400">
+                      {duplicateAlert.message}
+                    </p>
+                    <div className="flex items-center gap-3 pt-1">
+                      <button
+                        onClick={() => handleProceedToExtraction(true)}
+                        className="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition"
+                      >
+                        Override & Re-Extract Match
+                      </button>
+                      {duplicateAlert.existingMatchId && (
+                        <Link
+                          href={`/matches/${duplicateAlert.existingMatchId}`}
+                          className="text-xs text-amber-800 dark:text-amber-300 hover:underline flex items-center gap-1 font-semibold"
+                        >
+                          <span>View Existing Match</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {errorMessage && (
+                  <div className="p-3 bg-red-50 dark:bg-red-950/30 border border-red-500/20 rounded-xl text-xs text-red-700 dark:text-red-400 flex items-center gap-2">
+                    <AlertTriangle className="h-4 w-4 shrink-0" />
+                    <span>{errorMessage}</span>
+                  </div>
+                )}
+
+                <button
+                  onClick={() => handleProceedToExtraction(false)}
+                  disabled={
+                    extracting ||
+                    analyzingQuality ||
+                    (qualityDiagnostics !== null &&
+                      !qualityDiagnostics.overallPass)
+                  }
+                  className={`w-full py-3.5 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition shadow-lg ${
+                    qualityDiagnostics?.overallPass
+                      ? "bg-purple-600 hover:bg-purple-500 text-white shadow-purple-900/30 cursor-pointer"
+                      : "bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed"
+                  }`}
+                >
+                  {extracting ? (
+                    <>
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      <span>Extracting & Reconciling 16 Players…</span>
+                    </>
+                  ) : (
+                    <>
+                      <FileCheck className="h-4 w-4" />
+                      <span>Proceed to Maker-Checker Review</span>
+                      <ArrowRight className="h-4 w-4" />
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           </div>

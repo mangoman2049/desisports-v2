@@ -557,8 +557,8 @@ async function runTestSuite() {
       "2": ["DesiDabanggs", "DesiTigers"],
       "3": ["VPGR", "DesiDabanggs"],
       "4": ["DesiTitans", "DesiTigers"],
-      "5": ["DesiTitans", "DesiDabanggs"],
-      "6": ["VPGR", "DesiTigers"],
+      "5": ["VPGR", "DesiTigers"],
+      "6": ["DesiTitans", "DesiDabanggs"],
     };
 
     let crossContaminations = 0;
@@ -843,6 +843,108 @@ async function runTestSuite() {
     passedAll = false;
   }
 
+  // Test 21: Match 5 & 6 Analysis Integrity & Team Matching Controls
+  console.log("\n[Test 21] Match 5 & 6 Analysis Integrity & Team Matching Controls:");
+  try {
+    const { MATCH_ANALYSES } = await import("../src/lib/match-analyses");
+    const m5 = MATCH_ANALYSES["5"];
+    const m6 = MATCH_ANALYSES["6"];
+
+    console.log(`- Match 5 Title: ${m5?.matchTitle} (Winner: ${m5?.winner})`);
+    console.log(`- Match 5 Score: ${m5?.scoreSummary}`);
+    console.log(`- Match 6 Title: ${m6?.matchTitle} (Winner: ${m6?.winner})`);
+    console.log(`- Match 6 Score: ${m6?.scoreSummary}`);
+
+    const m5IsFinal = m5?.matchTitle.includes("DesiTigers") && m5?.matchTitle.includes("VPGR") && m5?.winner === "DesiTigers";
+    const m6Is3rdPlace = (m6?.matchTitle.includes("DesiDabanggs") || m6?.matchTitle.includes("DesiTitans")) && m6?.winner === "DesiDabanggs" && m6?.scoreSummary.includes("94 def. DesiTitans 76");
+
+    if (!m5IsFinal || !m6Is3rdPlace) {
+      console.error("FAIL: Match 5 and 6 analyses are not correctly mapped to their respective matches and scores!");
+      passedAll = false;
+    } else {
+      console.log("PASS: Match 5 (Championship Final) and Match 6 (3rd Place Playoff) successfully reconciled and verified.");
+    }
+  } catch (err) {
+    console.error("FAIL: Test 21 encountered error:", err);
+    passedAll = false;
+  }
+
+  // Test 22: Tournament 2 Authentic Squads & 9 Scheduled Fixtures
+  console.log("\n[Test 22] Tournament 2 Authentic Squads & 9 Scheduled Fixtures:");
+  try {
+    const t2Data = (await import("../prisma/tournament_2_data.json")).default;
+    const t2Squads = t2Data.squads || [];
+    const t2Fixtures = t2Data.fixtures || [];
+
+    const totalAssignments = t2Squads.reduce((acc: number, s: any) => acc + (s.players?.length || 0), 0);
+    const playerSeen = new Set<string>();
+    let hasDuplicate = false;
+
+    for (const s of t2Squads) {
+      for (const p of s.players || []) {
+        const id = String(p.id);
+        if (playerSeen.has(id)) {
+          hasDuplicate = true;
+          console.error(`Duplicate found: Player ${p.name} (ID: ${id}) in squad ${s.team}`);
+        }
+        playerSeen.add(id);
+      }
+    }
+
+    console.log(`- T2 Franchise Squads: ${t2Squads.length} / 4`);
+    console.log(`- T2 Total Player Assignments: ${totalAssignments} / 52`);
+    console.log(`- T2 Unique Players Count: ${playerSeen.size} / 52 (Duplicates: ${hasDuplicate ? "YES" : "0"})`);
+    console.log(`- T2 Scheduled Fixtures: ${t2Fixtures.length} / 9`);
+
+    if (t2Squads.length !== 4 || totalAssignments !== 52 || hasDuplicate || t2Fixtures.length !== 9) {
+      console.error("FAIL: Tournament 2 squads or fixtures do not strictly reconcile with authentic live tournament structure!");
+      passedAll = false;
+    } else {
+      console.log("PASS: Tournament 2 authentic squads (52 unique players, 0 duplicates) and 9 scheduled fixtures verified.");
+    }
+  } catch (err) {
+    console.error("FAIL: Test 22 encountered error:", err);
+    passedAll = false;
+  }
+
+  // Test 23: Scorecard Upload Fixture Selector & Mismatch Validation Guard
+  console.log("\n[Test 23] Scorecard Upload Fixture Selector & Mismatch Validation Guard:");
+  try {
+    const { getNextUpcomingFixture, validateFixtureTeamsMatch } = await import("../src/lib/tournament-fixtures");
+    const nextT2 = getNextUpcomingFixture(2);
+
+    console.log(`- Default Next Fixture for T2: Match #${nextT2?.matchNumber} (${nextT2?.team1} vs ${nextT2?.team2}) on ${nextT2?.date}`);
+
+    const isNextMatch1 = nextT2?.matchNumber === 1 && nextT2?.team1 === "Desi Titans" && nextT2?.team2 === "Desi Dabanggs";
+
+    // Test mismatch detection
+    const mismatch = validateFixtureTeamsMatch(
+      { team1: "Desi Titans", team2: "Desi Dabanggs" },
+      "VPGR",
+      "Desi Tigers"
+    );
+    console.log(`- Mismatched Teams Detected as Error: ${!mismatch.isMatch}`);
+    console.log(`- Mismatch Message: "${mismatch.reason}"`);
+
+    // Test valid matching
+    const validMatch = validateFixtureTeamsMatch(
+      { team1: "Desi Titans", team2: "Desi Dabanggs" },
+      "Titans",
+      "Dabanggs"
+    );
+    console.log(`- Valid Teams Accepted with Fuzzy Normalization: ${validMatch.isMatch}`);
+
+    if (!isNextMatch1 || mismatch.isMatch || !validMatch.isMatch) {
+      console.error("FAIL: Fixture selector next-match defaulting or team mismatch validation failed!");
+      passedAll = false;
+    } else {
+      console.log("PASS: Fixture selector smart defaulting and strict mismatch validation guard verified.");
+    }
+  } catch (err) {
+    console.error("FAIL: Test 23 encountered error:", err);
+    passedAll = false;
+  }
+
   await prisma.$disconnect();
 
   if (!passedAll) {
@@ -850,7 +952,7 @@ async function runTestSuite() {
     process.exit(1);
   } else {
     console.log("\n==================================================");
-    console.log("✅ ALL 20 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
+    console.log("✅ ALL 23 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
     console.log("==================================================");
     process.exit(0);
   }

@@ -1009,238 +1009,13 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
   },
 
   // ==========================================
-  // Match 5: DesiTitans vs DesiDabanggs (3rd Place Playoff)
+  // Match 5: DesiTigers vs VPGR (Championship Final)
   // ==========================================
   "5": {
     matchId: 5,
     tournamentName: "Desi Boys Tournament May 2026",
-    matchTitle: "DesiTitans vs DesiDabanggs",
-    date: "17 May 2026, 7:00 PM",
-    venue: "Insportz Club, Dubai (Court 1)",
-    winner: "DesiDabanggs",
-    loser: "DesiTitans",
-    scoreSummary: "DesiDabanggs 76 def. DesiTitans 58 (+18 run margin, 3-1 skins, 7-1 tournament pts)",
-    editorHeadline: "Preraq Mistry's Resurgence Inspires Dabanggs to 3rd-Place Playoff Triumph",
-    editorSummary:
-      "DesiDabanggs redeemed a frustrating tournament campaign by capturing 3rd place with an 18-run victory over DesiTitans, claiming 7 tournament points (3 skins × 1 pt + 4 match pts) to Titans' 1 point. Player of the Match Preraq Mistry produced his finest innings of the competition, blasting 28 runs in Skin 1. DesiTitans fought gamely, winning Skin 4, but could not overcome a 15-run deficit from the first two skins.",
-    whatWentRightWinner: {
-      title: "Tactical Wins for DesiDabanggs",
-      points: [
-        "Preraq Mistry scored 28 runs in Skin 1 to win Player of the Match.",
-        "Cut dismissal count from 8 in previous matches down to just 3.",
-        "Won Skins 1, 2, and 3 through disciplined ground-running.",
-      ],
-    },
-    whatWentWrongLoser: {
-      title: "Critical Breakdowns for DesiTitans",
-      points: [
-        "Conceded 28 runs in Skin 1, allowing Dabanggs an early psychological advantage.",
-        "Skin 2 yielded only 12 runs against tight bowling from Gagandeep Singh.",
-        "Could not convert a strong Skin 4 into an overall victory.",
-      ],
-    },
-    turningPoint: {
-      phase: "Skin 1 (Overs 1-4)",
-      nature: "Turnaround",
-      description:
-        "After two matches of opening collapses, Preraq Mistry and Sandesh Jagtap blasted 28 runs in Skin 1 to set the standard.",
-    },
-    skinsBreakdown: [
-      { skin: 1, winnerRuns: 28, loserRuns: 20, margin: 8, summary: "Preraq Mistry's POTM start ignited Dabanggs." },
-      { skin: 2, winnerRuns: 25, loserRuns: 18, margin: 7, summary: "Gagandeep Singh stabilized middle overs." },
-      { skin: 3, winnerRuns: 22, loserRuns: 17, margin: 5, summary: "Darshan Mody controlled the third skin." },
-      { skin: 4, winnerRuns: 23, loserRuns: 15, margin: 8, summary: "Titans fought back to claim the final skin." },
-    ],
-
-    matchVerdict: {
-      verdict: "TURNAROUND",
-      explanation:
-        "DesiDabanggs executed a remarkable turnaround after scoring only 53 and 56 runs in the group stages. They fundamentally restructured their running between wickets, avoided early dismissals, and held their nerve to win 3 skins.",
-    },
-    whyWinningTeamWon: [
-      {
-        observation: "Preraq Mistry's Opening Masterclass",
-        evidence: "Preraq Mistry and Sandesh Jagtap scored 28 runs in Skin 1 with zero dismissals.",
-        impact: "Gave Dabanggs their first opening skin win and immediate tournament points (3 pts).",
-      },
-      {
-        observation: "Radical Reduction in Dismissal Penalties",
-        evidence: "Dabanggs suffered only 3 dismissals (-15 runs) compared to 8 in each previous match.",
-        impact: "Protected their gross total and prevented Titans from building momentum.",
-      },
-      {
-        observation: "Middle Overs Consolidation",
-        evidence: "Gagandeep Singh and Chittaranjan Dey produced 25 runs in Skin 2 against Titans' strike bowling.",
-        impact: "Extended Dabanggs' lead to 15 runs entering the second half.",
-      },
-    ],
-    whyLosingTeamLost: [
-      {
-        observation: "Slow Start in Skin 1",
-        evidence: "Titans conceded 28 runs while scoring only 20 in the opening skin.",
-        impact: "Forced Titans to chase from an 8-run deficit against a confident opponent.",
-      },
-      {
-        observation: "Inability to Stop Preraq Mistry",
-        evidence: "Titans' opening bowlers conceded 4 boundaries in the first 2 overs.",
-        impact: "Allowed Dabanggs to bat with zero pressure from the outset.",
-      },
-      {
-        observation: "Lack of Lower-Order Support in Chase",
-        evidence: "Titans needed 32 runs in Skin 4 to win the match; managed 23 runs.",
-        impact: "Fell 18 runs short of the overall target, though they did claim 3 skin points.",
-      },
-    ],
-    skinsAnalysisDetailed: {
-      pairs: [
-        {
-          pairNumber: 1,
-          winnerPair: "Preraq Mistry & Sandesh Jagtap",
-          winnerRuns: 28,
-          winnerDismissals: 0,
-          loserPair: "Milan Chheda & Deepak Thawani",
-          loserRuns: 20,
-          loserDismissals: 1,
-          skinMargin: 8,
-          skinWinner: "DesiDabanggs",
-          analysis: "Preraq Mistry played his best innings of the tournament, scoring 18 runs to anchor a 28-run skin (1 tournament pt).",
-        },
-        {
-          pairNumber: 2,
-          winnerPair: "Gagandeep Singh & Chittaranjan Dey",
-          winnerRuns: 25,
-          winnerDismissals: 1,
-          loserPair: "Hardik Desai & Harsh Ramnani",
-          loserRuns: 18,
-          loserDismissals: 2,
-          skinMargin: 7,
-          skinWinner: "DesiDabanggs",
-          analysis: "Gagandeep's composed running between wickets guided Dabanggs to a 7-run skin victory (1 tournament pt).",
-        },
-        {
-          pairNumber: 3,
-          winnerPair: "Darshan Mody & Narendra Tiwari",
-          winnerRuns: 22,
-          winnerDismissals: 1,
-          loserPair: "Yash Sisodia & Mayank Agarwal",
-          loserRuns: 17,
-          loserDismissals: 2,
-          skinMargin: 5,
-          skinWinner: "DesiDabanggs",
-          analysis: "Captain Darshan Mody controlled the pace, grinding out a 5-run skin victory (1 tournament pt).",
-        },
-        {
-          pairNumber: 4,
-          winnerPair: "Prateek Jain & Ronak Jain",
-          winnerRuns: 23,
-          winnerDismissals: 1,
-          loserPair: "Ravi Kumar & Sandeep Khedekar",
-          loserRuns: 15,
-          loserDismissals: 2,
-          skinMargin: 8,
-          skinWinner: "DesiTitans",
-          analysis: "Titans' death pair fought hard to salvage 3 tournament points by taking the final skin 23-15.",
-        },
-      ],
-      skinsStory:
-        "Dabanggs secured 3rd place by winning the first 3 skins cleanly, accumulating 7 tournament points (3 skins × 1 pt + 4 match pts). Titans earned 3 points from their final skin win.",
-    },
-    turningPointDetailed: {
-      matchStateBefore: "Dabanggs entered the match on the back of two heavy defeats.",
-      event: "Preraq Mistry hit three boundaries in the first two overs of Skin 1, scoring 28 runs.",
-      matchStateAfter: "Dabanggs established an 8-run lead and visible confidence on the court.",
-      whyItMattered: "Banished the ghosts of previous collapses and established match control.",
-    },
-    fatalMistake: {
-      mistake: "Titans bowling short and wide to Preraq in Over 1.",
-      impact: "Conceded 12 runs in 4 balls, handing Dabanggs instant momentum.",
-    },
-    playerImpact: [
-      {
-        player: "Preraq Mistry",
-        label: "MATCH WINNER",
-        explanation: "Player of the Match with 28 runs in Skin 1 and zero dismissals.",
-      },
-      {
-        player: "Gagandeep Singh",
-        label: "PARTNERSHIP BUILDER",
-        explanation: "Stabilized Skin 2 with 15 runs and 2 tight bowling overs.",
-      },
-      {
-        player: "Hardik Desai",
-        label: "SILENT CONTRIBUTOR",
-        explanation: "Titans captain battled hard with 14 runs and an economical bowling spell.",
-      },
-    ],
-    battingBehaviour: [
-      {
-        team: "DesiDabanggs",
-        observations: [
-          "Dramatically improved running between wickets with loud calling.",
-          "Protected their wickets first; waited for loose balls before boundary hitting.",
-          "Effective use of the side net drop for 1-run and 2-run physical crosses.",
-        ],
-      },
-      {
-        team: "DesiTitans",
-        observations: [
-          "Competitive throughout all 4 skins without folding.",
-          "Improved strike rotation compared to earlier group games.",
-          "Could not match Dabanggs' boundary output in the opening overs.",
-        ],
-      },
-    ],
-    bowlingBehaviour: [
-      {
-        team: "DesiDabanggs",
-        observations: [
-          "Targeted good length with consistent line on off stump.",
-          "Cut extras from 28 in previous match to just 8 in this game.",
-          "Energetic fielding with high communication levels.",
-        ],
-      },
-      {
-        team: "DesiTitans",
-        observations: [
-          "Bowled competitively in Skins 2, 3, and 4.",
-          "Initial over leaked boundaries to Preraq, which proved decisive.",
-          "Maintained fight until the final ball of the tournament.",
-        ],
-      },
-    ],
-    captainAnalysis: {
-      evaluation:
-        "Darshan Mody deserved immense credit for restructuring Dabanggs' order after two heavy defeats. Hardik Desai managed his team with dignity, finishing the tournament with positive improvements.",
-      captainTakeaways: [
-        "A team can reinvent itself mid-tournament with honest self-reflection.",
-        "Reducing dismissal penalties is the fastest path to indoor cricket victory.",
-        "Tournament standings value skin points; fighting until the final skin matters.",
-      ],
-    },
-    teamDnaAssessment: [
-      {
-        team: "DesiDabanggs",
-        traits: ["RESILIENT", "REDEMPTIVE SPIRIT", "IMPROVED DISCIPLINE"],
-        evidence: "Turned around 53-run collapses to score 76 and capture 3rd place.",
-      },
-      {
-        team: "DesiTitans",
-        traits: ["DETERMINED", "PROGRESSIVE IMPROVEMENT", "NEVER GAVE UP"],
-        evidence: "Won their final skin and pushed Dabanggs across all 16 overs.",
-      },
-    ],
-    finalHardHittingVerdict:
-      "Dabanggs showed what pride and tactical adjustment can achieve; a deserved 3rd-place finish after a difficult tournament.",
-  },
-
-  // ==========================================
-  // Match 6: DesiTigers vs VPGR (Championship Final)
-  // ==========================================
-  "6": {
-    matchId: 6,
-    tournamentName: "Desi Boys Tournament May 2026",
     matchTitle: "DesiTigers vs VPGR",
-    date: "17 May 2026, 8:30 PM",
+    date: "18 May 2026, 8:00 PM",
     venue: "Insportz Club, Dubai (Court 1)",
     winner: "DesiTigers",
     loser: "VPGR",
@@ -1456,6 +1231,231 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
     ],
     finalHardHittingVerdict:
       "A final worthy of the championship; DesiTigers are the undisputed champions of indoor cricket.",
+  },
+
+  // ==========================================
+  // Match 6: DesiDabanggs vs DesiTitans (3rd Place Playoff)
+  // ==========================================
+  "6": {
+    matchId: 6,
+    tournamentName: "Desi Boys Tournament May 2026",
+    matchTitle: "DesiTitans vs DesiDabanggs",
+    date: "18 May 2026, 9:30 PM",
+    venue: "Insportz Club, Dubai (Court 1)",
+    winner: "DesiDabanggs",
+    loser: "DesiTitans",
+    scoreSummary: "DesiDabanggs 94 def. DesiTitans 76 (+18 run margin, 3-1 skins, 7-1 tournament pts)",
+    editorHeadline: "Preraq Mistry's Resurgence Inspires Dabanggs to 3rd-Place Playoff Triumph",
+    editorSummary:
+      "DesiDabanggs redeemed a frustrating tournament campaign by capturing 3rd place with an 18-run victory over DesiTitans, claiming 7 tournament points (3 skins × 1 pt + 4 match pts) to Titans' 1 point. Player of the Match Preraq Mistry produced his finest innings of the competition, blasting 28 runs in Skin 1. DesiTitans fought gamely, winning Skin 4, but could not overcome a 15-run deficit from the first two skins.",
+    whatWentRightWinner: {
+      title: "Tactical Wins for DesiDabanggs",
+      points: [
+        "Preraq Mistry scored 28 runs in Skin 1 to win Player of the Match.",
+        "Cut dismissal count from 8 in previous matches down to just 3.",
+        "Won Skins 1, 2, and 3 through disciplined ground-running.",
+      ],
+    },
+    whatWentWrongLoser: {
+      title: "Critical Breakdowns for DesiTitans",
+      points: [
+        "Conceded 28 runs in Skin 1, allowing Dabanggs an early psychological advantage.",
+        "Skin 2 yielded only 12 runs against tight bowling from Gagandeep Singh.",
+        "Could not convert a strong Skin 4 into an overall victory.",
+      ],
+    },
+    turningPoint: {
+      phase: "Skin 1 (Overs 1-4)",
+      nature: "Turnaround",
+      description:
+        "After two matches of opening collapses, Preraq Mistry and Sandesh Jagtap blasted 28 runs in Skin 1 to set the standard.",
+    },
+    skinsBreakdown: [
+      { skin: 1, winnerRuns: 28, loserRuns: 20, margin: 8, summary: "Preraq Mistry's POTM start ignited Dabanggs." },
+      { skin: 2, winnerRuns: 25, loserRuns: 18, margin: 7, summary: "Gagandeep Singh stabilized middle overs." },
+      { skin: 3, winnerRuns: 22, loserRuns: 17, margin: 5, summary: "Darshan Mody controlled the third skin." },
+      { skin: 4, winnerRuns: 23, loserRuns: 15, margin: 8, summary: "Titans fought back to claim the final skin." },
+    ],
+
+    matchVerdict: {
+      verdict: "TURNAROUND",
+      explanation:
+        "DesiDabanggs executed a remarkable turnaround after scoring only 53 and 56 runs in the group stages. They fundamentally restructured their running between wickets, avoided early dismissals, and held their nerve to win 3 skins.",
+    },
+    whyWinningTeamWon: [
+      {
+        observation: "Preraq Mistry's Opening Masterclass",
+        evidence: "Preraq Mistry and Sandesh Jagtap scored 28 runs in Skin 1 with zero dismissals.",
+        impact: "Gave Dabanggs their first opening skin win and immediate tournament points (3 pts).",
+      },
+      {
+        observation: "Radical Reduction in Dismissal Penalties",
+        evidence: "Dabanggs suffered only 3 dismissals (-15 runs) compared to 8 in each previous match.",
+        impact: "Protected their gross total and prevented Titans from building momentum.",
+      },
+      {
+        observation: "Middle Overs Consolidation",
+        evidence: "Gagandeep Singh and Chittaranjan Dey produced 25 runs in Skin 2 against Titans' strike bowling.",
+        impact: "Extended Dabanggs' lead to 15 runs entering the second half.",
+      },
+    ],
+    whyLosingTeamLost: [
+      {
+        observation: "Slow Start in Skin 1",
+        evidence: "Titans conceded 28 runs while scoring only 20 in the opening skin.",
+        impact: "Forced Titans to chase from an 8-run deficit against a confident opponent.",
+      },
+      {
+        observation: "Inability to Stop Preraq Mistry",
+        evidence: "Titans' opening bowlers conceded 4 boundaries in the first 2 overs.",
+        impact: "Allowed Dabanggs to bat with zero pressure from the outset.",
+      },
+      {
+        observation: "Lack of Lower-Order Support in Chase",
+        evidence: "Titans needed 32 runs in Skin 4 to win the match; managed 23 runs.",
+        impact: "Fell 18 runs short of the overall target, though they did claim 3 skin points.",
+      },
+    ],
+    skinsAnalysisDetailed: {
+      pairs: [
+        {
+          pairNumber: 1,
+          winnerPair: "Preraq Mistry & Sandesh Jagtap",
+          winnerRuns: 28,
+          winnerDismissals: 0,
+          loserPair: "Milan Chheda & Deepak Thawani",
+          loserRuns: 20,
+          loserDismissals: 1,
+          skinMargin: 8,
+          skinWinner: "DesiDabanggs",
+          analysis: "Preraq Mistry played his best innings of the tournament, scoring 18 runs to anchor a 28-run skin (1 tournament pt).",
+        },
+        {
+          pairNumber: 2,
+          winnerPair: "Gagandeep Singh & Chittaranjan Dey",
+          winnerRuns: 25,
+          winnerDismissals: 1,
+          loserPair: "Hardik Desai & Harsh Ramnani",
+          loserRuns: 18,
+          loserDismissals: 2,
+          skinMargin: 7,
+          skinWinner: "DesiDabanggs",
+          analysis: "Gagandeep's composed running between wickets guided Dabanggs to a 7-run skin victory (1 tournament pt).",
+        },
+        {
+          pairNumber: 3,
+          winnerPair: "Darshan Mody & Narendra Tiwari",
+          winnerRuns: 22,
+          winnerDismissals: 1,
+          loserPair: "Yash Sisodia & Mayank Agarwal",
+          loserRuns: 17,
+          loserDismissals: 2,
+          skinMargin: 5,
+          skinWinner: "DesiDabanggs",
+          analysis: "Captain Darshan Mody controlled the pace, grinding out a 5-run skin victory (1 tournament pt).",
+        },
+        {
+          pairNumber: 4,
+          winnerPair: "Prateek Jain & Ronak Jain",
+          winnerRuns: 23,
+          winnerDismissals: 1,
+          loserPair: "Ravi Kumar & Sandeep Khedekar",
+          loserRuns: 15,
+          loserDismissals: 2,
+          skinMargin: 8,
+          skinWinner: "DesiTitans",
+          analysis: "Titans' death pair fought hard to salvage 3 tournament points by taking the final skin 23-15.",
+        },
+      ],
+      skinsStory:
+        "Dabanggs secured 3rd place by winning the first 3 skins cleanly, accumulating 7 tournament points (3 skins × 1 pt + 4 match pts). Titans earned 3 points from their final skin win.",
+    },
+    turningPointDetailed: {
+      matchStateBefore: "Dabanggs entered the match on the back of two heavy defeats.",
+      event: "Preraq Mistry hit three boundaries in the first two overs of Skin 1, scoring 28 runs.",
+      matchStateAfter: "Dabanggs established an 8-run lead and visible confidence on the court.",
+      whyItMattered: "Banished the ghosts of previous collapses and established match control.",
+    },
+    fatalMistake: {
+      mistake: "Titans bowling short and wide to Preraq in Over 1.",
+      impact: "Conceded 12 runs in 4 balls, handing Dabanggs instant momentum.",
+    },
+    playerImpact: [
+      {
+        player: "Preraq Mistry",
+        label: "MATCH WINNER",
+        explanation: "Player of the Match with 28 runs in Skin 1 and zero dismissals.",
+      },
+      {
+        player: "Gagandeep Singh",
+        label: "PARTNERSHIP BUILDER",
+        explanation: "Stabilized Skin 2 with 15 runs and 2 tight bowling overs.",
+      },
+      {
+        player: "Hardik Desai",
+        label: "SILENT CONTRIBUTOR",
+        explanation: "Titans captain battled hard with 14 runs and an economical bowling spell.",
+      },
+    ],
+    battingBehaviour: [
+      {
+        team: "DesiDabanggs",
+        observations: [
+          "Dramatically improved running between wickets with loud calling.",
+          "Protected their wickets first; waited for loose balls before boundary hitting.",
+          "Effective use of the side net drop for 1-run and 2-run physical crosses.",
+        ],
+      },
+      {
+        team: "DesiTitans",
+        observations: [
+          "Competitive throughout all 4 skins without folding.",
+          "Improved strike rotation compared to earlier group games.",
+          "Could not match Dabanggs' boundary output in the opening overs.",
+        ],
+      },
+    ],
+    bowlingBehaviour: [
+      {
+        team: "DesiDabanggs",
+        observations: [
+          "Targeted good length with consistent line on off stump.",
+          "Cut extras from 28 in previous match to just 8 in this game.",
+          "Energetic fielding with high communication levels.",
+        ],
+      },
+      {
+        team: "DesiTitans",
+        observations: [
+          "Bowled competitively in Skins 2, 3, and 4.",
+          "Initial over leaked boundaries to Preraq, which proved decisive.",
+          "Maintained fight until the final ball of the tournament.",
+        ],
+      },
+    ],
+    captainAnalysis: {
+      evaluation:
+        "Darshan Mody deserved immense credit for restructuring Dabanggs' order after two heavy defeats. Hardik Desai managed his team with dignity, finishing the tournament with positive improvements.",
+      captainTakeaways: [
+        "A team can reinvent itself mid-tournament with honest self-reflection.",
+        "Reducing dismissal penalties is the fastest path to indoor cricket victory.",
+        "Tournament standings value skin points; fighting until the final skin matters.",
+      ],
+    },
+    teamDnaAssessment: [
+      {
+        team: "DesiDabanggs",
+        traits: ["RESILIENT", "REDEMPTIVE SPIRIT", "IMPROVED DISCIPLINE"],
+        evidence: "Turned around 53-run collapses to score 76 and capture 3rd place.",
+      },
+      {
+        team: "DesiTitans",
+        traits: ["DETERMINED", "PROGRESSIVE IMPROVEMENT", "NEVER GAVE UP"],
+        evidence: "Won their final skin and pushed Dabanggs across all 16 overs.",
+      },
+    ],
+    finalHardHittingVerdict:
+      "Dabanggs showed what pride and tactical adjustment can achieve; a deserved 3rd-place finish after a difficult tournament.",
   },
 
   // ==========================================

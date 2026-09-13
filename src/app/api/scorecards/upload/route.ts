@@ -19,6 +19,9 @@ export async function POST(req: NextRequest) {
     const matchTitle = (formData.get("matchTitle") as string) || undefined;
     const tournamentIdRaw = formData.get("tournamentId") as string | null;
     const tournamentId = tournamentIdRaw ? parseInt(tournamentIdRaw, 10) : 0;
+    const fixtureIdRaw = formData.get("fixtureId") as string | null;
+    const expectedHomeTeam = (formData.get("expectedHomeTeam") as string) || undefined;
+    const expectedAwayTeam = (formData.get("expectedAwayTeam") as string) || undefined;
 
     let imageUrl = "/uploads/scorecards/sample-scorecard.jpg";
     let width = 1600;
@@ -75,6 +78,35 @@ export async function POST(req: NextRequest) {
 
     const homeScore = reconciledScorecard.homeInnings.totalRuns || 0;
     const awayScore = reconciledScorecard.awayInnings.totalRuns || 0;
+
+    // STRICT FIXTURE MISMATCH VALIDATION
+    if (expectedHomeTeam && expectedAwayTeam) {
+      const { validateFixtureTeamsMatch } = await import("@/lib/tournament-fixtures");
+      const matchValidation = validateFixtureTeamsMatch(
+        { team1: expectedHomeTeam, team2: expectedAwayTeam },
+        reconciledScorecard.homeInnings.teamName,
+        reconciledScorecard.awayInnings.teamName
+      );
+
+      if (!matchValidation.isMatch) {
+        return NextResponse.json(
+          {
+            success: false,
+            isMismatch: true,
+            message: matchValidation.reason,
+            extractedTeams: {
+              home: reconciledScorecard.homeInnings.teamName,
+              away: reconciledScorecard.awayInnings.teamName,
+            },
+            expectedTeams: {
+              home: expectedHomeTeam,
+              away: expectedAwayTeam,
+            },
+          },
+          { status: 422 } // 422 Unprocessable Entity
+        );
+      }
+    }
 
     // DUPLICATE SCORECARD CHECK - Matching Date/Time and 100% confidence Final Scores
     if (!forceDuplicate) {

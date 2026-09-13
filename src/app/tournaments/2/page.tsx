@@ -37,7 +37,8 @@ export default async function TournamentTwoPage() {
     { date: "Fri, 09 Oct 2026", time: "8:00 PM", day: "Finals!" },
   ];
 
-  const hasCompletedMatches = dynamicData.fixtures && dynamicData.fixtures.length > 0;
+  const completedMatches = (dynamicData.fixtures || []).filter((f) => f.status === "COMPLETED");
+  const hasCompletedMatches = completedMatches.length > 0;
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12">
@@ -219,12 +220,12 @@ export default async function TournamentTwoPage() {
               </h2>
             </div>
             <span className="text-xs text-slate-500 font-mono">
-              {dynamicData.fixtures.length} Match(es) Recorded
+              {completedMatches.length} Match(es) Recorded
             </span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {dynamicData.fixtures.map((fix) => (
+            {completedMatches.map((fix) => (
               <MatchCard
                 key={fix.id}
                 id={String(fix.id)}
@@ -342,35 +343,79 @@ export default async function TournamentTwoPage() {
         </div>
       </section>
 
-      {/* SECTION 2: MATCH DATES */}
+      {/* SECTION 4: MATCH DATES & FIXTURE SCHEDULE */}
       <section className="space-y-3">
-        <div className="flex items-center gap-2">
-          <Calendar className="w-5 h-5 text-sky-600" />
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-            Match Dates & Fixture Schedule
-          </h2>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-sky-600" />
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+              Official Match Schedule & Fixtures (9 Matches)
+            </h2>
+          </div>
+          <span className="text-xs text-slate-500 font-mono">
+            18 Sep — 09 Oct 2026 • Insportz Club, Dubai
+          </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-          {matchDates.map((m, idx) => (
-            <div
-              key={idx}
-              className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 flex items-center gap-3 shadow-xs"
-            >
-              <div className="flex h-10 w-10 shrink-0 flex-col items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 font-bold border border-emerald-200/50">
-                <span className="text-[10px] uppercase leading-none">{m.date.split(" ")[2]}</span>
-                <span className="text-sm leading-tight">{m.date.split(" ")[1]}</span>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          {dynamicData.fixtures.map((m: any, idx: number) => {
+            const isCompleted = m.status === "COMPLETED";
+
+            return (
+              <div
+                key={m.id || idx}
+                className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between space-y-3 hover:border-slate-300 dark:hover:border-slate-700 transition"
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                      {m.stage || `Match #${idx + 1}`}
+                    </span>
+                    <span
+                      className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                        isCompleted
+                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300"
+                          : "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300"
+                      }`}
+                    >
+                      {isCompleted ? "Completed" : "Upcoming"}
+                    </span>
+                  </div>
+
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                      {m.team1} <span className="text-slate-400 font-normal">vs</span> {m.team2}
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-mono mt-0.5 flex items-center gap-1.5">
+                      <Clock className="w-3 h-3 text-slate-400" />
+                      <span>{m.date}</span>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+                  {isCompleted ? (
+                    <Link
+                      href={m.scorecardUrl || `/matches/${m.id}`}
+                      className="font-bold text-emerald-600 dark:text-emerald-400 hover:underline inline-flex items-center gap-1"
+                    >
+                      <span>View Scorecard</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  ) : (
+                    <Link
+                      href={`/admin/scorecards/new?tournamentId=2&fixtureId=${m.fixtureId || m.id}`}
+                      className="font-bold text-purple-600 dark:text-purple-400 hover:underline inline-flex items-center gap-1"
+                    >
+                      <span>Upload Scorecard</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </Link>
+                  )}
+                  <span className="text-[11px] text-slate-400">Court 1</span>
+                </div>
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-bold text-slate-900 dark:text-white truncate">
-                  {m.date}
-                </p>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
-                  {m.time} • {m.day}
-                </p>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 

@@ -351,6 +351,69 @@ export async function getTournamentDetails(
     const standings = computeStandingsFromMatches(teamNames, dbMatches);
     const leaderboards = computeLeaderboardsFromStats(dbStats);
 
+    const scheduledFixtures: any[] = (tournament2Json as any).fixtures || [];
+    const mergedFixtures = scheduledFixtures.map((fix) => {
+      const matchedDb = dbMatches.find(
+        (m) =>
+          (m.homeTeam?.name === fix.team1 && m.awayTeam?.name === fix.team2) ||
+          (m.homeTeam?.name === fix.team2 && m.awayTeam?.name === fix.team1)
+      );
+
+      if (matchedDb) {
+        return {
+          id: matchedDb.id,
+          fixtureId: fix.id,
+          date: matchedDb.matchDate || fix.date,
+          stage: fix.stage,
+          team1: matchedDb.homeTeam?.name,
+          score1: matchedDb.homeScore,
+          winner1: matchedDb.homeScore > matchedDb.awayScore,
+          team2: matchedDb.awayTeam?.name,
+          score2: matchedDb.awayScore,
+          winner2: matchedDb.awayScore > matchedDb.homeScore,
+          potm: matchedDb.potmPlayer?.canonicalName || "TBD",
+          scorecardUrl: `/matches/${matchedDb.id}`,
+          status: "COMPLETED",
+        };
+      }
+
+      return {
+        id: fix.id,
+        fixtureId: fix.id,
+        date: fix.date,
+        stage: fix.stage,
+        team1: fix.team1,
+        score1: 0,
+        winner1: false,
+        team2: fix.team2,
+        score2: 0,
+        winner2: false,
+        potm: "TBD",
+        scorecardUrl: `/admin/scorecards/new?tournamentId=2&fixtureId=${fix.id}`,
+        status: "UPCOMING",
+        venue: fix.venue,
+      };
+    });
+
+    const extraMatches = dbMatches
+      .filter((m) => !mergedFixtures.some((f) => f.id === m.id))
+      .map((m) => ({
+        id: m.id,
+        date: m.matchDate,
+        stage: "Match",
+        team1: m.homeTeam?.name,
+        score1: m.homeScore,
+        winner1: m.homeScore > m.awayScore,
+        team2: m.awayTeam?.name,
+        score2: m.awayScore,
+        winner2: m.awayScore > m.homeScore,
+        potm: m.potmPlayer?.canonicalName || "TBD",
+        scorecardUrl: `/matches/${m.id}`,
+        status: "COMPLETED",
+      }));
+
+    const allFixtures = [...mergedFixtures, ...extraMatches];
+
     return {
       id: 2,
       title: (tournament2Json as any).title || "DesiBoys Bazooka 4.0",
@@ -362,19 +425,7 @@ export async function getTournamentDetails(
       topRunGetters: leaderboards.topRunGetters,
       topWicketTakers: leaderboards.topWicketTakers,
       topContributors: leaderboards.topContributors,
-      fixtures: dbMatches.map((m) => ({
-        id: m.id,
-        date: m.matchDate,
-        stage: "Group Match",
-        team1: m.homeTeam?.name || "Home",
-        score1: m.homeScore,
-        winner1: m.homeScore > m.awayScore,
-        team2: m.awayTeam?.name || "Away",
-        score2: m.awayScore,
-        winner2: m.awayScore > m.homeScore,
-        potm: m.potmPlayer?.canonicalName || "TBD",
-        scorecardUrl: `/matches/${m.id}`,
-      })),
+      fixtures: allFixtures,
       squads: (tournament2Json as any).squads || [],
       mvp: leaderboards.mvp,
       champions: standings.length > 0 && dbMatches.length > 0 ? standings[0].team : null,

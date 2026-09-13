@@ -10,7 +10,37 @@ interface Props {
 
 export async function generateMetadata({ params }: Props) {
   const { id } = await params;
-  const analysis = MATCH_ANALYSES[id];
+  const matchIdNum = parseInt(id, 10);
+  let analysis = MATCH_ANALYSES[id];
+
+  if (!isNaN(matchIdNum)) {
+    try {
+      const dbMatch = await prisma.match.findUnique({
+        where: { id: matchIdNum },
+        include: { homeTeam: true, awayTeam: true },
+      });
+      if (dbMatch) {
+        if (dbMatch.tacticalAnalysis) {
+          try {
+            analysis = JSON.parse(dbMatch.tacticalAnalysis);
+          } catch {}
+        }
+        const h = dbMatch.homeTeam.name.toLowerCase().replace(/\s+/g, "");
+        const a = dbMatch.awayTeam.name.toLowerCase().replace(/\s+/g, "");
+        if (analysis) {
+          const ct = (analysis.matchTitle || "").toLowerCase().replace(/\s+/g, "");
+          if (!ct.includes(h) || !ct.includes(a)) {
+            const found = Object.values(MATCH_ANALYSES).find((cand) => {
+              const c = (cand.matchTitle || "").toLowerCase().replace(/\s+/g, "");
+              return c.includes(h) && c.includes(a);
+            });
+            if (found) analysis = found;
+          }
+        }
+      }
+    } catch {}
+  }
+
   if (analysis) {
     return {
       title: `${analysis.matchTitle} — Match Analysis | DesiSports`,
@@ -72,6 +102,37 @@ export default async function MatchDetailPage({ params }: Props) {
 
   if (!analysis && MATCH_ANALYSES[id]) {
     analysis = MATCH_ANALYSES[id];
+  }
+
+  // Strict Team-Matching Integrity Guard
+  const matchesTeams = (a: MatchTacticalAnalysis, home: string, away: string) => {
+    const title = (a.matchTitle || "").toLowerCase().replace(/\s+/g, "");
+    const winner = (a.winner || "").toLowerCase().replace(/\s+/g, "");
+    const loser = (a.loser || "").toLowerCase().replace(/\s+/g, "");
+    const h = home.toLowerCase().replace(/\s+/g, "");
+    const aTeam = away.toLowerCase().replace(/\s+/g, "");
+
+    const hasHome = title.includes(h) || winner.includes(h) || loser.includes(h);
+    const hasAway = title.includes(aTeam) || winner.includes(aTeam) || loser.includes(aTeam);
+    return hasHome && hasAway;
+  };
+
+  if (dbMatch && analysis) {
+    if (!matchesTeams(analysis, dbMatch.homeTeam.name, dbMatch.awayTeam.name)) {
+      console.warn(
+        `[Integrity Guard] Analysis mismatch for match #${id}: "${analysis.matchTitle}" does not match ${dbMatch.homeTeam.name} vs ${dbMatch.awayTeam.name}. Searching for correct analysis.`
+      );
+      analysis = null;
+    }
+  }
+
+  if (dbMatch && !analysis) {
+    for (const candidate of Object.values(MATCH_ANALYSES)) {
+      if (matchesTeams(candidate, dbMatch.homeTeam.name, dbMatch.awayTeam.name)) {
+        analysis = candidate;
+        break;
+      }
+    }
   }
 
   // If still not available and dbMatch exists, generate grounded deterministic analysis

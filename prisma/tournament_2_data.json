@@ -47,66 +47,79 @@
         {
           "id": "96",
           "name": "Aman Maheshwari",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/3d5e9855-d0c0-4b1b-ac8d-7ffe252e036f.png",
           "isCaptain": false
         },
         {
           "id": "70",
           "name": "Bijoy Kumar Goswami",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/c3288092-2f29-494f-ab01-b6153f0b95a7.jpg",
           "isCaptain": false
         },
         {
           "id": "12",
-          "name": "CChittaranjan Dey",
+          "name": "Chittaranjan Dey",
+          "avatar": null,
           "isCaptain": false
         },
         {
           "id": "22",
-          "name": "GGulshan Sharma",
+          "name": "Gulshan Sharma",
+          "avatar": null,
           "isCaptain": false
         },
         {
           "id": "23",
-          "name": "Hardik DesaiCaptain",
+          "name": "Hardik Desai",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/381aad31-49f5-4cb5-b13f-11f26db20e02.webp",
           "isCaptain": true
         },
         {
           "id": "26",
           "name": "Hemang Shah",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/57b3fb35-39d2-4925-bf86-4586bd0051b6.jpg",
           "isCaptain": false
         },
         {
           "id": "29",
           "name": "Ishu Bharadwaj",
+          "avatar": "https://desisports.milanchheda.com/storage/profiles/wSxtp9FqzHeQ5ALSO0rSJSwQt0RfDKDlAyZ6yDJB.jpg",
           "isCaptain": false
         },
         {
           "id": "44",
           "name": "Prateek Jain",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/5428e509-5887-42dc-945f-e6640bd4ce90.jpg",
           "isCaptain": false
         },
         {
           "id": "46",
           "name": "Preraq Mistry",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/fab7e9fa-b07b-4768-9427-3929a00beeac.jpg",
           "isCaptain": false
         },
         {
           "id": "97",
           "name": "Sachin Agarwal",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/19d87a73-2003-40eb-9748-cd64994b7f69.jpg",
           "isCaptain": false
         },
         {
           "id": "51",
           "name": "Sahil Aggarwal",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/54f84c51-8a10-4ee6-aaa4-1e88e3558384.jpg",
           "isCaptain": false
         },
         {
           "id": "65",
-          "name": "SShaurya Bhatnagar",
+          "name": "Shaurya Bhatnagar",
+          "avatar": null,
           "isCaptain": false
         },
         {
           "id": "76",
           "name": "Sunny Vaswani",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/3bc314b3-5f78-40c5-83f0-0dcd1cfb5b99.jpg",
           "isCaptain": false
         }
       ]
@@ -119,67 +132,80 @@
       "players": [
         {
           "id": "2",
-          "name": "AAbhishek Agarwal",
+          "name": "Abhishek Agarwal",
+          "avatar": null,
           "isCaptain": false
         },
         {
           "id": "13",
           "name": "Daman Singh",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/fd2a3d44-d19e-452e-846b-81a9ad093ac5.jpg",
           "isCaptain": false
         },
         {
           "id": "24",
           "name": "Harsh Ramnani",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/e0e6ebb3-8bfc-43f7-9058-64a466f7d78d.jpg",
           "isCaptain": false
         },
         {
           "id": "92",
           "name": "Harshad Jariwala",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/77552184-1edb-45a3-abce-cb6dbc644b07.jpg",
           "isCaptain": false
         },
         {
           "id": "68",
           "name": "Jigar Shah",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/538c1e76-0a83-4e72-b642-3f61492364cd.jpg",
           "isCaptain": false
         },
         {
           "id": "30",
           "name": "Kalrav Shah",
+          "avatar": "https://desisports.milanchheda.com/storage/profiles/7TVwUhysOFdYJLv56KNSIDeXMZWOktapfrXKqA5r.jpg",
           "isCaptain": false
         },
         {
           "id": "93",
           "name": "Kamal Jeet Singh",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/fa8c17bc-be6d-4553-9d58-da3d28234340.jpg",
           "isCaptain": false
         },
         {
           "id": "48",
-          "name": "Ritesh MehtaCaptain",
+          "name": "Ritesh Mehta",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/432c4324-cb77-4d26-884d-8de724a94ddb.jpg",
           "isCaptain": true
         },
         {
           "id": "49",
-          "name": "Ritesh sarda",
+          "name": "Ritesh Sarda",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/bde80f6d-5860-457f-9395-c67731be794a.jpg",
           "isCaptain": false
         },
         {
           "id": "50",
           "name": "Ronak Jain",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/d3e1fd04-2d56-41fc-b757-869e9ddd010c.jpg",
           "isCaptain": false
         },
         {
           "id": "55",
           "name": "Sandeep Khedekar",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/bd87dc5a-20ae-46a3-b157-2dd272bb9e75.jpg",
           "isCaptain": false
         },
         {
           "id": "57",
           "name": "Saurabh Ranjan",
+          "avatar": "https://desisports.milanchheda.com/storage/profiles/Ejq8v8AJD9buDyRDxjoaGWH9WTMrgROxU2ZG6QmL.jpg",
           "isCaptain": false
         },
         {
           "id": "94",
-          "name": "rajeev dudeja",
+          "name": "Rajeev Dudeja",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/b2eaa5c4-f60a-4ca7-9b66-e5eb6dc08048.jpg",
           "isCaptain": false
         }
       ]
@@ -193,66 +219,79 @@
         {
           "id": "90",
           "name": "Aditya Bhardwaj",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/b8659f84-69f8-4f95-b488-8fa6c63be59d.jpg",
           "isCaptain": false
         },
         {
           "id": "75",
           "name": "Brijesh Gopinathan",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/bf2aa366-6502-4b6d-a2d8-7ff2d77e5150.jpg",
           "isCaptain": false
         },
         {
           "id": "21",
           "name": "Gaurav Arora",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/1d957f2a-655f-4bc2-8b21-699db98471bd.jpg",
           "isCaptain": false
         },
         {
           "id": "84",
-          "name": "Hardik kumar",
+          "name": "Hardik Kumar",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/5c7c7c66-e7ee-4763-b271-cca2738d07cf.jpg",
           "isCaptain": false
         },
         {
           "id": "71",
           "name": "Himadri Gautam",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/a90d4bc4-24dd-45ad-bc99-8310248662b6.jpg",
           "isCaptain": false
         },
         {
           "id": "27",
           "name": "Himanshu Kalyani",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/84f4409f-5c32-4228-84ad-b8be54e98389.jpg",
           "isCaptain": false
         },
         {
           "id": "31",
-          "name": "KKartik Kohli",
+          "name": "Kartik Kohli",
+          "avatar": null,
           "isCaptain": false
         },
         {
           "id": "67",
           "name": "Kunal Jain",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/6ba99eec-c156-41d9-bbb9-86567135ff8a.jpg",
           "isCaptain": false
         },
         {
           "id": "74",
           "name": "Kunal Sood",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/d4d66b9b-abb9-47ff-bde2-ac14c0e86d58.jpg",
           "isCaptain": false
         },
         {
           "id": "36",
           "name": "Manthan Shah",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/f8e2d2e6-31cf-45f3-89cd-a278bae6a9f2.jpg",
           "isCaptain": false
         },
         {
           "id": "43",
           "name": "Prateek Attree",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/d57dceb5-aa05-4528-9870-5b0dc15983aa.jpg",
           "isCaptain": false
         },
         {
           "id": "45",
-          "name": "Prateek NaharCaptain",
+          "name": "Prateek Nahar",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/a481cd9a-8560-4ed8-94ce-4bfb364db8cd.jpg",
           "isCaptain": true
         },
         {
           "id": "52",
           "name": "Sahil Arora",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/4640feba-7224-4e5f-b3f0-d3059608e2e0.jpg",
           "isCaptain": false
         }
       ]
@@ -266,66 +305,79 @@
         {
           "id": "85",
           "name": "Anuj",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/73cc916a-238b-4e56-9364-89caa85c4fbd.jpg",
           "isCaptain": false
         },
         {
           "id": "14",
-          "name": "Darshan ModyCaptain",
+          "name": "Darshan Mody",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/646b273b-acf3-4326-ac5c-6574a7d0d80e.jpg",
           "isCaptain": true
         },
         {
           "id": "16",
-          "name": "Deepak thawani",
+          "name": "Deepak Thawani",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/57e94350-cc40-4a32-b07c-e70894e86442.png",
           "isCaptain": false
         },
         {
           "id": "20",
           "name": "Gagandeep Singh",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/040d5a95-eaf2-4fe8-922e-c52abd56dded.jpg",
           "isCaptain": false
         },
         {
           "id": "32",
-          "name": "Kunal soni",
+          "name": "Kunal Soni",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/c6f1d57b-1305-48fc-a84d-8fa6b334d588.jpg",
           "isCaptain": false
         },
         {
           "id": "37",
           "name": "Mayank Agarwal",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/3b338794-ac61-48f6-a89b-cff45041799d.jpg",
           "isCaptain": false
         },
         {
           "id": "38",
           "name": "Milan Chheda",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/LoDTPXK3QMGJDBPsurARtqh0x9reIgWzdKY5x1zd.png",
           "isCaptain": false
         },
         {
           "id": "39",
           "name": "Narendra Tiwari",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/4ZTy0pQY1lLlboptmJrZH3CfR0O7SJ9AYtgmb3Lk.jpg",
           "isCaptain": false
         },
         {
           "id": "87",
           "name": "R Chaitanya",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/5fa09054-c085-40b9-b2b7-65bfdf2021bf.jpg",
           "isCaptain": false
         },
         {
           "id": "47",
-          "name": "Ravi kumar",
+          "name": "Ravi Kumar",
+          "avatar": "https://desisports.milanchheda.com/storage/profiles/UgDqR5zO1dr6GgevPCYfgQ2A3Lqfwn2kRSje0Kt4.jpg",
           "isCaptain": false
         },
         {
           "id": "53",
           "name": "Sajid Merchant",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/fbe12178-ab3a-4ae8-9cb1-5a4b83e30a1f.jpg",
           "isCaptain": false
         },
         {
           "id": "54",
           "name": "Sameer Gohel",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/f9565cdb-d4d2-4a6d-bcb6-a57777f1704d.jpg",
           "isCaptain": false
         },
         {
           "id": "56",
           "name": "Sandesh Jagtap",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/ee6d5bba-817e-4e54-86e8-6a06f754f3b3.jpg",
           "isCaptain": false
         }
       ]
@@ -698,6 +750,116 @@
       "name": "rajeev dudeja",
       "avatar": "https://desisports.milanchheda.com/storage/profile-photos/b2eaa5c4-f60a-4ca7-9b66-e5eb6dc08048.jpg",
       "daysFree": "4 / 9"
+    }
+  ],
+  "fixtures": [
+    {
+      "id": 101,
+      "matchNumber": 1,
+      "date": "18 Sep 2026, 8:00 PM",
+      "rawDate": "2026-09-18T20:00:00+04:00",
+      "day": "Friday",
+      "stage": "League Match 1",
+      "team1": "Desi Titans",
+      "team2": "Desi Dabanggs",
+      "venue": "Insportz Club, Dubai (Court 1)",
+      "status": "UPCOMING"
+    },
+    {
+      "id": 102,
+      "matchNumber": 2,
+      "date": "21 Sep 2026, 8:00 PM",
+      "rawDate": "2026-09-21T20:00:00+04:00",
+      "day": "Monday",
+      "stage": "League Match 2",
+      "team1": "Desi Tigers",
+      "team2": "Desi Challengers",
+      "venue": "Insportz Club, Dubai (Court 1)",
+      "status": "UPCOMING"
+    },
+    {
+      "id": 103,
+      "matchNumber": 3,
+      "date": "23 Sep 2026, 8:00 PM",
+      "rawDate": "2026-09-23T20:00:00+04:00",
+      "day": "Wednesday",
+      "stage": "League Match 3",
+      "team1": "Desi Titans",
+      "team2": "Desi Tigers",
+      "venue": "Insportz Club, Dubai (Court 1)",
+      "status": "UPCOMING"
+    },
+    {
+      "id": 104,
+      "matchNumber": 4,
+      "date": "28 Sep 2026, 8:00 PM",
+      "rawDate": "2026-09-28T20:00:00+04:00",
+      "day": "Monday",
+      "stage": "League Match 4",
+      "team1": "Desi Dabanggs",
+      "team2": "Desi Challengers",
+      "venue": "Insportz Club, Dubai (Court 1)",
+      "status": "UPCOMING"
+    },
+    {
+      "id": 105,
+      "matchNumber": 5,
+      "date": "30 Sep 2026, 8:00 PM",
+      "rawDate": "2026-09-30T20:00:00+04:00",
+      "day": "Wednesday",
+      "stage": "League Match 5",
+      "team1": "Desi Titans",
+      "team2": "Desi Challengers",
+      "venue": "Insportz Club, Dubai (Court 1)",
+      "status": "UPCOMING"
+    },
+    {
+      "id": 106,
+      "matchNumber": 6,
+      "date": "02 Oct 2026, 8:00 PM",
+      "rawDate": "2026-10-02T20:00:00+04:00",
+      "day": "Friday",
+      "stage": "League Match 6",
+      "team1": "Desi Dabanggs",
+      "team2": "Desi Tigers",
+      "venue": "Insportz Club, Dubai (Court 1)",
+      "status": "UPCOMING"
+    },
+    {
+      "id": 107,
+      "matchNumber": 7,
+      "date": "05 Oct 2026, 8:00 PM",
+      "rawDate": "2026-10-05T20:00:00+04:00",
+      "day": "Monday",
+      "stage": "Playoff (3rd vs 4th)",
+      "team1": "3rd Place",
+      "team2": "4th Place",
+      "venue": "Insportz Club, Dubai (Court 1)",
+      "status": "UPCOMING"
+    },
+    {
+      "id": 108,
+      "matchNumber": 8,
+      "date": "07 Oct 2026, 9:30 PM",
+      "rawDate": "2026-10-07T21:30:00+04:00",
+      "day": "Wednesday",
+      "stage": "3rd Place Playoff",
+      "team1": "TBD",
+      "team2": "TBD",
+      "venue": "Insportz Club, Dubai (Court 1)",
+      "status": "UPCOMING"
+    },
+    {
+      "id": 109,
+      "matchNumber": 9,
+      "date": "09 Oct 2026, 8:00 PM",
+      "rawDate": "2026-10-09T20:00:00+04:00",
+      "day": "Friday",
+      "stage": "The Championship Final",
+      "team1": "1st Place",
+      "team2": "2nd Place",
+      "venue": "Insportz Club, Dubai (Court 1)",
+      "status": "UPCOMING"
     }
   ]
 }
