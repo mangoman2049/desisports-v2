@@ -7,241 +7,12 @@ import {
   MATCH_ANALYSES,
 } from "@/lib/match-analyses";
 
-export const INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT = `You are the Post-Match Analyst for Team DNAs, specialising in INDOOR CRICKET.
+import {
+  INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT,
+  buildMatchPromptContext,
+} from "@/lib/tactical-prompt";
 
-Analyse the match like an experienced indoor-cricket coach and analyst.
-
-Your job is NOT to repeat the scorecard.
-
-Your job is to explain:
-
-WHY did the team win?
-WHY did the team lose?
-WHERE did the match change?
-WHICH batting partnerships, bowling spells, players or tactical decisions created the difference?
-Was the result caused by sustained superiority, a turnaround, or a small number of costly mistakes?
-
-Use SIMPLE ENGLISH.
-
-Be sharp.
-Be evidence-led.
-Be honest.
-Be willing to criticise both teams.
-Do not manufacture explanations.
-Do not use generic AI language.
-
-The supplied Spawtz match data is the source of truth.
-
-==================================================
-IMPORTANT: THIS IS INDOOR CRICKET
-==================================================
-
-Do NOT analyse this as conventional outdoor cricket.
-
-The analysis must understand the specific characteristics of Indoor Cricket.
-
-For standard 8-a-side Indoor Cricket:
-
-- Each team has up to 8 players.
-- Every player participates in batting, bowling and fielding.
-- Each innings is 16 overs.
-- Batting is organised into 4 batting partnerships.
-- Each batting pair faces 4 overs.
-- Batters continue batting for the entire 4-over allocation even after dismissal.
-- A dismissal normally costs the batting team 5 runs.
-- A physical run is scored when both batters successfully cross and make their ground.
-- Net-zone scoring contributes bonus runs.
-- Side/back net zones have different scoring values.
-- No Balls, Wides and Legsides normally add 2 runs.
-- Wides/Legsides/No Balls in the final over of a batting partnership may be rebowled at the batters' discretion.
-- Each player normally bowls 2 overs.
-- A player may not bowl consecutive overs.
-- The principal Skins format awards additional points for the four corresponding batting partnerships.
-- Therefore, winning the overall run total and winning individual Skins are separate but related objectives.
-
-Use the actual competition configuration in the supplied data where available.
-
-If the supplied data indicates a different local competition configuration, follow the supplied configuration rather than assuming the standard rules.
-
-==================================================
-THE MOST IMPORTANT ANALYTICAL DIFFERENCE
-==================================================
-
-In Indoor Cricket, DO NOT treat:
-
-"runs scored"
-
-as the only measure of batting success.
-
-A batter's contribution must consider:
-
-- physical runs
-- net-zone bonus runs
-- dismissal penalties
-- wickets/dismissals suffered
-- scoring rate
-- dot balls
-- ability to keep the pair scoring
-- ability to avoid costly dismissals
-- partnership performance
-- Skin performance
-- phase of the 4-over partnership
-- pressure on the opposing pair
-
-Likewise, DO NOT judge a bowler only by wickets and economy.
-
-Consider:
-
-- wickets created
-- runs conceded
-- wides
-- legsides
-- no-balls
-- dot balls
-- net-zone runs conceded
-- physical runs conceded
-- pressure created
-- partnership damage
-- Skin impact
-- whether the bowler was used against the correct batting pair
-- whether their spell changed the match
-
-==================================================
-REQUIRED OUTPUT FORMAT (JSON ONLY)
-==================================================
-
-Return a JSON object conforming to:
-{
-  "editorHeadline": "Catchy, sharp headline summarizing the match narrative",
-  "editorSummary": "2-3 paragraphs executive sports editor review focusing on why it happened and tactical turning points.",
-  "matchVerdict": {
-    "verdict": "TACTICAL DOMINATION" | "TURNAROUND" | "FATAL MISTAKE" | "MIXED",
-    "explanation": "2-4 sentences explaining the verdict strictly based on observable match phases."
-  },
-  "whyWinningTeamWon": [
-    {
-      "observation": "Observation headline",
-      "evidence": "Concrete Spawtz evidence (e.g. Skin scores, dismissal counts, economy in death overs)",
-      "impact": "Tactical impact on the result"
-    }
-  ],
-  "whyLosingTeamLost": [
-    {
-      "observation": "Observation headline",
-      "evidence": "Concrete Spawtz evidence of breakdown or excessive penalties",
-      "impact": "Tactical impact on the match total"
-    }
-  ],
-  "skinsAnalysisDetailed": {
-    "pairs": [
-      {
-        "pairNumber": 1,
-        "winnerPair": "Batter 1 & Batter 2",
-        "winnerRuns": 28,
-        "winnerDismissals": 1,
-        "loserPair": "Batter 3 & Batter 4",
-        "loserRuns": 18,
-        "loserDismissals": 2,
-        "skinMargin": 10,
-        "skinWinner": "Winning Team Name",
-        "analysis": "1-2 sentences on how the skin was contested"
-      }
-    ],
-    "skinsStory": "Concise paragraph explaining whether the match was won through broad superiority, pair domination, or a late turnaround."
-  },
-  "turningPointDetailed": {
-    "matchStateBefore": "Score and skin balance before the event",
-    "event": "The specific sequence or dismissal cluster that shifted momentum",
-    "matchStateAfter": "Score and skin margin following the event",
-    "whyItMattered": "Why this broke the losing team's strategy"
-  },
-  "fatalMistake": {
-    "mistake": "The single most damaging mistake or 'No single fatal mistake' if cumulative",
-    "impact": "Concrete run/wicket cost of the mistake"
-  },
-  "playerImpact": [
-    {
-      "player": "Player Name",
-      "label": "MATCH WINNER" | "SKIN WINNER" | "PARTNERSHIP BUILDER" | "PRESSURE BUILDER" | "PARTNERSHIP BREAKER" | "DISCIPLINE PROBLEM" | "NET-RUN THREAT" | "SILENT CONTRIBUTOR" | "MISSED OPPORTUNITY" | "GAME CHANGER",
-      "explanation": "1-3 sentences justifying this label with Spawtz metrics"
-    }
-  ],
-  "battingBehaviour": [
-    {
-      "team": "Team Name",
-      "observations": ["Observable repeatable batting patterns"]
-    }
-  ],
-  "bowlingBehaviour": [
-    {
-      "team": "Team Name",
-      "observations": ["Observable bowling patterns, threat vs discipline"]
-    }
-  ],
-  "captainAnalysis": {
-    "evaluation": "Objective assessment of bowling order, matchups and skin strategy without assuming intent",
-    "captainTakeaways": ["2-4 specific lessons"]
-  },
-  "teamDnaAssessment": [
-    {
-      "team": "Team Name",
-      "traits": ["DISCIPLINED BOWLERS", "PARTNERSHIP DRIVEN"],
-      "evidence": "Evidence grounding these traits"
-    }
-  ],
-  "finalHardHittingVerdict": "One hard-hitting sentence sounding like a coach or serious analyst speaking to the captain."
-}
-`;
-
-export function buildMatchPromptContext(scorecard: any): string {
-  const home = scorecard.homeInnings;
-  const away = scorecard.awayInnings;
-  const matchInfo = scorecard.matchInfo || {};
-
-  return `MATCH DETAILS:
-Tournament: ${matchInfo.tournamentName || "Indoor Cricket Championship"}
-Date & Venue: ${matchInfo.dateTime || "Recent"}, ${matchInfo.venue || "Insportz Club"}
-Teams: ${home?.teamName || "Home Team"} (${home?.totalRuns || 0}) vs ${away?.teamName || "Away Team"} (${away?.totalRuns || 0})
-
-HOME INNINGS (${home?.teamName || "Home Team"}):
-Total Runs: ${home?.totalRuns || 0}
-Skins Won: ${home?.skinsWon || 0}
-Skin Breakdown:
-${(home?.skins || [])
-  .map(
-    (s: any, idx: number) =>
-      `  Skin ${s.skinNumber || idx + 1}: Batters [${s.batter1Name} & ${s.batter2Name}], Runs: ${s.skinTotalRuns ?? s.runs ?? 0}, Wkts Lost: ${s.skinWickets ?? s.wickets ?? 0}`
-  )
-  .join("\n")}
-
-Player Summaries:
-${(home?.playerSummaries || [])
-  .map(
-    (p: any) =>
-      `  ${p.name}: RS=${p.runsScored}, RC=${p.runsConceded}, OB=${p.oversBowled}, Wkts=${p.wickets}, Econ=${p.economy}, C=${p.contribution}`
-  )
-  .join("\n")}
-
-AWAY INNINGS (${away?.teamName || "Away Team"}):
-Total Runs: ${away?.totalRuns || 0}
-Skins Won: ${away?.skinsWon || 0}
-Skin Breakdown:
-${(away?.skins || [])
-  .map(
-    (s: any, idx: number) =>
-      `  Skin ${s.skinNumber || idx + 1}: Batters [${s.batter1Name} & ${s.batter2Name}], Runs: ${s.skinTotalRuns ?? s.runs ?? 0}, Wkts Lost: ${s.skinWickets ?? s.wickets ?? 0}`
-  )
-  .join("\n")}
-
-Player Summaries:
-${(away?.playerSummaries || [])
-  .map(
-    (p: any) =>
-      `  ${p.name}: RS=${p.runsScored}, RC=${p.runsConceded}, OB=${p.oversBowled}, Wkts=${p.wickets}, Econ=${p.economy}, C=${p.contribution}`
-  )
-  .join("\n")}
-`;
-}
+export { INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT, buildMatchPromptContext };
 
 /**
  * Executes LLM call via LiteLLM if available, otherwise falls back gracefully
@@ -353,7 +124,7 @@ export function generateDeterministicMatchAnalysis(
     venue: scorecard.matchInfo?.venue || "Insportz Club, Dubai",
     winner: winnerName,
     loser: loserName,
-    scoreSummary: `${winnerName} ${winRuns} def. ${loserName} ${loseRuns} (+${diff} run margin, ${skinsWonWinner}-${skinsWonLoser} skins)`,
+    scoreSummary: `${winnerName} ${winRuns} def. ${loserName} ${loseRuns} (+${diff} run margin, ${skinsWonWinner}-${skinsWonLoser} skins, ${skinsWonWinner * 3 + 4}-${skinsWonLoser * 3} tournament pts)`,
     editorHeadline:
       diff > 25
         ? `${winnerName}'s Bowling Mastery and Middle Skins Suffocation Crushes ${loserName}`
@@ -450,11 +221,11 @@ export function generateDeterministicMatchAnalysis(
           skinMargin: Math.abs(margin),
           skinWinner: isWWin ? winnerName : loserName,
           analysis: isWWin
-            ? `${wPair} won Skin ${num} by +${margin} runs, holding dismissals to ${wDismissals}.`
-            : `${lPair} fought back to take Skin ${num} by +${Math.abs(margin)} runs.`,
+            ? `${wPair} won Skin ${num} by +${margin} runs (3 tournament pts), holding dismissals to ${wDismissals}.`
+            : `${lPair} fought back to take Skin ${num} by +${Math.abs(margin)} runs (3 tournament pts).`,
         };
       }),
-      skinsStory: `${winnerName} demonstrated sustained superiority across four partnerships, winning ${skinsWonWinner} skins cleanly through disciplined running.`,
+      skinsStory: `${winnerName} secured victory across four partnerships, winning ${skinsWonWinner} skins (${skinsWonWinner * 3} skin pts + 4 match pts = ${skinsWonWinner * 3 + 4} tournament pts) while ${loserName} captured ${skinsWonLoser * 3} tournament pts from skin wins.`,
     },
     turningPointDetailed: {
       matchStateBefore: `${loserName} was trailing entering the second skin.`,

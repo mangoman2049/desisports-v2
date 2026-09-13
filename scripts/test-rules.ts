@@ -471,6 +471,143 @@ async function runTestSuite() {
     passedAll = false;
   }
 
+  // Test 16: Tactical Prompt Isolation & Anti-Presentism / Spawtz Points Rules
+  console.log("\n[Test 16] Tactical Prompt Isolation & Anti-Presentism / Spawtz Points Rules:");
+  try {
+    const { INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT } = await import("../src/lib/tactical-prompt");
+
+    const hasAntiPresentism =
+      INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("ANTI-PRESENTISM") &&
+      INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("CHRONOLOGICAL TIMELINE") &&
+      INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("ZERO foresight");
+
+    const hasSpawtzPoints =
+      INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("SKIN WIN = 3 POINTS") &&
+      INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("MATCH WIN = 4 POINTS") &&
+      INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("16 POINTS");
+
+    const hasIndoorCricketRules =
+      INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("-5 RUN PENALTY") &&
+      INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("16 overs") &&
+      INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("4 batting partnerships (Skins 1 to 4)");
+
+    const hasSquadIntegrity =
+      INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("SQUAD INTEGRITY & CANONICAL NAMES") &&
+      INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("canonical database names");
+
+    console.log(`- Anti-Presentism / Chronological Timeline: ${hasAntiPresentism ? "VERIFIED" : "MISSING"}`);
+    console.log(`- Spawtz Tournament Points Structure (3/4/16): ${hasSpawtzPoints ? "VERIFIED" : "MISSING"}`);
+    console.log(`- Indoor Cricket Rules (-5 penalty, 16 overs, 4 skins): ${hasIndoorCricketRules ? "VERIFIED" : "MISSING"}`);
+    console.log(`- Squad Integrity & Canonical Names: ${hasSquadIntegrity ? "VERIFIED" : "MISSING"}`);
+
+    if (!hasAntiPresentism || !hasSpawtzPoints || !hasIndoorCricketRules || !hasSquadIntegrity) {
+      console.error("FAIL: Tactical Prompt module missing required indoor cricket tactical principles!");
+      passedAll = false;
+    } else {
+      console.log("PASS: Tactical Prompt module isolated and fully verified with anti-presentism and Spawtz points.");
+    }
+  } catch (err) {
+    console.error("FAIL: Test 16 encountered error:", err);
+    passedAll = false;
+  }
+
+  // Test 17: Zero Squad Cross-Contamination Across All Tournament Match Analyses
+  console.log("\n[Test 17] Zero Squad Cross-Contamination Across All Tournament Match Analyses:");
+  try {
+    const { MATCH_ANALYSES } = await import("../src/lib/match-analyses");
+    const squadsData = JSON.parse(fs.readFileSync(path.join(process.cwd(), "prisma", "squads.json"), "utf-8"));
+
+    const playerToTeam = new Map<string, string>();
+    for (const sq of squadsData) {
+      for (const p of sq.players) {
+        playerToTeam.set(p.name.toLowerCase(), sq.team);
+      }
+    }
+
+    const fixtures: Record<string, [string, string]> = {
+      "1": ["VPGR", "DesiTitans"],
+      "2": ["DesiDabanggs", "DesiTigers"],
+      "3": ["VPGR", "DesiDabanggs"],
+      "4": ["DesiTitans", "DesiTigers"],
+      "5": ["DesiTitans", "DesiDabanggs"],
+      "6": ["VPGR", "DesiTigers"],
+    };
+
+    let crossContaminations = 0;
+    for (const [mId, [t1, t2]] of Object.entries(fixtures)) {
+      const analysis = MATCH_ANALYSES[mId];
+      if (!analysis) {
+        console.error(`FAIL: Match analysis for Match ${mId} is missing!`);
+        passedAll = false;
+        continue;
+      }
+
+      const allowedTeams = new Set([t1.toLowerCase(), t2.toLowerCase()]);
+      const analysisStr = JSON.stringify(analysis).toLowerCase();
+
+      playerToTeam.forEach((team, pName) => {
+        if (pName.length > 4 && analysisStr.includes(pName)) {
+          if (!allowedTeams.has(team.toLowerCase())) {
+            console.error(`FAIL: Cross-contamination in Match ${mId}: Player "${pName}" belongs to ${team}, but fixture is ${t1} vs ${t2}`);
+            crossContaminations++;
+          }
+        }
+      });
+    }
+
+    console.log(`- Cross-Contamination Violations across Matches 1-6: ${crossContaminations}`);
+    if (crossContaminations > 0) {
+      console.error(`FAIL: Found ${crossContaminations} cross-contamination errors in match analyses!`);
+      passedAll = false;
+    } else {
+      console.log("PASS: All 6 tournament match analyses strictly respect tournament squad rosters (0 violations).");
+    }
+  } catch (err) {
+    console.error("FAIL: Test 17 encountered error:", err);
+    passedAll = false;
+  }
+
+  // Test 18: Scorecard Rules Engine Defensive Handling of Sparse/Null Objects
+  console.log("\n[Test 18] Scorecard Rules Engine Defensive Handling of Sparse/Null Objects:");
+  try {
+    // 1. Completely empty object cast to any
+    const emptyReport = validateIndoorCricketScorecard({} as any);
+    console.log(`- Empty object handling: passed=${emptyReport.passed}, confidence=${emptyReport.confidenceScore}%`);
+
+    // 2. Partial scorecard with undefined arrays
+    const partialScorecard = {
+      homeInnings: {
+        team: "Home Team",
+        total: 50,
+        skins: [
+          { skinNumber: 1, runs: 20 },
+          { skinNumber: 2, runs: 10, overs: undefined },
+        ],
+        playerSummaries: undefined,
+      },
+      awayInnings: {
+        team: "Away Team",
+        total: 40,
+        skins: undefined,
+        playerSummaries: [],
+      },
+      skinsSummary: undefined,
+    };
+
+    const partialReport = validateIndoorCricketScorecard(partialScorecard as any);
+    console.log(`- Sparse scorecard handling: passed=${partialReport.passed}, confidence=${partialReport.confidenceScore}%`);
+
+    if (typeof emptyReport.confidenceScore !== "number" || typeof partialReport.confidenceScore !== "number") {
+      console.error("FAIL: validateIndoorCricketScorecard failed to return valid confidence score on sparse input");
+      passedAll = false;
+    } else {
+      console.log("PASS: Rules engine gracefully handles sparse/corrupt scorecard objects without throwing runtime exceptions.");
+    }
+  } catch (err) {
+    console.error("FAIL: Test 18 encountered error:", err);
+    passedAll = false;
+  }
+
   await prisma.$disconnect();
 
   if (!passedAll) {
@@ -478,7 +615,7 @@ async function runTestSuite() {
     process.exit(1);
   } else {
     console.log("\n==================================================");
-    console.log("✅ ALL 15 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
+    console.log("✅ ALL 18 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
     console.log("==================================================");
     process.exit(0);
   }

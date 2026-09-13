@@ -329,7 +329,7 @@ export default function MatchViewClient({
                   </h3>
                 </div>
                 <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-200/80 dark:bg-amber-900/60 text-amber-900 dark:text-amber-200">
-                  {analysis.turningPoint.nature}
+                  {analysis.turningPoint?.nature || "Tactical Domination"}
                 </span>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
@@ -350,7 +350,7 @@ export default function MatchViewClient({
           )}
 
           {/* SECTION 5: 4-PAIR SKIN ANALYSIS TABLE */}
-          <div className="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm space-y-4">
+          <div className="p-4 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm space-y-4">
             <div className="flex items-center gap-2 text-slate-900 dark:text-white">
               <Layers className="w-4 h-4 text-emerald-600" />
               <h3 className="text-sm font-black uppercase tracking-wider">
@@ -358,7 +358,8 @@ export default function MatchViewClient({
               </h3>
             </div>
 
-            <div className="overflow-x-auto">
+            {/* Desktop Table View */}
+            <div className="hidden sm:block overflow-x-auto">
               <table className="w-full min-w-[620px] text-xs text-left border-collapse">
                 <thead>
                   <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-400 font-mono text-[10px] uppercase">
@@ -400,6 +401,47 @@ export default function MatchViewClient({
                 </tbody>
               </table>
             </div>
+
+            {/* Mobile Responsive Cards View */}
+            <div className="block sm:hidden space-y-3">
+              {skinPairs.map((p, idx) => (
+                <div key={idx} className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850/40 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-mono font-bold text-xs bg-slate-200 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-800 dark:text-slate-200">
+                      Skin {p.pairNumber}
+                    </span>
+                    <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                      {p.skinWinner} (+{p.skinMargin} runs)
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="p-2 rounded-lg bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200/40 dark:border-emerald-900/30">
+                      <div className="text-[10px] uppercase font-bold text-emerald-700 dark:text-emerald-400">Winner Pair</div>
+                      <div className="font-semibold text-slate-900 dark:text-white mt-0.5 truncate">{p.winnerPair}</div>
+                      <div className="font-mono text-emerald-600 font-bold mt-0.5">
+                        {p.winnerRuns} <span className="text-slate-400 text-[10px]">({p.winnerDismissals}w)</span>
+                      </div>
+                    </div>
+
+                    <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                      <div className="text-[10px] uppercase font-bold text-slate-500">Opponent Pair</div>
+                      <div className="font-semibold text-slate-700 dark:text-slate-300 mt-0.5 truncate">{p.loserPair}</div>
+                      <div className="font-mono text-rose-500 font-bold mt-0.5">
+                        {p.loserRuns} <span className="text-slate-400 text-[10px]">({p.loserDismissals}w)</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {p.analysis && (
+                    <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed pt-1 border-t border-slate-200/60 dark:border-slate-800">
+                      {p.analysis}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+
             {analysis.skinsAnalysisDetailed?.skinsStory && (
               <p className="text-xs text-slate-500 dark:text-slate-400 font-mono pt-2 border-t border-slate-100 dark:border-slate-800">
                 Summary: {analysis.skinsAnalysisDetailed.skinsStory}
@@ -447,7 +489,7 @@ export default function MatchViewClient({
                   <div key={idx} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 space-y-1">
                     <div className="font-bold text-slate-900 dark:text-white">{b.team} Batting Tendencies:</div>
                     <ul className="list-disc list-inside text-slate-600 dark:text-slate-400 space-y-0.5">
-                      {b.observations.map((o, i) => (
+                      {(b.observations || []).map((o, i) => (
                         <li key={i}>{o}</li>
                       ))}
                     </ul>
@@ -472,7 +514,7 @@ export default function MatchViewClient({
                   <div className="space-y-1 pt-2 border-t border-slate-100 dark:border-slate-800">
                     <div className="font-bold text-slate-900 dark:text-white">Key Takeaways:</div>
                     <ul className="list-disc list-inside text-slate-600 dark:text-slate-400 space-y-0.5">
-                      {analysis.captainAnalysis.captainTakeaways.map((t, i) => (
+                      {(analysis.captainAnalysis.captainTakeaways || []).map((t, i) => (
                         <li key={i}>{t}</li>
                       ))}
                     </ul>

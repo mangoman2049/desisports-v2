@@ -17,9 +17,10 @@ const STATIC_MATCH_SCORECARDS: Record<string, string> = {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
-  const { id } = params;
+  const resolvedParams = await Promise.resolve(params);
+  const id = resolvedParams.id;
   const searchParams = request.nextUrl.searchParams;
   const download = searchParams.get("download") === "true";
   const format = searchParams.get("format") || "webp";

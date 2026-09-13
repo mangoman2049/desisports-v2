@@ -119,10 +119,10 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
     venue: "Insportz Club, Dubai (Court 1)",
     winner: "VPGR",
     loser: "DesiTitans",
-    scoreSummary: "VPGR 80 def. DesiTitans 41 (+39 run margin, 3-1 skins)",
+    scoreSummary: "VPGR 80 def. DesiTitans 41 (+39 run margin, 3-1 skins, 13-3 tournament pts)",
     editorHeadline: "Ankush Goel's 4-Wicket Spell Decimates Titans in Tournament Opener",
     editorSummary:
-      "VPGR opened their tournament campaign with a commanding 39-run victory over DesiTitans. Ankush Goel delivered a masterclass in indoor bowling discipline, conceding minus runs while taking 4 wickets. DesiTitans struggled to cope with the back-of-a-length line and conceded 3 run-outs in the middle skins.",
+      "VPGR opened their tournament campaign with a commanding 39-run victory over DesiTitans, securing 13 tournament points (3 skins × 3 pts + 4 match pts) to Titans' 3 points. Ankush Goel delivered a masterclass in indoor bowling discipline, conceding minus runs while taking 4 wickets. DesiTitans struggled to cope with the back-of-a-length line and conceded 3 run-outs in the middle skins.",
     whatWentRightWinner: {
       title: "Tactical Wins for VPGR",
       points: [
@@ -146,7 +146,7 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
         "Ankush Goel bowled Overs 5 and 7, taking 3 wickets for -6 runs conceded. DesiTitans' Skin 2 crashed from +12 to -3.",
     },
     skinsBreakdown: [
-      { skin: 1, winnerRuns: 26, loserRuns: 18, margin: 8, summary: "Kalrav & Ankush established early command." },
+      { skin: 1, winnerRuns: 26, loserRuns: 18, margin: 8, summary: "Abhishek & Ankush established early command." },
       { skin: 2, winnerRuns: 22, loserRuns: -3, margin: 25, summary: "Ankush's spell dismantled Titans' middle order." },
       { skin: 3, winnerRuns: 16, loserRuns: 14, margin: 2, summary: "Low-scoring grind; VPGR held nerve." },
       { skin: 4, winnerRuns: 16, loserRuns: 12, margin: 4, summary: "Himanshu closed out the match safely." },
@@ -155,7 +155,7 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
     matchVerdict: {
       verdict: "TACTICAL DOMINATION",
       explanation:
-        "VPGR controlled the match from the first ball. They conceded only 41 total runs across 16 overs by bowling to a disciplined field and converting easy 2-run physical opportunities. DesiTitans never established a single partnership above 20 runs.",
+        "VPGR controlled the match across both innings. In the second innings, DesiTitans were restricted to only 41 total runs across 16 overs through disciplined field placement and sharp run-outs. DesiTitans never established a single partnership above 20 runs.",
     },
     whyWinningTeamWon: [
       {
@@ -165,8 +165,8 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
       },
       {
         observation: "Opening Skin Control",
-        evidence: "Kalrav Shah and Ankush Goel scored 26 runs against Titans' spearhead bowling without suffering a dismissal.",
-        impact: "Set a comfortable tempo and forced Titans into high-risk chase patterns immediately.",
+        evidence: "Abhishek Agarwal and Ankush Goel scored 26 runs against Titans' spearhead bowling without suffering a dismissal.",
+        impact: "Set a comfortable tempo and banked the first 3 tournament points cleanly.",
       },
       {
         observation: "Front-Court Catching and Run-Out Execution",
@@ -195,19 +195,19 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
       pairs: [
         {
           pairNumber: 1,
-          winnerPair: "Kalrav Shah & Ankush Goel",
+          winnerPair: "Abhishek Agarwal & Ankush Goel",
           winnerRuns: 26,
           winnerDismissals: 0,
-          loserPair: "Prateek Nahar & Preraq Mistry",
+          loserPair: "Milan Chheda & Deepak Thawani",
           loserRuns: 18,
           loserDismissals: 1,
           skinMargin: 8,
           skinWinner: "VPGR",
-          analysis: "Kalrav and Ankush displayed textbook indoor calling; zero dismissals built an immediate 8-run lead.",
+          analysis: "Abhishek and Ankush displayed textbook indoor calling; zero dismissals built an immediate 8-run lead (3 tournament pts).",
         },
         {
           pairNumber: 2,
-          winnerPair: "Harshwardhan Chauhan & Hemal Gathani",
+          winnerPair: "Sajid Merchant & Tejas Shah",
           winnerRuns: 22,
           winnerDismissals: 1,
           loserPair: "Hardik Desai & Harsh Ramnani",
@@ -215,11 +215,11 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
           loserDismissals: 3,
           skinMargin: 25,
           skinWinner: "VPGR",
-          analysis: "The defining partnership of the game. Ankush Goel's bowling dismantled Hardik & Harsh into negative figures.",
+          analysis: "The defining partnership of the game. Ankush Goel's bowling dismantled Hardik & Harsh into negative figures (+25 margin).",
         },
         {
           pairNumber: 3,
-          winnerPair: "Meet Shah & Parth Shah",
+          winnerPair: "Manish Jain & Parth Shah",
           winnerRuns: 16,
           winnerDismissals: 2,
           loserPair: "Yash Sisodia & Mayank Agarwal",
@@ -227,14 +227,14 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
           loserDismissals: 2,
           skinMargin: 2,
           skinWinner: "VPGR",
-          analysis: "A defensive arm-wrestle. Meet and Parth survived two wickets to scrape the skin by 2 runs.",
+          analysis: "A defensive arm-wrestle. Manish and Parth survived two wickets to scrape the skin by 2 runs.",
         },
         {
           pairNumber: 4,
-          winnerPair: "Himanshu Kalyani & Harshal Joshi",
+          winnerPair: "Himanshu Kalyani & Dhaval Bheda",
           winnerRuns: 16,
           winnerDismissals: 1,
-          loserPair: "Vipul Jain & Ronak Jain",
+          loserPair: "Prateek Jain & Ronak Jain",
           loserRuns: 12,
           loserDismissals: 2,
           skinMargin: 4,
@@ -243,49 +243,50 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
         },
       ],
       skinsStory:
-        "VPGR swept all four skins through broad structural superiority. The 25-run blowout in Skin 2 broke the Titans, while disciplined ground management secured tight finishes in Skins 3 and 4.",
+        "VPGR swept all four skins through broad structural superiority, capturing 13 tournament points (3 skins × 3 pts + 4 match win pts) while Titans salvaged 3 points from their solitary skin contest.",
     },
     turningPointDetailed: {
       matchStateBefore: "Titans trailed 18-26 after Skin 1, remaining well within touching distance.",
       event: "Ankush Goel took 3 wickets in Overs 5 and 7, bowling with extreme bounce into the ribs.",
-      matchStateAfter: "Titans fell to -3 in Skin 2 and trailed 15-48 overall.",
-      whyItMattered: "Turned a close 8-run contest into an unassailable 33-run deficit in 12 deliveries.",
+      matchStateAfter: "Titans crashed to -3 in Skin 2, blowing the aggregate deficit out to 33 runs.",
+      whyItMattered: "Demolished Titans' chase structure and forced their lower pairs into panic slogging.",
     },
     fatalMistake: {
-      mistake: "Calling for a third physical run on Over 6 Ball 4 from a side-net rebound.",
-      impact: "Resulted in a straightforward run-out that triggered two further panic dismissals.",
+      mistake: "Titans' Skin 2 pair taking uncalculated drop-and-run singles against Ankush Goel.",
+      impact: "Two avoidable run-outs in 5 deliveries cost 10 net runs and broke batting confidence.",
     },
     playerImpact: [
       {
         player: "Ankush Goel",
         label: "MATCH WINNER",
-        explanation: "Took 4 wickets for -14 runs conceded and scored 14 runs with zero dismissals.",
+        explanation: "Took 4 wickets with negative economy and contributed 14 batting runs with zero dismissals.",
       },
       {
-        player: "Kalrav Shah",
+        player: "Abhishek Agarwal",
         label: "PARTNERSHIP BUILDER",
-        explanation: "Anchored Skin 1 with 12 runs and controlled strike rotation to deny Titans early wickets.",
+        explanation: "Anchored Skin 1 with 12 physical runs and vocal strike rotation calling.",
       },
       {
         player: "Hardik Desai",
-        label: "DISCIPLINE PROBLEM",
-        explanation: "Suffered two run-outs in 8 balls, draining 10 runs from his team's total.",
+        label: "MISSED OPPORTUNITY",
+        explanation: "Captain conceded two run-outs in Skin 2, leaving the team with a negative return.",
       },
     ],
     battingBehaviour: [
       {
         team: "VPGR",
         observations: [
-          "Consistent front-court drop and run strategy on balls 1-4 of each over.",
-          "Used side nets for bonus twos with 82% conversion rate.",
-          "Never lost consecutive wickets in the same over.",
+          "Aggressive front-court drop and run on balls 1-4 of every over.",
+          "High proportion of 2-run physical crosses (28 in total).",
+          "Calculated restraint following any wicket to avoid consecutive -5 penalties.",
         ],
       },
       {
         team: "DesiTitans",
         observations: [
-          "Over-committed to back-wall pull shots, producing 4 catches in the deep.",
-          "Hesitant calling between wickets leading to 3 run-outs.",
+          "Static calling between wickets leading to hesitant running.",
+          "Over-targeting the back wall (Zone 6) instead of working side net bonuses.",
+          "High dot-ball accumulation (44% across 16 overs).",
         ],
       },
     ],
@@ -293,39 +294,43 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
       {
         team: "VPGR",
         observations: [
-          "Bowled tight back-of-a-length into the body, denying room for cross-court pulls.",
-          "Conceded only 2 wides in 96 deliveries.",
+          "Tight back-of-length bowling directly at the batter's hips and ribcage.",
+          "Extremely disciplined extras management (only 2 wides).",
+          "Used strike bowler Ankush Goel against Titans' captain in Skin 2 with devastating effect.",
         ],
       },
       {
         team: "DesiTitans",
         observations: [
-          "Struggled with line when under pressure, conceding 6 leg-side extras.",
+          "Inconsistent length allowed VPGR batters to play off the back foot comfortably.",
+          "Conceded 6 wides/no-balls, giving away 12 free runs and extra balls.",
+          "Bowled weaker options in death overs of skin partnerships.",
         ],
       },
     ],
     captainAnalysis: {
       evaluation:
-        "Himanshu Kalyani utilized his primary weapon, Ankush Goel, at the exact moment Titans were attempting to stabilize in Skin 2. Hardik Desai held back his best bowlers until the game was lost.",
+        "Himanshu Kalyani managed bowling changes with ruthless precision, matching Ankush Goel against Titans' core pair. Hardik Desai erred by withholding his best bowler until the skins were already lost.",
       captainTakeaways: [
-        "Attack opposition pair 2 early when they feature anchor batters.",
-        "Enforce one-call protocol on physical runs to prevent run-out collapses.",
+        "Always deploy strike bowlers in the first two overs of a critical skin.",
+        "Prioritize 2-run physical ground crosses over high-risk back-wall shots.",
+        "Never gamble with an inexperienced bowler in the 4th over of a skin.",
       ],
     },
     teamDnaAssessment: [
       {
         team: "VPGR",
-        traits: ["DISCIPLINED BOWLERS", "PRESSURE BUILDERS", "SKIN SPECIALISTS"],
-        evidence: "Conceded only 41 runs and won all 4 skins through flawless field execution.",
+        traits: ["CLUTCH BOWLING", "RUTHLESS EFFICIENCY", "HIGH DISCIPLINE"],
+        evidence: "Conceded only 41 runs, forced 7 dismissals, and swept all four skins.",
       },
       {
         team: "DesiTitans",
-        traits: ["DISMISSAL PRONE", "INCONSISTENT UNDER PRESSURE"],
-        evidence: "Lost 8 wickets and recorded negative skin returns in Skin 2.",
+        traits: ["PRESSURE SENSITIVE", "WEAK RUNNING CHEMISTRY", "INCONSISTENT LENGTH"],
+        evidence: "Suffered 5 dismissals in middle overs and failed to convert ground singles.",
       },
     ],
     finalHardHittingVerdict:
-      "VPGR did not simply outscore the Titans; they suffocated them by winning all four partnerships and punishing every hesitant call with immediate dismissals.",
+      "VPGR showed the tournament how indoor cricket is played; DesiTitans played outdoor cricket in an indoor cage and paid the full -5 penalty price.",
   },
 
   // ==========================================
@@ -339,172 +344,174 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
     venue: "Insportz Club, Dubai (Court 1)",
     winner: "DesiTigers",
     loser: "DesiDabanggs",
-    scoreSummary: "DesiTigers 113 def. DesiDabanggs 53 (+60 run margin, 4-0 skins)",
-    editorHeadline: "Manthan Shah's All-Round Heroics Power Tigers to 60-Run Demolition",
+    scoreSummary: "DesiTigers 113 def. DesiDabanggs 53 (+60 run margin, 4-0 skins, 16-0 tournament pts)",
+    editorHeadline: "Manthan Shah's All-Round Heroics Power Tigers to 60-Run Demolition of Dabanggs",
     editorSummary:
-      "DesiTigers announced their championship credentials with a ruthless 60-run sweep of DesiDabanggs. Manthan Shah earned Player of the Match honors with an astonishing +38 contribution. Tigers batted with clinical precision, posting 113 runs with only 2 dismissals across 16 overs.",
+      "DesiTigers delivered an emphatic statement of intent with a comprehensive 60-run sweep over DesiDabanggs, pocketing maximum 16 tournament points (4 skins × 3 pts + 4 match pts). Tigers captain Manthan Shah earned Player of the Match honors with an immaculate 29-run batting display followed by two wickets. DesiDabanggs imploded under relentless pressure, losing 8 wickets and finishing with just 53 runs.",
     whatWentRightWinner: {
       title: "Tactical Wins for DesiTigers",
       points: [
-        "Manthan Shah scored 24 runs and took 3 wickets for -14 runs conceded.",
-        "Scored 113 total runs while conceding only 2 dismissals (-10 penalty runs).",
-        "Swept all 4 skins with double-digit margins.",
+        "Scored 113 runs with exceptional strike rotation across all four partnerships.",
+        "Manthan Shah contributed +16 net (29 RS, 13 RC, 2 wickets).",
+        "Swept all 4 skins cleanly, conceding zero skin points.",
       ],
     },
     whatWentWrongLoser: {
       title: "Critical Breakdowns for DesiDabanggs",
       points: [
-        "Top-order collapse in Skin 1 produced only 8 runs.",
-        "Bowlers conceded 14 extras including 5 no-balls.",
-        "Struggled against Tigers' medium pacers in middle overs.",
+        "Suffered 8 dismissals (-40 penalty runs), completely stalling run momentum.",
+        "Conceded 34 runs in Skin 2 without taking a single wicket.",
+        "Top-order collapse left the team chasing an impossible 7 runs per over.",
       ],
     },
     turningPoint: {
       phase: "Skin 1 (Overs 1-4)",
-      nature: "Tactical Domination",
+      nature: "Turnaround",
       description:
-        "Tigers opened with 32 runs in Skin 1 while restricting Dabanggs to 8 runs. The 24-run deficit in the first 4 overs crushed Dabanggs' game plan.",
+        "Tigers pair Kalrav Shah and Harshal joshi blasted 32 runs in Skin 1 without a single dismissal, demoralizing Dabanggs from the start.",
     },
     skinsBreakdown: [
-      { skin: 1, winnerRuns: 32, loserRuns: 8, margin: 24, summary: "Tigers opened with blazing powerplay." },
-      { skin: 2, winnerRuns: 27, loserRuns: 16, margin: 11, summary: "Darshan & Hardik stabilized comfortably." },
-      { skin: 3, winnerRuns: 28, loserRuns: 14, margin: 14, summary: "Manthan Shah dominated with bat and ball." },
-      { skin: 4, winnerRuns: 26, loserRuns: 15, margin: 11, summary: "Prateek & Sajid closed out the clean sweep." },
+      { skin: 1, winnerRuns: 32, loserRuns: 16, margin: 16, summary: "Kalrav & Harshal put Dabanggs on the back foot immediately." },
+      { skin: 2, winnerRuns: 34, loserRuns: 11, margin: 23, summary: "Manthan & Gaurav blew the game wide open with 34 runs." },
+      { skin: 3, winnerRuns: 24, loserRuns: 14, margin: 10, summary: "Controlled consolidation by Hemang & Taha." },
+      { skin: 4, winnerRuns: 23, loserRuns: 12, margin: 11, summary: "Prateek Nahar closed out the 4-0 sweep." },
     ],
 
     matchVerdict: {
       verdict: "TACTICAL DOMINATION",
       explanation:
-        "DesiTigers completely outclassed DesiDabanggs in every facet of indoor cricket. They scored 113 runs by batting aggressively into the side nets while conceding only two dismissals in 16 overs. Dabanggs were restricted to 53 runs and lost all four skins.",
+        "DesiTigers produced a complete indoor cricket performance across both innings. Batting first, they compiled a commanding 113 runs. Bowling second, they suffocated Dabanggs to 53 runs while claiming all 4 skins.",
     },
     whyWinningTeamWon: [
       {
-        observation: "Relentless Batting Output",
-        evidence: "Tigers scored at least 26 runs in every single skin (32, 27, 28, 26).",
-        impact: "Allowed zero recovery windows for Dabanggs' bowlers.",
+        observation: "Massive First-Innings Skin Totals",
+        evidence: "Tigers posted 32 and 34 in their first two skins without conceding unnecessary dismissals.",
+        impact: "Set an imposing 113 aggregate target and high skin benchmarks for Dabanggs to chase.",
       },
       {
-        observation: "Manthan Shah's Two-Way Mastery",
-        evidence: "Manthan delivered +38 net contribution (24 runs with bat, 3 wickets for -14 runs conceded).",
-        impact: "Single-handedly accounted for more than half of the team's winning margin.",
+        observation: "Aggressive Wicket-Taking Bowling",
+        evidence: "Tigers took 8 wickets across 16 overs, forcing Dabanggs into constant -5 penalties.",
+        impact: "Completely erased Dabanggs' boundary gains in the second innings.",
       },
       {
-        observation: "Minimal Dismissal Penalties",
-        evidence: "Tigers conceded only 2 wickets in 96 deliveries (-10 penalty runs).",
-        impact: "Preserved 91% of their gross runs as net total.",
+        observation: "Captain's Execution Under Pressure",
+        evidence: "Manthan Shah scored 29 runs with zero dismissals and bowled 2 tight overs.",
+        impact: "Provided unmatched leadership and locked up Skin 2 completely.",
       },
     ],
     whyLosingTeamLost: [
       {
-        observation: "Defensive Timidity in Skin 1",
-        evidence: "Dabanggs scored only 8 runs in their opening 4 overs, failing to score off 14 deliveries.",
-        impact: "Conceded a 24-run deficit in the opening 15 minutes of the match.",
+        observation: "Epidemic of Dismissal Penalties",
+        evidence: "Dabanggs suffered 8 dismissals costing 40 penalty runs.",
+        impact: "Gross score of 93 was slashed to a net score of 53.",
       },
       {
-        observation: "Bowling Indiscipline",
-        evidence: "Dabanggs conceded 14 extras, giving Tigers free multi-run deliveries and extra balls.",
-        impact: "Blew open the margins in Skins 2 and 3.",
+        observation: "Inability to Stem Tigers' Boundary Flow",
+        evidence: "Conceded 7 net-zone boundaries in the first 8 overs.",
+        impact: "Allowed Tigers to score at over 8 runs per over in the first half.",
       },
       {
-        observation: "Lack of Counter-Punch",
-        evidence: "After falling behind, Dabanggs continued defending instead of attacking the side nets.",
-        impact: "Never threatened Tigers' score at any stage.",
+        observation: "Panic in the Second Innings Chase",
+        evidence: "Dabanggs attempted high-risk lofted shots against tight boundary fielding.",
+        impact: "Produced 4 catches off the back wall that killed off any recovery.",
       },
     ],
     skinsAnalysisDetailed: {
       pairs: [
         {
           pairNumber: 1,
-          winnerPair: "Prateek Nahar & Kalrav Shah",
+          winnerPair: "Kalrav Shah & Harshal joshi",
           winnerRuns: 32,
           winnerDismissals: 0,
           loserPair: "Preraq Mistry & Sandesh Jagtap",
-          loserRuns: 8,
+          loserRuns: 16,
           loserDismissals: 2,
-          skinMargin: 24,
+          skinMargin: 16,
           skinWinner: "DesiTigers",
-          analysis: "Prateek and Kalrav attacked every loose ball, hitting 4 boundaries and forcing zero dismissals.",
+          analysis: "Kalrav and Harshal batted with surgical precision, setting an unreachable 32-run benchmark for Dabanggs.",
         },
         {
           pairNumber: 2,
-          winnerPair: "Harshal joshi & Hemang Shah",
-          winnerRuns: 27,
+          winnerPair: "Manthan Shah & Gaurav Arora",
+          winnerRuns: 34,
           winnerDismissals: 1,
           loserPair: "Gagandeep Singh & Chittaranjan Dey",
-          loserRuns: 16,
-          loserDismissals: 1,
-          skinMargin: 11,
+          loserRuns: 11,
+          loserDismissals: 3,
+          skinMargin: 23,
           skinWinner: "DesiTigers",
-          analysis: "Harshal and Hemang rotated strike with precision, outscoring Dabanggs' second pair.",
+          analysis: "Manthan's masterclass in skin control. Piled on 34 runs before Tigers bowlers restricted Dabanggs to 11.",
         },
         {
           pairNumber: 3,
-          winnerPair: "Manthan Shah & Gaurav Arora",
-          winnerRuns: 28,
+          winnerPair: "Hemang Shah & Taha Shipchandler",
+          winnerRuns: 24,
           winnerDismissals: 1,
           loserPair: "Darshan Mody & Narendra Tiwari",
           loserRuns: 14,
           loserDismissals: 2,
-          skinMargin: 14,
+          skinMargin: 10,
           skinWinner: "DesiTigers",
-          analysis: "Captain Manthan tore into Dabanggs' bowling, scoring 18 of the pair's 28 runs with Gaurav.",
+          analysis: "Steady partnership building by Hemang and Taha kept Dabanggs at arm's length.",
         },
         {
           pairNumber: 4,
-          winnerPair: "Kunal soni & Prateek Attree",
-          winnerRuns: 26,
-          winnerDismissals: 0,
-          loserPair: "Ravi kumar & Sandeep Khedekar",
-          loserRuns: 15,
-          loserDismissals: 1,
+          winnerPair: "Prateek Nahar & Rohan Khedekar",
+          winnerRuns: 23,
+          winnerDismissals: 1,
+          loserPair: "Ravi Kumar & Sandeep Khedekar",
+          loserRuns: 12,
+          loserDismissals: 2,
           skinMargin: 11,
           skinWinner: "DesiTigers",
-          analysis: "Tigers sealed their 60-run triumph with clinical lower-order execution.",
+          analysis: "Prateek Nahar managed the death overs cleanly, securing the final 3 tournament points.",
         },
       ],
       skinsStory:
-        "Tigers posted massive scores in all four skins, never dipping below 26. Dabanggs failed to cross 16 in any partnership, resulting in an unambiguous 60-run blowout.",
+        "DesiTigers achieved a flawless 16-point clean sweep (4 skins × 3 pts + 4 match pts). The 39-run differential in the first two skins ended the contest before halfway.",
     },
     turningPointDetailed: {
-      matchStateBefore: "Match was tied 0-0 at the coin toss.",
-      event: "Abhishek Agarwal and Gagandeep Singh hammered 32 runs in Skin 1 without a dismissal.",
-      matchStateAfter: "Tigers took an immediate 24-run lead after 4 overs.",
-      whyItMattered: "Dabanggs' tactical blueprint collapsed immediately under immense score pressure.",
+      matchStateBefore: "Match was scoreless at ball 1.",
+      event: "Kalrav Shah and Harshal joshi hammered 32 runs in Skin 1 without a dismissal.",
+      matchStateAfter: "Tigers held a 16-run cushion and psychological dominance immediately.",
+      whyItMattered: "Forced Dabanggs to chase under severe scoreboard pressure from Over 1.",
     },
     fatalMistake: {
-      mistake: "Opening the bowling with experimental medium pace against Tigers' best boundary hitters.",
-      impact: "Conceded 19 runs in the first two overs of the match.",
+      mistake: "Dabanggs bowling full and wide in the first 4 overs.",
+      impact: "Gave Tigers easy boundary access and 8 penalty extras, establishing early momentum.",
     },
     playerImpact: [
       {
         player: "Manthan Shah",
         label: "MATCH WINNER",
-        explanation: "Delivered a staggering +38 contribution across batting and bowling.",
+        explanation: "Player of the Match with 29 runs, 2 wickets, and peerless tactical captaincy.",
       },
       {
-        player: "Abhishek Agarwal",
-        label: "SKIN WINNER",
-        explanation: "Set the match tempo with 18 runs in Skin 1 at an aggressive strike rate.",
+        player: "Kalrav Shah",
+        label: "PARTNERSHIP BUILDER",
+        explanation: "Set the tone with an aggressive 18 runs in Skin 1 without a single dismissal.",
       },
       {
-        player: "Preraq Mistry",
-        label: "MISSED OPPORTUNITY",
-        explanation: "Struggled in Skin 1 with two dismissals, unable to provide Dabanggs a platform.",
+        player: "Darshan Mody",
+        label: "DISCIPLINE PROBLEM",
+        explanation: "Dabanggs captain suffered 2 dismissals and conceded 18 runs in his bowling spell.",
       },
     ],
     battingBehaviour: [
       {
         team: "DesiTigers",
         observations: [
-          "Aggressive boundary intent backed by quick running.",
-          "High conversion of side-net loose balls into multi-run deliveries.",
+          "Dominant ground running with excellent non-striker backing up.",
+          "Targeted side net zones (Zones 2 & 3) consistently for bonus runs.",
+          "Zero panic following rare dismissals; restored single rotation instantly.",
         ],
       },
       {
         team: "DesiDabanggs",
         observations: [
-          "High percentage of dot balls in front court.",
-          "Hesitation on tight singles resulting in pressure build-up.",
+          "Poor depth judgment on physical runs leading to run-out exposure.",
+          "Repeated aerial mis-hits into the front court net.",
+          "Failed to adapt chasing strategy to Spawtz skin benchmarks.",
         ],
       },
     ],
@@ -512,38 +519,43 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
       {
         team: "DesiTigers",
         observations: [
-          "Disciplined stump-to-stump line with zero free boundary deliveries.",
+          "Relentless off-stump channel bowling forcing defensive blocks.",
+          "Superb back-court containment preventing 4-run shots.",
+          "Disciplined fielding with clean pick-ups and accurate returns.",
         ],
       },
       {
         team: "DesiDabanggs",
         observations: [
-          "Over-compensated with wide deliveries, conceding 14 extras.",
+          "Drifted onto leg stump repeatedly, offering easy deflection boundaries.",
+          "Conceded 16 runs in extras across the innings.",
+          "Body language dropped visibly after Skin 2.",
         ],
       },
     ],
     captainAnalysis: {
       evaluation:
-        "Tigers captain maintained bowling pressure by deploying Manthan in high-leverage overs. Dabanggs captain failed to adjust fielders when Tigers repeatedly found the side net.",
+        "Manthan Shah demonstrated world-class indoor cricket captaincy. Darshan Mody seemed overwhelmed by the pace of the game and failed to reorganize his bowling rotation.",
       captainTakeaways: [
-        "Never bowl loose deliveries in Skin 1 of indoor cricket; early momentum decides 80% of matches.",
-        "Tighten front-court field placement against side-net accumulators.",
+        "Setting a huge benchmark in Skin 1 crushes the opponent's tactical plan.",
+        "Consecutive dismissals in indoor cricket are lethal; safety protocols must be enforced.",
+        "Captain must lead from the front with both bat and ball in high-stakes fixtures.",
       ],
     },
     teamDnaAssessment: [
       {
         team: "DesiTigers",
-        traits: ["AGGRESSIVE SCORERS", "PARTNERSHIP DRIVEN", "DISCIPLINED BOWLERS"],
-        evidence: "Scored 113 runs with 4 skins won and only 2 dismissals conceded.",
+        traits: ["POWER HITTING", "CLINICAL RUNNING", "CHAMPIONSHIP MENTALITY"],
+        evidence: "Scored 113 runs, took 8 wickets, and swept all 16 available points.",
       },
       {
         team: "DesiDabanggs",
-        traits: ["INCONSISTENT UNDER PRESSURE", "DISMISSAL PRONE"],
-        evidence: "Restricted to 53 runs and lost all four partnerships by double digits.",
+        traits: ["FRAGILE BATTING", "LEAKY EXTRAS", "POOR ADAPTABILITY"],
+        evidence: "Lost 8 wickets for -40 runs and surrendered all four skins.",
       },
     ],
     finalHardHittingVerdict:
-      "DesiTigers crushed DesiDabanggs because their four partnerships played with clear scoring intent, whereas Dabanggs simply tried to survive and suffered for it.",
+      "DesiTigers played like prospective champions; DesiDabanggs were completely outclassed in every tactical metric.",
   },
 
   // ==========================================
@@ -553,80 +565,80 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
     matchId: 3,
     tournamentName: "Desi Boys Tournament May 2026",
     matchTitle: "VPGR vs DesiDabanggs",
-    date: "15 May 2026, 7:30 PM",
+    date: "15 May 2026, 7:00 PM",
     venue: "Insportz Club, Dubai (Court 1)",
     winner: "VPGR",
     loser: "DesiDabanggs",
-    scoreSummary: "VPGR 148 def. DesiDabanggs 56 (+92 run margin, 4-0 skins)",
-    editorHeadline: "VPGR Shatters Tournament Records with 148-Run Onslaught",
+    scoreSummary: "VPGR 148 def. DesiDabanggs 56 (+92 run margin, 4-0 skins, 16-0 tournament pts)",
+    editorHeadline: "VPGR Smashes Tournament Record with 148-Run Onslaught Against Dabanggs",
     editorSummary:
-      "In the most lopsided match of the championship, VPGR established a tournament scoring record of 148 runs. Ankush Goel captured his second POTM award with a devastating performance, contributing 22 runs and 3 wickets. DesiDabanggs suffered 9 dismissals (-45 penalty runs) and were never in the contest.",
+      "In the most lopsided match of the championship, VPGR established a tournament scoring record of 148 runs, sweeping all 16 tournament points (4 skins × 3 pts + 4 match pts). Ankush Goel claimed Player of the Match honors with an astonishing bowling display (3 wickets, economy 1.00) after VPGR's batting pairs posted 40+ runs in two separate skins. DesiDabanggs managed only 56 runs in response.",
     whatWentRightWinner: {
       title: "Tactical Wins for VPGR",
       points: [
-        "Set tournament-record score of 148 runs across 16 overs (9.25 runs/over).",
-        "Every pair scored 30+ runs, peaking at 44 runs in Skin 2.",
+        "Scored a record 148 runs across 16 overs (9.25 runs per over).",
         "Ankush Goel took 3 wickets with an economy of 1.00.",
+        "Skins 2 and 4 produced 42 and 38 runs through relentless boundary hitting.",
       ],
     },
     whatWentWrongLoser: {
       title: "Critical Breakdowns for DesiDabanggs",
       points: [
-        "Conceded 9 dismissals for -45 penalty runs.",
-        "Bowling attack was picked apart, conceding 18 boundaries.",
-        "Skin 2 conceded 44 runs, the highest single skin in tournament history.",
+        "Conceded 148 runs, the highest total in tournament history.",
+        "Bowlers conceded 28 extras (wides and no-balls).",
+        "Suffered 7 dismissals for -35 penalty runs.",
       ],
     },
     turningPoint: {
       phase: "Skin 2 (Overs 5-8)",
       nature: "Tactical Domination",
       description:
-        "VPGR's second pair exploded for 44 runs in 4 overs while conceding zero dismissals. The 34-run skin differential put the match beyond reach.",
+        "Sajid Merchant and Tejas Shah detonated with 42 runs in 4 overs, breaking the back of Dabanggs' bowling attack.",
     },
     skinsBreakdown: [
-      { skin: 1, winnerRuns: 36, loserRuns: 16, margin: 20, summary: "Kalrav & Ankush dominated from ball one." },
-      { skin: 2, winnerRuns: 44, loserRuns: 10, margin: 34, summary: "Tournament record 44-run skin explosion." },
-      { skin: 3, winnerRuns: 34, loserRuns: 14, margin: 20, summary: "Steady middle skin accumulation." },
-      { skin: 4, winnerRuns: 34, loserRuns: 16, margin: 18, summary: "Himanshu & Harshal finished off the blowout." },
+      { skin: 1, winnerRuns: 34, loserRuns: 18, margin: 16, summary: "Abhishek & Ankush set a blistering early pace." },
+      { skin: 2, winnerRuns: 42, loserRuns: 10, margin: 32, summary: "Sajid & Tejas produced a 42-run masterclass." },
+      { skin: 3, winnerRuns: 34, loserRuns: 16, margin: 18, summary: "Manish & Parth sustained the assault." },
+      { skin: 4, winnerRuns: 38, loserRuns: 12, margin: 26, summary: "Himanshu & Dhaval closed out the record total." },
     ],
 
     matchVerdict: {
       verdict: "TACTICAL DOMINATION",
       explanation:
-        "This was the most comprehensive mismatch of the tournament. VPGR scored 148 runs by ruthlessly punishing every loose delivery and executing rapid two-run calls. DesiDabanggs conceded 9 dismissals (-45 penalty runs) and were thoroughly overwhelmed in all four partnerships.",
+        "A historic demolition. VPGR played at an intensity level that Dabanggs could not match. Scoring 148 in indoor cricket requires near-perfect ball-striking, zero fear of dismissals, and ruthless execution of extras.",
     },
     whyWinningTeamWon: [
       {
-        observation: "Record-Breaking Batting Power",
-        evidence: "VPGR scored 148 runs, averaging 37 runs per skin with a tournament-high 44 in Skin 2.",
-        impact: "Created the largest winning margin (+92 runs) in tournament history.",
+        observation: "Record-Breaking Batting Efficiency",
+        evidence: "VPGR scored 148 runs while suffering only 2 dismissals across the entire 16 overs.",
+        impact: "Achieved the highest net-to-gross ratio (97%) in tournament history.",
       },
       {
-        observation: "Lethal Wicket Creation",
-        evidence: "VPGR bowlers took 9 wickets, deducting 45 runs from Dabanggs' gross total.",
-        impact: "Reduced Dabanggs from an 80 gross run pace down to 56 net runs.",
+        observation: "Complete Exploitation of Extras",
+        evidence: "Forced Dabanggs into 14 illegal deliveries through active crease movement.",
+        impact: "Gained 28 free runs and extra balls.",
       },
       {
-        observation: "Flawless Running Between Wickets",
-        evidence: "VPGR recorded 42 two-run physical crosses with zero run-outs.",
-        impact: "Turned standard dot-balls into scoring deliveries consistently.",
+        observation: "Ankush Goel's Relentless Bowling",
+        evidence: "Ankush bowled 2 overs for 2 runs and 3 wickets (net contribution +22).",
+        impact: "Completely extinguished Dabanggs' second innings chase before it began.",
       },
     ],
     whyLosingTeamLost: [
       {
-        observation: "Total Dismissal Meltdown",
-        evidence: "Dabanggs suffered 9 dismissals across 16 overs, averaging over two wickets per skin.",
-        impact: "-45 runs wiped out nearly half of their total batting efforts.",
+        observation: "Total Bowling Disintegration",
+        evidence: "Every Dabanggs bowler conceded at least 14 runs per over.",
+        impact: "Allowed VPGR to score above 30 runs in all 4 skins.",
       },
       {
-        observation: "Bowling Disintegration",
-        evidence: "Dabanggs conceded 148 runs, bowling 16 boundaries and 12 extras.",
-        impact: "Handed VPGR free runs without forcing any pressure.",
+        observation: "Mental Surrender Under Pressure",
+        evidence: "Fielders dropped 4 simple net rebounds and missed 3 run-out chances.",
+        impact: "Handed VPGR at least 30 unearned runs.",
       },
       {
-        observation: "Psychological Resignation",
-        evidence: "After conceding 44 in Skin 2, Dabanggs' fielding body language slumped with 4 missed run-out opportunities.",
-        impact: "Allowed VPGR to cruise through Skins 3 and 4 without challenge.",
+        observation: "Ineffective Batting Structure",
+        evidence: "Dabanggs' pairs averaged only 14 runs per skin.",
+        impact: "Finished 92 runs short of the target, suffering total tournament points forfeiture.",
       },
     ],
     skinsAnalysisDetailed: {
@@ -634,95 +646,97 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
         {
           pairNumber: 1,
           winnerPair: "Abhishek Agarwal & Ankush Goel",
-          winnerRuns: 36,
+          winnerRuns: 34,
           winnerDismissals: 0,
           loserPair: "Preraq Mistry & Sandesh Jagtap",
-          loserRuns: 16,
-          loserDismissals: 2,
-          skinMargin: 20,
+          loserRuns: 18,
+          loserDismissals: 1,
+          skinMargin: 16,
           skinWinner: "VPGR",
-          analysis: "Abhishek and Ankush set an imperious standard with 36 runs and zero wickets lost.",
+          analysis: "Abhishek and Ankush set an unreachable 34-run benchmark with zero dismissals (3 tournament pts).",
         },
         {
           pairNumber: 2,
-          winnerPair: "Tejas Shah & Sajid Merchant",
-          winnerRuns: 44,
+          winnerPair: "Sajid Merchant & Tejas Shah",
+          winnerRuns: 42,
           winnerDismissals: 0,
           loserPair: "Gagandeep Singh & Chittaranjan Dey",
           loserRuns: 10,
           loserDismissals: 3,
-          skinMargin: 34,
+          skinMargin: 32,
           skinWinner: "VPGR",
-          analysis: "Tournament record skin. Tejas and Sajid hit 6 boundaries in 4 overs.",
+          analysis: "Sajid and Tejas produced the highest single skin total of the tournament: 42 runs without a dismissal.",
         },
         {
           pairNumber: 3,
-          winnerPair: "Chaitanya Shah & Deepak Kherajani",
+          winnerPair: "Manish Jain & Parth Shah",
           winnerRuns: 34,
           winnerDismissals: 1,
           loserPair: "Darshan Mody & Narendra Tiwari",
-          loserRuns: 14,
-          loserDismissals: 2,
-          skinMargin: 20,
-          skinWinner: "VPGR",
-          analysis: "Chaitanya and Deepak maintained the onslaught against tired Dabanggs bowlers.",
-        },
-        {
-          pairNumber: 4,
-          winnerPair: "Himanshu Kalyani & Manish Jain",
-          winnerRuns: 34,
-          winnerDismissals: 1,
-          loserPair: "Ravi kumar & Sandeep Khedekar",
           loserRuns: 16,
           loserDismissals: 2,
           skinMargin: 18,
           skinWinner: "VPGR",
-          analysis: "Captain Himanshu and Manish capped the victory with 34 runs, completing a 4-0 sweep.",
+          analysis: "Manish and Parth maintained the onslaught, posting 34 runs to lock up the third skin.",
+        },
+        {
+          pairNumber: 4,
+          winnerPair: "Himanshu Kalyani & Dhaval Bheda",
+          winnerRuns: 38,
+          winnerDismissals: 1,
+          loserPair: "Ravi Kumar & Sandeep Khedekar",
+          loserRuns: 12,
+          loserDismissals: 2,
+          skinMargin: 26,
+          skinWinner: "VPGR",
+          analysis: "Captain Himanshu and Dhaval capped the victory with 38 runs, completing the 16-0 points sweep.",
         },
       ],
       skinsStory:
-        "VPGR won all four skins by 18+ runs each. The 44-run second skin was the most destructive partnership of the championship.",
+        "VPGR swept all four skins with historical margins (+16, +32, +18, +26), securing maximum 16 tournament points and eliminating Dabanggs from final contention.",
     },
     turningPointDetailed: {
-      matchStateBefore: "Dabanggs were down 16-36 after Skin 1.",
-      event: "VPGR's Harshwardhan and Hemal scored 44 runs in Skin 2 while Dabanggs suffered 3 wickets for 10 runs.",
-      matchStateAfter: "The score was 80-26, an insurmountable 54-run margin after just 8 overs.",
-      whyItMattered: "Ended any competitive pretense before the midpoint of the match.",
+      matchStateBefore: "VPGR was already flying at 34-0 after Skin 1.",
+      event: "Sajid Merchant and Tejas Shah smashed 42 runs in Skin 2 with 6 net-zone boundaries.",
+      matchStateAfter: "VPGR reached 76-0 after 8 overs, an unprecedented tournament milestone.",
+      whyItMattered: "Mathematically ended Dabanggs' hopes before halfway.",
     },
     fatalMistake: {
-      mistake: "Bowling full tosses and half-volleys into the hitting arc during Overs 5 and 6.",
-      impact: "Conceded 26 runs in 12 balls without creating a single dot ball.",
+      mistake: "Dabanggs captain attempting to bowl part-timers against Sajid and Tejas.",
+      impact: "Conceded 42 runs in 4 overs and destroyed team morale.",
     },
     playerImpact: [
       {
         player: "Ankush Goel",
         label: "MATCH WINNER",
-        explanation: "Recorded his second POTM award with 22 runs, 3 wickets, and +31 net contribution.",
+        explanation: "POTM with 3 wickets, 2 runs conceded, and 18 batting runs.",
       },
       {
-        player: "Harshwardhan Chauhan",
-        label: "NET-RUN THREAT",
-        explanation: "Hit 4 side-net boundaries in Skin 2 to power the tournament-record 44-run skin.",
+        player: "Sajid Merchant",
+        label: "GAME CHANGER",
+        explanation: "Exploded for 26 individual batting runs in Skin 2.",
       },
       {
-        player: "Manthan Shah",
-        label: "MISSED OPPORTUNITY",
-        explanation: "Struggled in Skin 2 with 2 dismissals as Dabanggs' innings completely disintegrated.",
+        player: "Himanshu Kalyani",
+        label: "PARTNERSHIP BUILDER",
+        explanation: "Finished the innings with 22 runs off 12 balls in Skin 4.",
       },
     ],
     battingBehaviour: [
       {
         team: "VPGR",
         observations: [
-          "Flawless combination of boundary power and ground running.",
-          "Exploited gaps behind the bowler with precision backcourt pushes.",
+          "World-class striking into back corner nets (Zones 4 & 5).",
+          "Near-zero dot-ball rate (under 15%).",
+          "Complete trust between batting partners on fast drop-and-run singles.",
         ],
       },
       {
         team: "DesiDabanggs",
         observations: [
-          "Repeated dismissals from reckless cross-batted swings.",
-          "Failed to build any multi-over partnerships.",
+          "Totally demoralized body language from Over 6 onwards.",
+          "Unable to score off good-length deliveries.",
+          "Excessive unforced run-outs under pressure.",
         ],
       },
     ],
@@ -730,38 +744,43 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
       {
         team: "VPGR",
         observations: [
-          "Attacked the stumps relentlessly, producing 9 wickets.",
+          "Hunting wickets on every ball; no defensive bowling.",
+          "Fielders positioned aggressively in the front net zone.",
+          "Clinical execution of run-out throws at the bowler's end.",
         ],
       },
       {
         team: "DesiDabanggs",
         observations: [
-          "Complete loss of line and length; conceded 148 runs.",
+          "Wayward bowling with 28 extras conceded.",
+          "Heads dropped after every boundary conceded.",
+          "No captaincy communication between overs.",
         ],
       },
     ],
     captainAnalysis: {
       evaluation:
-        "Himanshu Kalyani was ruthless, keeping his frontline bowlers attacking until the final delivery. Darshan Mody seemed powerless to halt the bleeding as bowling changes failed repeatedly.",
+        "Himanshu Kalyani was ruthless, keeping his frontline bowlers attacking until the final delivery. Darshan Mody appeared shell-shocked and offered no strategic resistance.",
       captainTakeaways: [
-        "In indoor cricket, once a skin concedes 25 runs, bowlers must switch to yorkers and defensive leg-stump lines.",
-        "Take a timeout after over 6 to stop the panic.",
+        "Never relent when the opposition is reeling; maximize skin points and tournament run difference.",
+        "Extras are the fastest way to concede 140+ in indoor cricket.",
+        "Captain must intervene when a bowling pair is being systematically dismantled.",
       ],
     },
     teamDnaAssessment: [
       {
         team: "VPGR",
-        traits: ["AGGRESSIVE SCORERS", "DISCIPLINED BOWLERS", "PRESSURE BUILDERS"],
-        evidence: "Posted 148 runs and took 9 wickets in a masterclass performance.",
+        traits: ["RECORD BREAKERS", "LETHAL STRIKING", "UNRELENTING INTENSITY"],
+        evidence: "Set tournament record of 148 runs with 16 tournament points swept.",
       },
       {
         team: "DesiDabanggs",
-        traits: ["DISMISSAL PRONE", "INCONSISTENT UNDER PRESSURE"],
-        evidence: "Conceded 148 runs, suffered 9 dismissals, and scored only 56 net runs.",
+        traits: ["DEFENSIVELY BROKEN", "BOWLING CRISIS", "ZERO RESILIENCE"],
+        evidence: "Conceded 148 runs and 28 extras in a 92-run blowout.",
       },
     ],
     finalHardHittingVerdict:
-      "VPGR's 148 runs proved what happens when elite bowling discipline meets ruthless indoor boundary execution; Dabanggs simply had no answers.",
+      "A clinical, professional destruction that will be remembered as the greatest batting exhibition in tournament history.",
   },
 
   // ==========================================
@@ -771,394 +790,178 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
     matchId: 4,
     tournamentName: "Desi Boys Tournament May 2026",
     matchTitle: "DesiTitans vs DesiTigers",
-    date: "15 May 2026, 9:00 PM",
+    date: "15 May 2026, 8:30 PM",
     venue: "Insportz Club, Dubai (Court 1)",
     winner: "DesiTigers",
     loser: "DesiTitans",
-    scoreSummary: "DesiTigers 103 def. DesiTitans 69 (+34 run margin, 3-1 skins)",
+    scoreSummary: "DesiTigers 103 def. DesiTitans 69 (+34 run margin, 3-1 skins, 13-3 tournament pts)",
     editorHeadline: "Prateek Nahar's 32-Run Masterclass Seals Final Spot for Tigers",
     editorSummary:
-      "DesiTigers guaranteed their spot in the championship final with a composed 34-run victory over DesiTitans. Captain Prateek Nahar led from the front with 32 runs and clean strike rotation. DesiTitans competed bravely in Skin 1 but collapsed under Tigers' suffocating death bowling in Skins 3 and 4.",
+      "DesiTigers guaranteed their spot in the championship final with a composed 34-run victory over DesiTitans, claiming 13 tournament points (3 skins × 3 pts + 4 match pts) to Titans' 3 points. Prateek Nahar earned Player of the Match honors with an unbeaten 32-run masterclass in the final skin. DesiTitans fought admirably in Skins 1 and 3, winning a skin point, but fell away in the middle and death overs.",
     whatWentRightWinner: {
       title: "Tactical Wins for DesiTigers",
       points: [
         "Prateek Nahar scored 32 runs with zero dismissals (Player of the Match).",
-        "Tigers won 3 skins (Skins 2, 3, 4) with disciplined middle-over accumulation.",
-        "Bowlers conceded only 12 runs in Skin 3, sealing the contest.",
+        "Won 3 out of 4 skins through superior boundary conversion.",
+        "Bowled tight death overs, conceding only 16 runs in the final skin.",
       ],
     },
     whatWentWrongLoser: {
       title: "Critical Breakdowns for DesiTitans",
       points: [
-        "Lost momentum in Skin 3, scoring only 12 runs.",
-        "Conceded 4 run-outs due to panic calling when chasing 100+.",
-        "Bowlers conceded 16 runs in the final over of Skin 4.",
+        "Skin 2 produced only 8 net runs due to 2 unforced run-outs.",
+        "Titans' death-overs bowling conceded 28 runs to Prateek and Rohan.",
+        "Could not sustain pressure after winning Skin 1.",
       ],
     },
     turningPoint: {
-      phase: "Skin 3 (Overs 9-12)",
+      phase: "Skin 4 (Overs 13-16)",
       nature: "Tactical Domination",
       description:
-        "Tigers' bowlers allowed only 12 runs in Skin 3 while scoring 28. The 16-run differential ended Titans' hopes of qualification.",
+        "Tigers pair Prateek Nahar and Rohan Khedekar piled on 28 runs in the final skin, extinguishing Titans' comeback hopes.",
     },
     skinsBreakdown: [
-      { skin: 1, winnerRuns: 22, loserRuns: 24, margin: -2, summary: "Titans edged high-scoring opening skin." },
-      { skin: 2, winnerRuns: 25, loserRuns: 17, margin: 8, summary: "Tigers took control in Skin 2." },
-      { skin: 3, winnerRuns: 28, loserRuns: 12, margin: 16, summary: "Decisive middle-skin suffocation by Tigers." },
-      { skin: 4, winnerRuns: 28, loserRuns: 16, margin: 12, summary: "Prateek Nahar masterclass closed the win." },
+      { skin: 1, winnerRuns: 24, loserRuns: 22, margin: 2, summary: "Titans edged a high-pressure opening skin." },
+      { skin: 2, winnerRuns: 26, loserRuns: 8, margin: 18, summary: "Tigers took control with disciplined middle batting." },
+      { skin: 3, winnerRuns: 25, loserRuns: 23, margin: 2, summary: "Competitive arm-wrestle won narrowly by Tigers." },
+      { skin: 4, winnerRuns: 28, loserRuns: 16, margin: 12, summary: "Prateek Nahar masterclass closed the contest." },
     ],
 
     matchVerdict: {
-      verdict: "FATAL MISTAKE",
+      verdict: "TURNAROUND",
       explanation:
-        "DesiTitans competed fiercely and actually won Skin 1 (24-22). However, a fatal tactical collapse in Skin 3—where they suffered two reckless run-outs and scored only 12 runs—handed DesiTigers a 34-run victory and locked in their place in the championship final.",
+        "DesiTitans produced their best start of the tournament, pushing Tigers hard in Skin 1. But Tigers demonstrated championship pedigree by seizing Skins 2 and 4 with superior tactical depth and running between wickets.",
     },
     whyWinningTeamWon: [
       {
         observation: "Prateek Nahar's Anchor Masterclass",
-        evidence: "Prateek scored 32 individual runs without a dismissal, turning strike on 78% of deliveries.",
-        impact: "Guaranteed a 28-run skin in the final partnership and eliminated scoreboard pressure.",
+        evidence: "Prateek scored 32 individual runs across 4 overs without offering a single dismissal chance.",
+        impact: "Provided the match-winning cushion in Skin 4 and secured POTM honors.",
       },
       {
-        observation: "Mid-Match Bowling Adaptation",
-        evidence: "After conceding 24 in Skin 1, Tigers' bowlers restricted Titans to 17, 12, and 16 runs in the remaining skins.",
-        impact: "Completely throttled Titans' scoring avenues in the middle overs.",
+        observation: "Dominant Skin 2 Response",
+        evidence: "After a tight opening skin, Manthan Shah and Gaurav Arora produced a +18 run swing in Skin 2.",
+        impact: "Restored Tigers' lead and forced Titans to chase high-risk boundary options.",
       },
       {
-        observation: "Skin 3 Defensive Suffocation",
-        evidence: "Tigers conceded only one boundary in Overs 9-12, taking 2 wickets for 12 runs.",
-        impact: "Turned a 6-run lead into a commanding 22-run lead entering the final skin.",
+        observation: "Death Overs Bowling Execution",
+        evidence: "Restricted Titans' final pair to 16 runs when 50 were needed.",
+        impact: "Closed out the match without giving up bonus fielding opportunities.",
       },
     ],
     whyLosingTeamLost: [
       {
-        observation: "Panic Run-Outs in Middle Overs",
-        evidence: "Titans conceded 4 run-outs across Skins 2 and 3 (-20 penalty runs).",
-        impact: "Erased their gross batting gains and killed the momentum generated in Skin 1.",
+        observation: "Skin 2 Collapse Under Pressure",
+        evidence: "Titans' second pair scored only 8 runs, suffering 2 run-outs.",
+        impact: "Conceded an 18-run margin that negated their competitive opening skin.",
       },
       {
-        observation: "Skin 3 Collapse",
-        evidence: "Titans managed only 12 runs in Skin 3, their lowest skin return of the match.",
-        impact: "Surrendered a 16-run differential to Tigers' 28-run response.",
+        observation: "Leaking Death-Over Boundaries",
+        evidence: "Titans conceded 16 runs off Over 16 to Prateek Nahar and Rohan Khedekar.",
+        impact: "Blew the target beyond reach and forfeited the final skin's 3 tournament points.",
       },
       {
-        observation: "Death Over Concessions",
-        evidence: "Titans conceded 16 runs off Over 16 to Prateek Nahar and Sajid Merchant.",
-        impact: "Blew out the margin from 18 runs to 34 runs.",
+        observation: "Inability to Convert Tight Skins",
+        evidence: "Lost Skin 3 by just 2 runs (23-25) after leading at the 2-over mark.",
+        impact: "Missed an opportunity to capture 3 vital skin points.",
       },
     ],
     skinsAnalysisDetailed: {
       pairs: [
         {
           pairNumber: 1,
-          winnerPair: "Abhishek Agarwal & Gagandeep Singh",
-          winnerRuns: 22,
+          winnerPair: "Milan Chheda & Deepak Thawani",
+          winnerRuns: 24,
           winnerDismissals: 1,
-          loserPair: "Prateek Nahar & Preraq Mistry",
-          loserRuns: 24,
+          loserPair: "Kalrav Shah & Harshal joshi",
+          loserRuns: 22,
           loserDismissals: 1,
-          skinMargin: -2,
+          skinMargin: 2,
           skinWinner: "DesiTitans",
-          analysis: "Titans played their best indoor cricket of the tournament, edging Skin 1 by 2 runs with clean boundary hitting.",
+          analysis: "Titans' best partnership of the tournament; Milan and Deepak edged the skin by 2 runs to take 3 tournament points.",
         },
         {
           pairNumber: 2,
-          winnerPair: "Darshan Mody & Hardik Desai",
-          winnerRuns: 25,
+          winnerPair: "Manthan Shah & Gaurav Arora",
+          winnerRuns: 26,
           winnerDismissals: 0,
           loserPair: "Hardik Desai & Harsh Ramnani",
-          loserRuns: 17,
-          loserDismissals: 1,
-          skinMargin: 8,
+          loserRuns: 8,
+          loserDismissals: 2,
+          skinMargin: 18,
           skinWinner: "DesiTigers",
-          analysis: "Tigers took control with disciplined running; zero dismissals restored a 6-run overall lead.",
+          analysis: "The turning point. Manthan and Gaurav batted flawlessly while Titans conceded two costly run-outs.",
         },
         {
           pairNumber: 3,
-          winnerPair: "Manthan Shah & Taha Shipchandler",
-          winnerRuns: 28,
+          winnerPair: "Hemang Shah & Taha Shipchandler",
+          winnerRuns: 25,
           winnerDismissals: 1,
           loserPair: "Yash Sisodia & Mayank Agarwal",
-          loserRuns: 12,
+          loserRuns: 23,
           loserDismissals: 2,
-          skinMargin: 16,
+          skinMargin: 2,
           skinWinner: "DesiTigers",
-          analysis: "The match-defining partnership. Tigers strangled Titans' third pair, opening a 22-run cushion.",
+          analysis: "A gripping contest. Hemang and Taha scored 8 off the final over to claim the skin by 2 runs.",
         },
         {
           pairNumber: 4,
-          winnerPair: "Prateek Nahar & Sajid Merchant",
+          winnerPair: "Prateek Nahar & Rohan Khedekar",
           winnerRuns: 28,
           winnerDismissals: 0,
-          loserPair: "Vipul Jain & Ronak Jain",
+          loserPair: "Prateek Jain & Ronak Jain",
           loserRuns: 16,
           loserDismissals: 2,
           skinMargin: 12,
           skinWinner: "DesiTigers",
-          analysis: "Prateek Nahar's POTM performance sealed the victory with 28 runs in the final skin.",
+          analysis: "Prateek Nahar's POTM performance sealed the victory with 28 runs in the final skin (3 tournament pts).",
         },
       ],
       skinsStory:
-        "Titans struck first by winning Skin 1, but Tigers adjusted their bowling lengths and dominated Skins 2, 3, and 4 with increasing authority.",
+        "Tigers won 3 out of 4 skins, banking 13 tournament points (3 skins × 3 pts + 4 match pts) while Titans banked a well-deserved 3 points from their Skin 1 triumph.",
     },
     turningPointDetailed: {
-      matchStateBefore: "Tigers led by only 6 runs (47-41) after Skin 2.",
-      event: "Tigers' bowlers conceded only 12 runs in Skin 3 while Manthan and Taha replied with 28 runs.",
-      matchStateAfter: "Tigers held a 75-53 lead (+22 runs) heading into Skin 4.",
-      whyItMattered: "Mathematically extinguished Titans' hopes of qualification for the Championship Final.",
+      matchStateBefore: "Titans led by 2 runs after winning Skin 1 (24-22).",
+      event: "Manthan Shah and Gaurav Arora scored 26-0 in Skin 2 while Titans' pair was restricted to 8-2.",
+      matchStateAfter: "Tigers took a 16-run aggregate lead and never relinquished it.",
+      whyItMattered: "Broke Titans' early momentum and restored Tigers' control.",
     },
     fatalMistake: {
-      mistake: "Attempting a suicidal second run on Over 10 Ball 3 when trailing by only 8 runs.",
-      impact: "Direct-hit run out cost -5 runs and halted Titans' momentum in Skin 3.",
+      mistake: "Titans' miscommunication between Hardik and Harsh in Over 7 resulting in a run-out.",
+      impact: "Turned a potential 18-run skin into an 8-run disaster.",
     },
     playerImpact: [
       {
         player: "Prateek Nahar",
         label: "MATCH WINNER",
-        explanation: "Scored 32 runs with zero dismissals, earning POTM honors and driving Tigers into the Final.",
+        explanation: "Player of the Match with 32 individual runs, anchor calling, and zero dismissals.",
       },
       {
         player: "Manthan Shah",
-        label: "PARTNERSHIP BUILDER",
-        explanation: "Led Skin 3 with 16 runs and executed tight middle-over bowling.",
+        label: "PRESSURE BUILDER",
+        explanation: "Captain steadied the ship in Skin 2 with 16 runs and disciplined bowling.",
       },
       {
-        player: "Hardik Desai",
-        label: "SILENT CONTRIBUTOR",
-        explanation: "Battled hard for Titans with 14 runs and a wicket, but lacked team support.",
-      },
-    ],
-    battingBehaviour: [
-      {
-        team: "DesiTigers",
-        observations: [
-          "Patient early-over accumulation turning into boundary explosions on balls 5 and 6.",
-          "High dismissal mitigation (only 2 wickets lost in 16 overs).",
-        ],
-      },
-      {
-        team: "DesiTitans",
-        observations: [
-          "Strong powerplay intent in Skin 1 followed by conservative hesitation in Skins 2 and 3.",
-          "Vulnerable to panic calling when required rate climbed above 7.0.",
-        ],
-      },
-    ],
-    bowlingBehaviour: [
-      {
-        team: "DesiTigers",
-        observations: [
-          "Adjusted lengths after Skin 1, pulling lengths back to hit splice and ribs.",
-        ],
-      },
-      {
-        team: "DesiTitans",
-        observations: [
-          "Competed well in patches but leaked 28 runs in both Skins 3 and 4.",
-        ],
-      },
-    ],
-    captainAnalysis: {
-      evaluation:
-        "Tigers captain demonstrated tactical maturity by altering bowling plans after losing Skin 1. Titans captain failed to prevent the middle-skin panic that led to multiple run-outs.",
-      captainTakeaways: [
-        "When losing Skin 1, do not panic; trust defensive lengths in middle skins.",
-        "Emphasize loud calling to avoid giving away 20 runs in unforced run-outs.",
-      ],
-    },
-    teamDnaAssessment: [
-      {
-        team: "DesiTigers",
-        traits: ["SKIN SPECIALISTS", "PARTNERSHIP DRIVEN", "DISCIPLINED BOWLERS"],
-        evidence: "Recovered from an opening skin loss to sweep the remaining 3 skins by 36 runs combined.",
-      },
-      {
-        team: "DesiTitans",
-        traits: ["INCONSISTENT UNDER PRESSURE", "DISMISSAL PRONE"],
-        evidence: "Conceded 4 run-outs and collapsed for 12 runs in Skin 3.",
-      },
-    ],
-    finalHardHittingVerdict:
-      "DesiTigers absorbed Titans' best opening punch, tightened their lengths, and proved why championship teams win the middle skins.",
-  },
-
-  // ==========================================
-  // Match 5: VPGR vs DesiTigers (CHAMPIONSHIP FINAL)
-  // ==========================================
-  "5": {
-    matchId: 5,
-    tournamentName: "Desi Boys Tournament May 2026",
-    matchTitle: "VPGR vs DesiTigers (Final)",
-    date: "18 May 2026, 9:00 PM",
-    venue: "Insportz Club, Dubai (Court 1)",
-    winner: "DesiTigers",
-    loser: "VPGR",
-    scoreSummary: "DesiTigers 111 def. VPGR 94 (+17 run margin, 3-1 skins)",
-    editorHeadline: "Tigers Crowned Champions in 111-94 Final Thriller as VPGR Rallies Too Late",
-    editorSummary:
-      "DesiTigers clinched the Desi Boys Championship with a masterclass 17-run triumph over VPGR. Player of the Match Abhishek Agarwal spearheaded the triumph, partnering Gagandeep Singh in a match-defining 28-run opening skin. While VPGR produced an explosive 35-run final skin from Himanshu Kalyani and Harshal Joshi, Tigers' middle-skin cushion proved impenetrable.",
-    whatWentRightWinner: {
-      title: "Championship Execution for DesiTigers",
-      points: [
-        "Tactical promotion of Abhishek Agarwal & Gagandeep Singh yielded +28 runs in Skin 1.",
-        "Darshan Mody & Hardik Desai dismantled VPGR's middle order with +31 runs in Skin 2.",
-        "Conceded only 2 dismissals across the entire 16 overs of the Championship Final.",
-      ],
-    },
-    whatWentWrongLoser: {
-      title: "Critical Breakdowns for VPGR",
-      points: [
-        "Middle skins (Skins 2 & 3) generated only 18 and 19 runs against hostile Tiger bowling.",
-        "Conceded a 21-run deficit across the middle 8 overs.",
-        "Harshal Joshi was held back until Skin 4, leaving middle skins isolated.",
-      ],
-    },
-    turningPoint: {
-      phase: "Skin 2 (Overs 5-8)",
-      nature: "Tactical Domination",
-      description:
-        "Tigers' Darshan Mody and Hardik Desai piled on 31 runs while restricting VPGR's pair to 18 runs. The 13-run swing opened a 19-run cushion that VPGR could never close.",
-    },
-    skinsBreakdown: [
-      { skin: 1, winnerRuns: 28, loserRuns: 22, margin: 6, summary: "Tigers promoted pair stunned VPGR's openers." },
-      { skin: 2, winnerRuns: 31, loserRuns: 18, margin: 13, summary: "Championship-winning skin by Darshan & Hardik." },
-      { skin: 3, winnerRuns: 24, loserRuns: 19, margin: 5, summary: "Tigers held line; VPGR restricted to singles." },
-      { skin: 4, winnerRuns: 28, loserRuns: 35, margin: -7, summary: "VPGR rallied heroically with 35, but Tigers held lead." },
-    ],
-
-    matchVerdict: {
-      verdict: "TACTICAL DOMINATION",
-      explanation:
-        "DesiTigers won the championship through superior tactical design. By promoting Abhishek Agarwal & Gagandeep Singh to open Skin 1 (+28 runs) and dominating Skin 2 (+31 runs), they built an unassailable 24-run cushion. VPGR's brilliant 35-run final skin was heroic but mathematically too late.",
-    },
-    whyWinningTeamWon: [
-      {
-        observation: "Tactical Opening Skin Promotion",
-        evidence: "Tigers promoted Abhishek Agarwal & Gagandeep Singh to Skin 1; they delivered 28 runs against VPGR's spearheads.",
-        impact: "Immediately neutralized VPGR's psychological edge and forced them to chase from behind.",
-      },
-      {
-        observation: "Dominant Middle Skins Control",
-        evidence: "Tigers outscored VPGR 55 to 37 across Skins 2 and 3 (+18 run differential).",
-        impact: "Built a 24-run lead entering the final skin, rendering VPGR's 35-run rally insufficient.",
-      },
-      {
-        observation: "Near-Zero Dismissal Rate in a Final",
-        evidence: "Tigers suffered only 2 dismissals in 96 deliveries (-10 penalty runs).",
-        impact: "Ensured every boundary and physical run directly enlarged their winning margin.",
-      },
-    ],
-    whyLosingTeamLost: [
-      {
-        observation: "Middle-Order Stagnation",
-        evidence: "VPGR scored only 18 and 19 runs in Skins 2 and 3, hitting only 2 boundaries in 8 overs.",
-        impact: "Allowed Tigers to dictate terms and build a 24-run lead.",
-      },
-      {
-        observation: "Holding Back Harshal Joshi",
-        evidence: "VPGR slotted strike bowler/batter Harshal Joshi into Skin 4 rather than using him to anchor Skin 2.",
-        impact: "Left Skins 2 and 3 without an elite boundary threat when the championship was being decided.",
-      },
-      {
-        observation: "Inability to Create Wickets in Final",
-        evidence: "VPGR bowlers took only 2 wickets against Tigers' top order.",
-        impact: "Failed to apply negative run pressure to Tigers' accumulators.",
-      },
-    ],
-    skinsAnalysisDetailed: {
-      pairs: [
-        {
-          pairNumber: 1,
-          winnerPair: "Abhishek Agarwal & Gagandeep Singh",
-          winnerRuns: 28,
-          winnerDismissals: 1,
-          loserPair: "Kalrav Shah & Ankush Goel",
-          loserRuns: 22,
-          loserDismissals: 1,
-          skinMargin: 6,
-          skinWinner: "DesiTigers",
-          analysis: "Abhishek took POTM honors with fearless front-court hitting, edging VPGR's benchmark opening pair.",
-        },
-        {
-          pairNumber: 2,
-          winnerPair: "Darshan Mody & Hardik Desai",
-          winnerRuns: 31,
-          winnerDismissals: 0,
-          loserPair: "Harshwardhan Chauhan & Hemal Gathani",
-          loserRuns: 18,
-          loserDismissals: 2,
-          skinMargin: 13,
-          skinWinner: "DesiTigers",
-          analysis: "The championship-winning partnership. Darshan and Hardik played with zero errors, piling on 31 runs.",
-        },
-        {
-          pairNumber: 3,
-          winnerPair: "Preraq Mistry & Taha Shipchandler",
-          winnerRuns: 24,
-          winnerDismissals: 1,
-          loserPair: "Meet Shah & Parth Shah",
-          loserRuns: 19,
-          loserDismissals: 1,
-          skinMargin: 5,
-          skinWinner: "DesiTigers",
-          analysis: "A tense middle-skin battle. Tigers held their ground to push their aggregate lead to 24 runs.",
-        },
-        {
-          pairNumber: 4,
-          winnerPair: "Prateek Nahar & Sajid Merchant",
-          winnerRuns: 28,
-          winnerDismissals: 0,
-          loserPair: "Himanshu Kalyani & Harshal Joshi",
-          loserRuns: 35,
-          loserDismissals: 0,
-          skinMargin: -7,
-          skinWinner: "VPGR",
-          analysis: "An electric 4th skin. Himanshu and Harshal scored 35, but Prateek and Sajid replied with 28 to seal the championship.",
-        },
-      ],
-      skinsStory:
-        "Tigers won the first three skins to establish an insurmountable 24-run buffer. VPGR's 35-run masterpiece in Skin 4 showed champion heart, but Tigers' 28-run reply safely preserved the title.",
-    },
-    turningPointDetailed: {
-      matchStateBefore: "Tigers held a slim 28-22 lead after Skin 1.",
-      event: "Darshan Mody and Hardik Desai scored 31 runs in Skin 2 while VPGR was restricted to 18.",
-      matchStateAfter: "Tigers' lead expanded to 19 runs (59-40), putting VPGR under extreme pressure.",
-      whyItMattered: "Forced VPGR to abandon structured running and chase impossible boundary targets.",
-    },
-    fatalMistake: {
-      mistake: "VPGR's decision to maintain conservative field placements during Skin 2 instead of attacking the stumps.",
-      impact: "Allowed Darshan and Hardik to take 14 easy singles without risking dismissals.",
-    },
-    playerImpact: [
-      {
-        player: "Abhishek Agarwal",
-        label: "MATCH WINNER",
-        explanation: "Player of the Match in the Final; his 28-run opening salvo set the championship tone.",
-      },
-      {
-        player: "Hardik Desai",
+        player: "Milan Chheda",
         label: "SKIN WINNER",
-        explanation: "Flawless execution in Skin 2 with 16 runs and zero errors to create the winning margin.",
-      },
-      {
-        player: "Harshal Joshi",
-        label: "GAME CHANGER",
-        explanation: "Fired 20 runs in Skin 4 to lead VPGR's 35-run rally, but was deployed one skin too late.",
+        explanation: "Anchored Titans' Skin 1 victory with 14 runs and positive calling.",
       },
     ],
     battingBehaviour: [
       {
         team: "DesiTigers",
         observations: [
-          "Championship-level composure; zero panicked calls across 16 overs.",
+          "Mastery of the death overs with aggressive ground-stroke placement.",
+          "Non-striker vocal calling minimized run-out risk throughout.",
           "Targeted side nets consistently for 2-run bonuses.",
         ],
       },
       {
-        team: "VPGR",
+        team: "DesiTitans",
         observations: [
-          "Too passive in Skins 2 and 3, accumulating 18 dot balls.",
-          "Exploded with intent in Skin 4, demonstrating what earlier aggression could have achieved.",
+          "Significantly improved opening partnership compared to previous games.",
+          "Still prone to middle-overs lapses with hesitations on second runs.",
+          "Struggled to rotate strike against Tigers' slower bowling variations.",
         ],
       },
     ],
@@ -1166,121 +969,126 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
       {
         team: "DesiTigers",
         observations: [
-          "Bowled disciplined off-stump channels in middle overs.",
+          "Smart variations in pace and trajectory off the side nets.",
+          "Bowled to defensive field placements with high discipline.",
+          "Direct-hit run-outs created the Skin 2 differential.",
         ],
       },
       {
-        team: "VPGR",
+        team: "DesiTitans",
         observations: [
-          "Struggled to penetrate Tigers' defensive wall, producing only 2 wickets.",
+          "Excellent opening spell in Skin 1 backed by spirited fielding.",
+          "Line deteriorated in Skin 4 under pressure from Prateek Nahar.",
+          "Conceded 14 extras across the match.",
         ],
       },
     ],
     captainAnalysis: {
       evaluation:
-        "Tigers captain Manthan Shah outmaneuvered VPGR with the opening skin promotion of Abhishek & Gagandeep. Himanshu Kalyani showed great leadership to rally his side to 35 in Skin 4, but his middle-skin structure cost the title.",
+        "Manthan Shah maintained composure after losing Skin 1, sticking to his planned batting order. Hardik Desai showed improved leadership, securing Titans' first skin point of the tournament.",
       captainTakeaways: [
-        "In a championship final, surprise the opposition with an attacking opening pair.",
-        "Never save your best boundary hitters for the final skin if the game is slipping away in Skin 2.",
+        "Losing Skin 1 is not fatal; championship teams respond with middle-skin dominance.",
+        "Death overs require specialist indoor bowlers who can deny side-net deflections.",
+        "Celebrate skin wins to maintain tournament morale and bank tournament points.",
       ],
     },
     teamDnaAssessment: [
       {
         team: "DesiTigers",
-        traits: ["CHAMPIONS", "PARTNERSHIP DRIVEN", "DISCIPLINED BOWLERS", "ELITE CHEMISTRY"],
-        evidence: "Scored 111 runs with 3 skins won in the pressure of a championship final.",
+        traits: ["TACTICAL MATURITY", "FINISHING SPECIALISTS", "CHAMPIONSHIP COMPOSED"],
+        evidence: "Won 3-1 in skins after trailing early; booked spot in the final.",
       },
       {
-        team: "VPGR",
-        traits: ["RESILIENT", "AGGRESSIVE FINISHERS", "DISCIPLINED BOWLERS"],
-        evidence: "Fought back with 35 runs in Skin 4, falling just 17 runs short of the title.",
+        team: "DesiTitans",
+        traits: ["FIGHTING SPIRIT", "IMPROVING DISCIPLINE", "MIDDLE OVER WEAKNESS"],
+        evidence: "Won their first skin point of the tournament and fought hard across 16 overs.",
       },
     ],
     finalHardHittingVerdict:
-      "DesiTigers are champions because they won the middle skins where championships are actually decided, leaving VPGR's brilliant final skin one partnership short.",
+      "Tigers showed the calm composure of true finalists; Titans proved they can compete with the best when they maintain discipline.",
   },
 
   // ==========================================
-  // Match 6: DesiTitans vs DesiDabanggs (3RD PLACE PLAYOFF)
+  // Match 5: DesiTitans vs DesiDabanggs (3rd Place Playoff)
   // ==========================================
-  "6": {
-    matchId: 6,
+  "5": {
+    matchId: 5,
     tournamentName: "Desi Boys Tournament May 2026",
-    matchTitle: "DesiTitans vs DesiDabanggs (3rd Place Playoff)",
-    date: "18 May 2026, 7:30 PM",
+    matchTitle: "DesiTitans vs DesiDabanggs",
+    date: "17 May 2026, 7:00 PM",
     venue: "Insportz Club, Dubai (Court 1)",
     winner: "DesiDabanggs",
     loser: "DesiTitans",
-    scoreSummary: "DesiDabanggs 94 def. DesiTitans 76 (+18 run margin, 3-1 skins)",
+    scoreSummary: "DesiDabanggs 76 def. DesiTitans 58 (+18 run margin, 3-1 skins, 13-3 tournament pts)",
     editorHeadline: "Preraq Mistry's Resurgence Inspires Dabanggs to 3rd-Place Playoff Triumph",
     editorSummary:
-      "DesiDabanggs redeemed a frustrating tournament campaign by capturing 3rd place with an 18-run victory over DesiTitans. Having managed only 53 and 56 runs in their previous two matches, Dabanggs erupted for 94 runs. Player of the Match Preraq Mistry set the tone in Skin 1 with 28 runs, while Titans were undone by 6 costly dismissals.",
+      "DesiDabanggs redeemed a frustrating tournament campaign by capturing 3rd place with an 18-run victory over DesiTitans, claiming 13 tournament points (3 skins × 3 pts + 4 match pts) to Titans' 3 points. Player of the Match Preraq Mistry produced his finest innings of the competition, blasting 28 runs in Skin 1. DesiTitans fought gamely, winning Skin 4, but could not overcome a 15-run deficit from the first two skins.",
     whatWentRightWinner: {
       title: "Tactical Wins for DesiDabanggs",
       points: [
         "Preraq Mistry scored 28 runs in Skin 1 to win Player of the Match.",
-        "Rebounded from 53 and 56 run group scores to post 94 runs.",
-        "Won Skins 1, 2, and 3 to build an unassailable 23-run lead.",
+        "Cut dismissal count from 8 in previous matches down to just 3.",
+        "Won Skins 1, 2, and 3 through disciplined ground-running.",
       ],
     },
     whatWentWrongLoser: {
       title: "Critical Breakdowns for DesiTitans",
       points: [
-        "Conceded 6 dismissals (-30 penalty runs) across the 16 overs.",
-        "Middle skins produced only 18 and 17 runs.",
-        "Bowling lacked discipline in high-pressure death deliveries.",
+        "Conceded 28 runs in Skin 1, allowing Dabanggs an early psychological advantage.",
+        "Skin 2 yielded only 12 runs against tight bowling from Gagandeep Singh.",
+        "Could not convert a strong Skin 4 into an overall victory.",
       ],
     },
     turningPoint: {
       phase: "Skin 1 (Overs 1-4)",
       nature: "Turnaround",
       description:
-        "After two matches of opening collapses, Preraq Mistry and Sandesh Jagtap blasted 28 runs in Skin 1. The immediate 8-run lead transformed Dabanggs' confidence.",
+        "After two matches of opening collapses, Preraq Mistry and Sandesh Jagtap blasted 28 runs in Skin 1 to set the standard.",
     },
     skinsBreakdown: [
       { skin: 1, winnerRuns: 28, loserRuns: 20, margin: 8, summary: "Preraq Mistry's POTM start ignited Dabanggs." },
       { skin: 2, winnerRuns: 25, loserRuns: 18, margin: 7, summary: "Gagandeep Singh stabilized middle overs." },
       { skin: 3, winnerRuns: 22, loserRuns: 17, margin: 5, summary: "Darshan Mody controlled the third skin." },
-      { skin: 4, winnerRuns: 19, loserRuns: 21, margin: -2, summary: "Titans edged final skin, but Dabanggs won comfortably." },
+      { skin: 4, winnerRuns: 23, loserRuns: 15, margin: 8, summary: "Titans fought back to claim the final skin." },
     ],
 
     matchVerdict: {
       verdict: "TURNAROUND",
       explanation:
-        "DesiDabanggs executed a remarkable turnaround after scoring only 53 and 56 runs in the group stages. Restructuring their batting order to promote Preraq Mistry yielded 94 runs, three skin victories, and an 18-run playoff triumph.",
+        "DesiDabanggs executed a remarkable turnaround after scoring only 53 and 56 runs in the group stages. They fundamentally restructured their running between wickets, avoided early dismissals, and held their nerve to win 3 skins.",
     },
     whyWinningTeamWon: [
       {
-        observation: "Aggressive Opening Statement",
+        observation: "Preraq Mistry's Opening Masterclass",
         evidence: "Preraq Mistry and Sandesh Jagtap scored 28 runs in Skin 1 with zero dismissals.",
-        impact: "Banished the self-doubt from earlier collapses and forced Titans onto defense.",
+        impact: "Gave Dabanggs their first opening skin win and immediate tournament points (3 pts).",
       },
       {
-        observation: "Consistent Partnership Scoring",
-        evidence: "Dabanggs scored 28, 25, 22, and 19 runs across their four partnerships.",
-        impact: "Demonstrated team-wide discipline with no single partnership collapsing below 19.",
+        observation: "Radical Reduction in Dismissal Penalties",
+        evidence: "Dabanggs suffered only 3 dismissals (-15 runs) compared to 8 in each previous match.",
+        impact: "Protected their gross total and prevented Titans from building momentum.",
       },
       {
-        observation: "Clutch Wicket Creation",
-        evidence: "Dabanggs took 6 wickets (-30 penalty runs) against Titans' middle order.",
-        impact: "Wiped out Titans' boundary bursts in Skins 2 and 3.",
+        observation: "Middle Overs Consolidation",
+        evidence: "Gagandeep Singh and Chittaranjan Dey produced 25 runs in Skin 2 against Titans' strike bowling.",
+        impact: "Extended Dabanggs' lead to 15 runs entering the second half.",
       },
     ],
     whyLosingTeamLost: [
       {
-        observation: "Self-Inflicted Dismissal Damage",
-        evidence: "Titans conceded 6 dismissals (-30 runs) including 4 unforced run-outs.",
-        impact: "Turned a competitive 106-run gross effort into a disappointing 76-run net total.",
-      },
-      {
-        observation: "Skin 2 and 3 Deficits",
-        evidence: "Titans were outscored 47-35 across the middle two skins.",
-        impact: "Allowed Dabanggs to build a 20-run cushion before the final skin.",
+        observation: "Slow Start in Skin 1",
+        evidence: "Titans conceded 28 runs while scoring only 20 in the opening skin.",
+        impact: "Forced Titans to chase from an 8-run deficit against a confident opponent.",
       },
       {
         observation: "Inability to Stop Preraq Mistry",
-        evidence: "Titans bowlers bowled short and wide to Preraq in Skin 1, conceding 3 boundaries.",
-        impact: "Allowed Dabanggs to seize the momentum from ball one.",
+        evidence: "Titans' opening bowlers conceded 4 boundaries in the first 2 overs.",
+        impact: "Allowed Dabanggs to bat with zero pressure from the outset.",
+      },
+      {
+        observation: "Lack of Lower-Order Support in Chase",
+        evidence: "Titans needed 32 runs in Skin 4 to win the match; managed 23 runs.",
+        impact: "Fell 18 runs short of the overall target, though they did claim 3 skin points.",
       },
     ],
     skinsAnalysisDetailed: {
@@ -1290,12 +1098,12 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
           winnerPair: "Preraq Mistry & Sandesh Jagtap",
           winnerRuns: 28,
           winnerDismissals: 0,
-          loserPair: "Deepak thawani & Milan Chheda",
+          loserPair: "Milan Chheda & Deepak Thawani",
           loserRuns: 20,
           loserDismissals: 1,
           skinMargin: 8,
           skinWinner: "DesiDabanggs",
-          analysis: "Preraq Mistry played his best innings of the tournament, scoring 18 runs to anchor a 28-run skin.",
+          analysis: "Preraq Mistry played his best innings of the tournament, scoring 18 runs to anchor a 28-run skin (3 tournament pts).",
         },
         {
           pairNumber: 2,
@@ -1307,76 +1115,78 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
           loserDismissals: 2,
           skinMargin: 7,
           skinWinner: "DesiDabanggs",
-          analysis: "Gagandeep and Chittaranjan controlled the running crease, forcing two run-outs from Titans.",
+          analysis: "Gagandeep's composed running between wickets guided Dabanggs to a 7-run skin victory (3 tournament pts).",
         },
         {
           pairNumber: 3,
           winnerPair: "Darshan Mody & Narendra Tiwari",
           winnerRuns: 22,
           winnerDismissals: 1,
-          loserPair: "Yash sisodia & Mayank Agarwal",
+          loserPair: "Yash Sisodia & Mayank Agarwal",
           loserRuns: 17,
           loserDismissals: 2,
           skinMargin: 5,
           skinWinner: "DesiDabanggs",
-          analysis: "Darshan utilized soft hands into the corners, grinding out a 5-run skin margin.",
+          analysis: "Captain Darshan Mody controlled the pace, grinding out a 5-run skin victory (3 tournament pts).",
         },
         {
           pairNumber: 4,
-          winnerPair: "Ravi kumar & Sandeep Khedekar",
-          winnerRuns: 19,
+          winnerPair: "Prateek Jain & Ronak Jain",
+          winnerRuns: 23,
           winnerDismissals: 1,
-          loserPair: "Prateek Jain & Ronak Jain",
-          loserRuns: 21,
-          loserDismissals: 1,
-          skinMargin: -2,
+          loserPair: "Ravi Kumar & Sandeep Khedekar",
+          loserRuns: 15,
+          loserDismissals: 2,
+          skinMargin: 8,
           skinWinner: "DesiTitans",
-          analysis: "Titans fought back to take the final skin 21-19, but Dabanggs celebrated 3rd place.",
+          analysis: "Titans' death pair fought hard to salvage 3 tournament points by taking the final skin 23-15.",
         },
       ],
       skinsStory:
-        "Dabanggs won the first three skins methodically. The 20-run buffer proved plenty despite Titans taking a consolation victory in Skin 4.",
+        "Dabanggs secured 3rd place by winning the first 3 skins cleanly, accumulating 13 tournament points (3 skins × 3 pts + 4 match pts). Titans earned 3 points from their final skin win.",
     },
     turningPointDetailed: {
-      matchStateBefore: "Dabanggs entered the match on the back of humiliating 53 and 56 run losses.",
+      matchStateBefore: "Dabanggs entered the match on the back of two heavy defeats.",
       event: "Preraq Mistry hit three boundaries in the first two overs of Skin 1, scoring 28 runs.",
-      matchStateAfter: "Dabanggs took an immediate 28-20 lead, transforming team confidence.",
-      whyItMattered: "Proved Dabanggs could score heavily when batting with positive intent.",
+      matchStateAfter: "Dabanggs established an 8-run lead and visible confidence on the court.",
+      whyItMattered: "Banished the ghosts of previous collapses and established match control.",
     },
     fatalMistake: {
-      mistake: "Titans conceded 3 run-outs in the space of 7 deliveries during Skin 2.",
-      impact: "Cost 15 runs and ended any chance of challenging Dabanggs' lead.",
+      mistake: "Titans bowling short and wide to Preraq in Over 1.",
+      impact: "Conceded 12 runs in 4 balls, handing Dabanggs instant momentum.",
     },
     playerImpact: [
       {
         player: "Preraq Mistry",
         label: "MATCH WINNER",
-        explanation: "Player of the Match; scored 28 runs in Skin 1 to inspire Dabanggs' 94-run total.",
+        explanation: "Player of the Match with 28 runs in Skin 1 and zero dismissals.",
       },
       {
-        player: "Manthan Shah",
+        player: "Gagandeep Singh",
         label: "PARTNERSHIP BUILDER",
-        explanation: "Scored 14 runs and bowled 2 tight overs in Skin 2 to preserve the advantage.",
+        explanation: "Stabilized Skin 2 with 15 runs and 2 tight bowling overs.",
       },
       {
         player: "Hardik Desai",
-        label: "DISCIPLINE PROBLEM",
-        explanation: "Suffered two costly run-outs in Skin 2 that wrecked Titans' momentum.",
+        label: "SILENT CONTRIBUTOR",
+        explanation: "Titans captain battled hard with 14 runs and an economical bowling spell.",
       },
     ],
     battingBehaviour: [
       {
         team: "DesiDabanggs",
         observations: [
-          "Dramatically improved running between wickets compared to group stage.",
-          "High conversion of loose balls into 2-run physical scores.",
+          "Dramatically improved running between wickets with loud calling.",
+          "Protected their wickets first; waited for loose balls before boundary hitting.",
+          "Effective use of the side net drop for 1-run and 2-run physical crosses.",
         ],
       },
       {
         team: "DesiTitans",
         observations: [
-          "Persistent panic calling in middle overs resulting in 4 run-outs.",
-          "Struggled to rotate strike against spin.",
+          "Competitive throughout all 4 skins without folding.",
+          "Improved strike rotation compared to earlier group games.",
+          "Could not match Dabanggs' boundary output in the opening overs.",
         ],
       },
     ],
@@ -1384,119 +1194,351 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
       {
         team: "DesiDabanggs",
         observations: [
-          "Attacked the stumps and induced 6 dismissals.",
+          "Targeted good length with consistent line on off stump.",
+          "Cut extras from 28 in previous match to just 8 in this game.",
+          "Energetic fielding with high communication levels.",
         ],
       },
       {
         team: "DesiTitans",
         observations: [
-          "Conceded too many free boundaries in Skin 1.",
+          "Bowled competitively in Skins 2, 3, and 4.",
+          "Initial over leaked boundaries to Preraq, which proved decisive.",
+          "Maintained fight until the final ball of the tournament.",
         ],
       },
     ],
     captainAnalysis: {
       evaluation:
-        "Darshan Mody deserved immense credit for restructuring Dabanggs' order after two heavy defeats. Hardik Desai was unable to curb his team's tendency to panic when trailing.",
+        "Darshan Mody deserved immense credit for restructuring Dabanggs' order after two heavy defeats. Hardik Desai managed his team with dignity, finishing the tournament with positive improvements.",
       captainTakeaways: [
-        "Order changes can reset a struggling batting unit; front-load in-form hitters.",
-        "Eliminate run-outs through mandatory calling discipline.",
+        "A team can reinvent itself mid-tournament with honest self-reflection.",
+        "Reducing dismissal penalties is the fastest path to indoor cricket victory.",
+        "Tournament standings value skin points; fighting until the final skin matters.",
       ],
     },
     teamDnaAssessment: [
       {
         team: "DesiDabanggs",
-        traits: ["RESILIENT", "PARTNERSHIP DRIVEN", "PRESSURE BUILDERS"],
-        evidence: "Overcame consecutive heavy defeats to score 94 runs and win 3 skins.",
+        traits: ["RESILIENT", "REDEMPTIVE SPIRIT", "IMPROVED DISCIPLINE"],
+        evidence: "Turned around 53-run collapses to score 76 and capture 3rd place.",
       },
       {
         team: "DesiTitans",
-        traits: ["DISMISSAL PRONE", "INCONSISTENT UNDER PRESSURE"],
-        evidence: "Lost 6 wickets and surrendered 3rd place despite scoring 21 in Skin 4.",
+        traits: ["DETERMINED", "PROGRESSIVE IMPROVEMENT", "NEVER GAVE UP"],
+        evidence: "Won their final skin and pushed Dabanggs across all 16 overs.",
       },
     ],
     finalHardHittingVerdict:
-      "DesiDabanggs proved that in tournament indoor cricket, one tactical batting order reset can transform a losing team into playoff winners.",
+      "Dabanggs showed what pride and tactical adjustment can achieve; a deserved 3rd-place finish after a difficult tournament.",
   },
 
   // ==========================================
-  // Match 7: Practice Match (Home Team vs Away Team)
+  // Match 6: DesiTigers vs VPGR (Championship Final)
   // ==========================================
-  "7": {
-    matchId: 7,
-    tournamentName: "Desisports Regular Practice",
-    matchTitle: "Home Team vs Away Team",
-    date: "09 Sep 2026, 20:17",
-    venue: "Insportz Club, Dubai (Court 2)",
-    winner: "Away Team",
-    loser: "Home Team",
-    scoreSummary: "Away Team 120 def. Home Team 63 (+57 run margin, 4-0 skins)",
-    editorHeadline: "Yash's Masterful +19 Impact Propels Away Team to Crushing 120-63 Practice Triumph",
+  "6": {
+    matchId: 6,
+    tournamentName: "Desi Boys Tournament May 2026",
+    matchTitle: "DesiTigers vs VPGR",
+    date: "17 May 2026, 8:30 PM",
+    venue: "Insportz Club, Dubai (Court 1)",
+    winner: "DesiTigers",
+    loser: "VPGR",
+    scoreSummary: "DesiTigers 111 def. VPGR 94 (+17 run margin, 2-2 skins, 10-6 tournament pts)",
+    editorHeadline: "DesiTigers Crowned Champions in 111-94 Epic Final Against VPGR",
     editorSummary:
-      "In a high-intensity Spawtz practice encounter at Insportz Club, Away Team showcased clinical indoor supremacy with a 57-run dismantling of Home Team. Player of the Match Yash spearheaded the clinic, scoring 18 runs and conceding -1 run across 2.0 overs with 3 wickets (+19 contribution). Home Team was derailed by 7 dismissals and an abysmal -3 run second skin.",
+      "DesiTigers clinched the Desi Boys Championship with a masterclass 17-run triumph over VPGR in an unforgettable final. In a tactical arm-wrestle that split the skins 2-2, Tigers earned 10 tournament points (2 skins × 3 pts + 4 match pts) while VPGR banked 6 points from their 2 skin victories. Player of the Match Manthan Shah outmaneuvered VPGR with bold pair assignments and clutch bowling in death overs.",
     whatWentRightWinner: {
-      title: "Tactical Masterclass for Away Team",
+      title: "Tactical Wins for DesiTigers",
       points: [
-        "Yash delivered an immaculate +19 contribution (18 RS, -1 RC, 3 wickets).",
-        "Away Team scored 120 total runs, averaging 30 runs per skin.",
-        "Bowlers took 7 wickets (-35 penalty runs), including a devastating 3-wicket Skin 2.",
+        "Kalrav Shah & Harshal joshi delivered +28 runs in Skin 1 to set an early benchmark.",
+        "Manthan Shah & Gaurav Arora dismantled VPGR's middle order with +31 runs in Skin 2.",
+        "Maintained nerve in death overs despite furious VPGR counter-attack.",
       ],
     },
     whatWentWrongLoser: {
-      title: "Critical Breakdowns for Home Team",
+      title: "Critical Breakdowns for VPGR",
       points: [
-        "Skin 2 imploded for -3 runs, suffering 3 dismissals against hostile bowling.",
-        "Conceded 7 dismissals (-35 penalty runs) in 16 overs.",
-        "Bowlers leaked 120 runs, allowing Away Team to score freely into the side nets.",
+        "Skin 2 batting collapsed to 18 runs under pressure from Manthan Shah.",
+        "Suffered 4 dismissals in middle skins, conceding 20 penalty runs.",
+        "Could not bridge the 13-run deficit despite winning Skin 4.",
       ],
     },
     turningPoint: {
       phase: "Skin 2 (Overs 5-8)",
-      nature: "Bowling Mastery",
+      nature: "Tactical Domination",
       description:
-        "Yash and Sahil choked Home Team's second pair to -3 runs while taking 3 wickets. The 36-run skin margin (33 vs -3) ended the practice contest as a competitive fixture.",
+        "Tigers' Manthan Shah and Gaurav Arora piled on 31 runs while restricting VPGR's pair to 18 runs. The 13-run skin margin proved decisive.",
     },
     skinsBreakdown: [
-      { skin: 1, winnerRuns: 34, loserRuns: 27, margin: 7, summary: "Competitive opening skin; Away edged by 7." },
-      { skin: 2, winnerRuns: 33, loserRuns: -3, margin: 36, summary: "Yash's bowling spell dismantled Home Team." },
-      { skin: 3, winnerRuns: 34, loserRuns: 29, margin: 5, summary: "High-scoring middle skin; Away held line." },
-      { skin: 4, winnerRuns: 19, loserRuns: 10, margin: 9, summary: "Away bowlers closed out the 4-0 skin sweep." },
+      { skin: 1, winnerRuns: 28, loserRuns: 24, margin: 4, summary: "Kalrav & Harshal set high standard in tense opener." },
+      { skin: 2, winnerRuns: 31, loserRuns: 18, margin: 13, summary: "Manthan & Gaurav blew the game open." },
+      { skin: 3, winnerRuns: 26, loserRuns: 24, margin: 2, summary: "VPGR counter-attacked through Sajid & Tejas." },
+      { skin: 4, winnerRuns: 28, loserRuns: 26, margin: 2, summary: "Himanshu fought hard to win the final skin for VPGR." },
     ],
 
     matchVerdict: {
       verdict: "TACTICAL DOMINATION",
       explanation:
-        "Away Team dominated every phase of this practice encounter. Scoring 120 runs across 16 overs and sweeping all four skins, their bowlers took 7 wickets and restricted Home Team to 63 runs. Yash's +19 contribution was the standout individual performance of the evening.",
+        "DesiTigers won the championship through superior tactical design. By batting first and posting 111 runs, they forced VPGR to chase against their premier bowling attack under immense pressure.",
     },
     whyWinningTeamWon: [
       {
-        observation: "Yash's Elite Two-Way Dominance",
-        evidence: "Yash scored 18 runs with zero dismissals, conceded -1 run in 2 overs, and took 3 wickets (+19 contribution).",
-        impact: "Directly accounted for a +36 run swing in Skin 2.",
+        observation: "Aggressive First-Innings Skin Building",
+        evidence: "Tigers' opening pairs posted 28 and 31 runs in the first two skins without reckless dismissals.",
+        impact: "Created an insurmountable 59-run foundation that absorbed VPGR's late resurgence.",
       },
       {
-        observation: "Balanced Scoring Across All 4 Skins",
-        evidence: "Away Team posted 34, 33, 34, and 19 runs across their four partnerships.",
-        impact: "Gave Home Team no respite and maintained a scoring rate above 7.5 per over.",
+        observation: "Suffocating Middle-Overs Bowling",
+        evidence: "Restricted VPGR's core pair to 18 runs in Skin 2, forcing two costly run-outs.",
+        impact: "Secured the vital +13 run differential that decided the championship.",
       },
       {
-        observation: "Relentless Wicket Creation",
-        evidence: "Away Team bowlers created 7 dismissals, deducting 35 runs from Home Team's total.",
-        impact: "Crushed Home Team's momentum whenever they threatened to rebuild.",
+        observation: "Championship Composure Under Siege",
+        evidence: "Tigers conceded only 2 extras across the final 4 overs under intense pressure.",
+        impact: "Protected the 17-run overall lead to capture the championship trophy.",
       },
     ],
     whyLosingTeamLost: [
       {
-        observation: "Catastrophic Skin 2 Breakdown",
-        evidence: "Home Team scored -3 net runs in Skin 2, losing 3 wickets in 8 deliveries.",
-        impact: "Surrendered a 36-run skin differential in 15 minutes of play.",
+        observation: "Costly Second-Skin Stumble",
+        evidence: "VPGR's second pair managed only 18 runs against Manthan's bowling.",
+        impact: "Surrendered a 13-run skin margin that proved impossible to recover.",
       },
       {
-        observation: "Failure to Contain Side-Net Scoring",
-        evidence: "Home Team conceded 120 runs, allowing Away batters 26 two-run physical crosses.",
-        impact: "Allowed Away Team to score comfortably without taking aerial risks.",
+        observation: "Excessive Dismissals in Chase",
+        evidence: "VPGR lost 4 wickets (-20 penalty runs) in the first 12 overs.",
+        impact: "Erased multiple boundary sequences that would have tied the aggregate score.",
       },
       {
-        observation: "Inability to Recover from Dismissals",
+        observation: "Conceding the First-Innings Psychological Edge",
+        evidence: "Allowed Tigers to score 111 runs off disciplined bowling.",
+        impact: "Fell behind the required run rate from the opening over of the chase.",
+      },
+    ],
+    skinsAnalysisDetailed: {
+      pairs: [
+        {
+          pairNumber: 1,
+          winnerPair: "Kalrav Shah & Harshal joshi",
+          winnerRuns: 28,
+          winnerDismissals: 1,
+          loserPair: "Abhishek Agarwal & Ankush Goel",
+          loserRuns: 24,
+          loserDismissals: 1,
+          skinMargin: 4,
+          skinWinner: "DesiTigers",
+          analysis: "A high-intensity opening skin; Kalrav and Harshal edged Ankush Goel by 4 runs to take 3 tournament points.",
+        },
+        {
+          pairNumber: 2,
+          winnerPair: "Manthan Shah & Gaurav Arora",
+          winnerRuns: 31,
+          winnerDismissals: 0,
+          loserPair: "Manish Jain & Parth Shah",
+          loserRuns: 18,
+          loserDismissals: 2,
+          skinMargin: 13,
+          skinWinner: "DesiTigers",
+          analysis: "The championship-defining partnership. Manthan and Gaurav batted with complete mastery for a 13-run win.",
+        },
+        {
+          pairNumber: 3,
+          winnerPair: "Sajid Merchant & Tejas Shah",
+          winnerRuns: 26,
+          winnerDismissals: 1,
+          loserPair: "Hemang Shah & Taha Shipchandler",
+          loserRuns: 24,
+          loserDismissals: 1,
+          skinMargin: 2,
+          skinWinner: "VPGR",
+          analysis: "VPGR fought back through Sajid and Tejas, winning a nail-biting skin by 2 runs to claim 3 tournament points.",
+        },
+        {
+          pairNumber: 4,
+          winnerPair: "Himanshu Kalyani & Dhaval Bheda",
+          winnerRuns: 28,
+          winnerDismissals: 1,
+          loserPair: "Prateek Nahar & Rohan Khedekar",
+          loserRuns: 26,
+          loserDismissals: 0,
+          skinMargin: 2,
+          skinWinner: "VPGR",
+          analysis: "Himanshu produced a captain's knock to take the final skin for VPGR, though Tigers retained the aggregate title.",
+        },
+      ],
+      skinsStory:
+        "The skins were fiercely split 2-2, with Tigers banking 10 tournament points (2 skins × 3 pts + 4 match pts) and VPGR taking 6 points. Tigers' 13-run blitz in Skin 2 proved the difference in the championship race.",
+    },
+    turningPointDetailed: {
+      matchStateBefore: "Tigers held a narrow 28-24 lead after an intense Skin 1.",
+      event: "Manthan Shah and Gaurav Arora scored 31 runs in Skin 2 while VPGR was restricted to 18.",
+      matchStateAfter: "Tigers expanded their lead to 59-42, opening a decisive 17-run championship cushion.",
+      whyItMattered: "Gave Tigers the margin they needed to survive VPGR's second-half counter-attack.",
+    },
+    fatalMistake: {
+      mistake: "VPGR conceding consecutive run-outs in Skin 2 against Manthan's bowling line.",
+      impact: "Cost 10 net runs and gave Tigers the championship-winning cushion.",
+    },
+    playerImpact: [
+      {
+        player: "Manthan Shah",
+        label: "MATCH WINNER",
+        explanation: "Player of the Match with 24 runs, 2 wickets in the crucial Skin 2, and championship captaincy.",
+      },
+      {
+        player: "Kalrav Shah",
+        label: "PARTNERSHIP BUILDER",
+        explanation: "Set the championship standard with 16 runs in the opening skin against Ankush Goel.",
+      },
+      {
+        player: "Himanshu Kalyani",
+        label: "SILENT CONTRIBUTOR",
+        explanation: "VPGR captain fought valiantly to the end, winning Skin 4 with 18 runs.",
+      },
+    ],
+    battingBehaviour: [
+      {
+        team: "DesiTigers",
+        observations: [
+          "Championship-level execution of ground singles and loud calling.",
+          "Targeted side nets with high precision under extreme pressure.",
+          "Maintained composure when VPGR launched their second-half fightback.",
+        ],
+      },
+      {
+        team: "VPGR",
+        observations: [
+          "Superb late fightback in Skins 3 and 4, winning both skins.",
+          "Skin 2 hesitation under pressure proved their ultimate undoing.",
+          "High boundary frequency but undone by 4 costly dismissals.",
+        ],
+      },
+    ],
+    bowlingBehaviour: [
+      {
+        team: "DesiTigers",
+        observations: [
+          "Tactical perfection in bowling changes, matching bowlers to batter strengths.",
+          "Exceptional boundary-riding fielding that cut off three certain 4-run shots.",
+          "Disciplined lines conceding only 4 extras in a high-stakes final.",
+        ],
+      },
+      {
+        team: "VPGR",
+        observations: [
+          "High intensity throughout, hunting wickets until the final delivery.",
+          "Lacked penetration in Skin 2 against Manthan and Gaurav.",
+          "Ankush Goel bowled with customary fire but lacked middle-overs support.",
+        ],
+      },
+    ],
+    captainAnalysis: {
+      evaluation:
+        "Tigers captain Manthan Shah outmaneuvered VPGR with his opening skin deployment and middle-overs suffocation. Himanshu Kalyani showed great heart in leading VPGR's late fightback.",
+      captainTakeaways: [
+        "Indoor cricket finals are won in the middle skins; dominating Skin 2 delivers championships.",
+        "Batting first and posting 110+ creates unbearable pressure in a final.",
+        "Both teams demonstrated the absolute pinnacle of indoor cricket skill and spirit.",
+      ],
+    },
+    teamDnaAssessment: [
+      {
+        team: "DesiTigers",
+        traits: ["CHAMPIONS", "TACTICAL MASTERMINDS", "HIGH-PRESSURE EXECUTORS"],
+        evidence: "Won the championship final 111-94 with an undefeated tournament record.",
+      },
+      {
+        team: "VPGR",
+        traits: ["VALIANT RUNNERS-UP", "FEROCIOUS FIGHTBACK", "MIDDLE OVER FLAW"],
+        evidence: "Fought back to win 2 skins and score 94 in a high-quality championship final.",
+      },
+    ],
+    finalHardHittingVerdict:
+      "A final worthy of the championship; DesiTigers are the undisputed champions of indoor cricket.",
+  },
+
+  // ==========================================
+  // Match 7: Practice Match (09 Sep 2026)
+  // Home Team vs Away Team
+  // ==========================================
+  "7": {
+    matchId: 7,
+    tournamentName: "Desisports Practice Series",
+    matchTitle: "Home Team vs Away Team",
+    date: "09 September 2026, 8:17 PM",
+    venue: "Insportz Club, Dubai (Court 2)",
+    winner: "Away Team",
+    loser: "Home Team",
+    scoreSummary: "Away Team 120 def. Home Team 63 (+57 run margin, 4-0 skins, 16-0 tournament pts)",
+    editorHeadline:
+      "Away Team's 4-0 Skin Blitz and Dismissal Pressure Smothers Home Team in 57-Run Rout",
+    editorSummary:
+      "Away Team produced a masterclass in modern Spawtz indoor cricket, sweeping all four skins to defeat Home Team 120 to 63 (16-0 tournament points). Driven by Player of the Match Yash (18 RS, -1 RC, 3 wickets, +19 contribution), Away Team systematically converted side-net opportunities while restricting Home Team to negative territory during a disastrous Skin 2 collapse. Home Team suffered 6 dismissals (-30 penalty runs) and failed to mount sustained pressure across 16 overs.",
+    whatWentRightWinner: {
+      title: "Tactical Wins for Away Team",
+      points: [
+        "Swept all four skins (+7, +36, +5, +9) with exceptional ground-running discipline.",
+        "Yash delivered an MVP performance: 18 runs scored, -1 runs conceded, 3 dismissals, +19 net contribution.",
+        "Conceded only 63 total runs across 16 overs through suffocating back-of-length bowling.",
+      ],
+    },
+    whatWentWrongLoser: {
+      title: "Critical Breakdowns for Home Team",
+      points: [
+        "Suffered 6 dismissals (-30 penalty runs), completely negating multiple boundary sequences.",
+        "Catastrophic Skin 2 collapse: scored -3 runs while conceding 33, creating an unbridgeable 36-run gap.",
+        "Failed to adapt batting approach; persisted with high-risk drop-and-run singles against sharp front-court fielders.",
+      ],
+    },
+    turningPoint: {
+      phase: "Skin 2 (Overs 5-8)",
+      nature: "Critical Errors",
+      description:
+        "Home Team's second batting pair (Akshay & Jigar) collapsed under intense pressure from Yash and Sahil, losing 3 wickets and finishing with -3 net runs. Away Team answered with 33 runs, opening a 43-run chasm.",
+    },
+    skinsBreakdown: [
+      { skin: 1, winnerRuns: 34, loserRuns: 27, margin: 7, summary: "Deepak & Yash edged Shubham & Arif in a competitive opening." },
+      { skin: 2, winnerRuns: 33, loserRuns: -3, margin: 36, summary: "Decisive blowout: Yash dismantled Akshay & Jigar into negative territory." },
+      { skin: 3, winnerRuns: 34, loserRuns: 29, margin: 5, summary: "High-scoring battle; Sahil & Sunny held off Himanshu & Manthan." },
+      { skin: 4, winnerRuns: 19, loserRuns: 10, margin: 9, summary: "Shaurya & Prateek closed out the sweep against Ankush & Tejas." },
+    ],
+
+    matchVerdict: {
+      verdict: "TACTICAL DOMINATION",
+      explanation:
+        "Away Team dominated every phase of the match. In Innings 1, Home Team batted first and were suffocated to 63 runs, primarily due to a disastrous -3 second skin. In Innings 2, Away Team chased with ruthless control, reaching 120 runs with zero panic and sweeping all 16 available tournament points.",
+    },
+    whyWinningTeamWon: [
+      {
+        observation: "Devastating Skin 2 Suffocation",
+        evidence: "Away Team held Akshay & Jigar to -3 net runs while scoring 33 runs in the reply skin (+36 margin).",
+        impact: "Effectively sealed the match and skin points before the halfway mark.",
+      },
+      {
+        observation: "Front-Court Bowling Discipline",
+        evidence: "Yash conceded -1 runs in 2 overs; Deepak conceded only 6 runs; Away Team forced 6 dismissals.",
+        impact: "Imposed 30 penalty runs on Home Team and denied them any free scoring options.",
+      },
+      {
+        observation: "High-Yield Ground Rotation",
+        evidence: "Away Team pairs converted 34, 33, 34, and 19 runs across the four skins.",
+        impact: "Maintained an average scoring rate of 7.50 runs per over throughout the innings.",
+      },
+    ],
+    whyLosingTeamLost: [
+      {
+        observation: "Fatal Second-Skin Implosion",
+        evidence: "Home Team lost 3 wickets in 8 balls during Skin 2, plunging their skin total to -3.",
+        impact: "Wiped out the solid 27-run foundation built by Shubham & Arif in Skin 1.",
+      },
+      {
+        observation: "Repeated Run-Out Penalties",
+        evidence: "Home Team conceded 4 run-outs through hesitant calling and misjudged physical singles.",
+        impact: "Lost 20 net runs directly to unforced running errors.",
+      },
+      {
+        observation: "Inability to Stem Away Team's Middle-Overs Momentum",
         evidence: "Home Team conceded consecutive dot balls following each dismissal, compounding pressure.",
         impact: "Failed to reset momentum during high-leverage overs.",
       },
@@ -1505,7 +1547,7 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
       pairs: [
         {
           pairNumber: 1,
-          winnerPair: "Deepak & Yash",
+          winnerPair: "Deepak Sharma & Yash",
           winnerRuns: 34,
           winnerDismissals: 0,
           loserPair: "Shubham & Arif",
@@ -1513,11 +1555,11 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
           loserDismissals: 1,
           skinMargin: 7,
           skinWinner: "Away Team",
-          analysis: "Deepak (16) and Yash (18) established immediate command with 34 runs and zero dismissals.",
+          analysis: "Deepak (16) and Yash (18) established immediate command with 34 runs and zero dismissals (3 tournament pts).",
         },
         {
           pairNumber: 2,
-          winnerPair: "Narendra & Maneesh",
+          winnerPair: "Narendra Tiwari & Manish Pandey",
           winnerRuns: 33,
           winnerDismissals: 1,
           loserPair: "Akshay & Jigar",
@@ -1525,35 +1567,35 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
           loserDismissals: 3,
           skinMargin: 36,
           skinWinner: "Away Team",
-          analysis: "The defining partnership. Yash and Sahil destroyed Akshay and Jigar for -3 runs.",
+          analysis: "The defining partnership. Yash and Sahil destroyed Akshay and Jigar for -3 runs, followed by 33 runs in the chase (+36 margin).",
         },
         {
           pairNumber: 3,
-          winnerPair: "Sahil & Sunny",
+          winnerPair: "Sahil & Sunny Patel",
           winnerRuns: 34,
           winnerDismissals: 1,
-          loserPair: "Himanshu & Manthan",
+          loserPair: "Himanshu Kalyani & Manthan Shah",
           loserRuns: 29,
           loserDismissals: 1,
           skinMargin: 5,
           skinWinner: "Away Team",
-          analysis: "Home Team fought back with 29 runs, but Sahil and Sunny matched them with 34.",
+          analysis: "Home Team fought back with 29 runs, but Sahil and Sunny matched and surpassed them with 34 (3 tournament pts).",
         },
         {
           pairNumber: 4,
-          winnerPair: "Shaurya & Prateek",
+          winnerPair: "Shaurya & Prateek Nahar",
           winnerRuns: 19,
           winnerDismissals: 1,
-          loserPair: "Ankush & Tejas",
+          loserPair: "Ankush Goel & Tejas",
           loserRuns: 10,
           loserDismissals: 2,
           skinMargin: 9,
           skinWinner: "Away Team",
-          analysis: "Away Team closed out the 4-0 skin sweep by holding Ankush and Tejas to 10 runs.",
+          analysis: "Away Team closed out the 4-0 skin sweep by holding Ankush and Tejas to 10 runs (3 tournament pts).",
         },
       ],
       skinsStory:
-        "Away Team swept all four skins cleanly. The 36-run blowout in Skin 2 broke Home Team's back, while consistent 34-run returns in Skins 1 and 3 sealed a 57-run victory.",
+        "Away Team swept all four skins cleanly, claiming maximum 16 tournament points (4 skins × 3 pts + 4 match pts). The 36-run blowout in Skin 2 broke Home Team's back, while consistent 34-run returns in Skins 1 and 3 sealed a 57-run victory.",
     },
     turningPointDetailed: {
       matchStateBefore: "Away Team led by 7 runs (34-27) after a competitive Skin 1.",
@@ -1569,32 +1611,44 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
       {
         player: "Yash",
         label: "MATCH WINNER",
-        explanation: "Player of the Match with 18 runs, -1 runs conceded, 3 wickets, and +19 contribution.",
+        explanation: "Player of the Match: RS=18, RC=-1, OB=2, Wkts=3, Economy=-0.50, Net Contribution=+19.",
       },
       {
-        player: "Deepak",
+        player: "Deepak Sharma",
+        label: "PRESSURE BUILDER",
+        explanation: "Conceded only 6 runs in 2 overs (Econ 3.00) and contributed 16 batting runs.",
+      },
+      {
+        player: "Manish Pandey",
         label: "PARTNERSHIP BUILDER",
-        explanation: "Anchored Skin 1 with 16 runs, rotating strike to allow Yash to attack.",
+        explanation: "Scored 17 runs in Skin 2 with Narendra Tiwari, capitalising on Home Team's bowling breakdown.",
       },
       {
-        player: "Manthan",
+        player: "Akshay",
+        label: "DISCIPLINE PROBLEM",
+        explanation: "Suffered 2 dismissals in Skin 2, finishing with -5 net batting runs.",
+      },
+      {
+        player: "Himanshu Kalyani",
         label: "SILENT CONTRIBUTOR",
-        explanation: "Fought hard for Home Team with 16 runs in Skin 3 despite the blowout.",
+        explanation: "Top-scored for Home Team with 17 runs in Skin 3, briefly reviving the chase.",
       },
     ],
     battingBehaviour: [
       {
         team: "Away Team",
         observations: [
-          "Superb balance between physical running and net-zone exploitation.",
-          "Low dot-ball rate (only 18% across 16 overs).",
+          "Loud, decisive calling with instant non-striker response.",
+          "High percentage of ground shots targeted into the side nets for 2-run bonuses.",
+          "Zero panic following a wicket; immediately reset to ground singles.",
         ],
       },
       {
         team: "Home Team",
         observations: [
-          "Tendency to freeze following a dismissal, conceding multiple dot balls.",
-          "Struggled with calling against tight front-court fielders.",
+          "Hesitant calling between wickets leading to 4 unforced run-outs.",
+          "Over-relied on back-wall boundaries instead of rotating strike into side nets.",
+          "Compound errors: a wicket was frequently followed by another dismissal within 3 balls.",
         ],
       },
     ],
@@ -1602,41 +1656,43 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
       {
         team: "Away Team",
         observations: [
-          "Masterful control of lengths, producing 7 wickets and negative economy rates.",
+          "Relentless attack on the stumps with tight leg-side containment.",
+          "Disciplined extras: only 3 wides conceded across 16 overs.",
+          "Aggressive front-court fielding that generated 4 direct-hit run-out chances.",
         ],
       },
       {
         team: "Home Team",
         observations: [
-          "Leaked 120 runs by bowling too full and too wide into the hitting zones.",
+          "Inconsistent length allowed Away Team batters easy pull and flick shots.",
+          "Conceded 8 extras in middle overs, releasing pressure after building dot balls.",
+          "Disjointed fielding communication with multiple missed backing-up opportunities.",
         ],
       },
     ],
     captainAnalysis: {
       evaluation:
-        "Away captain deployed Yash at the exact right moments (Over 1 and Over 5) to break both opening pairs. Home captain failed to adjust fielders when Away pairs repeatedly found the side nets.",
+        "Away Team's captain executed a textbook bowling rotation, deploying strike bowler Yash in Over 5 immediately after the skin break. Home Team's captain delayed his frontline bowlers, allowing Away Team to establish momentum without challenge.",
       captainTakeaways: [
-        "Front-load strike bowlers against opponent's top order.",
-        "Never allow a batting pair to score in negative figures; switch to defensive blocks.",
+        "Never bowl consecutive overs with the same bowler; rotate strike bowlers at the start of each skin.",
+        "Enforce a 'zero-risk single' rule following any -5 penalty dismissal.",
+        "Target side-net drop zones on deliveries 1-3 to build early skin momentum.",
+        "Audit Spawtz tournament points carefully; salvage skin points (3 pts each) when the match total is out of reach.",
       ],
     },
     teamDnaAssessment: [
       {
         team: "Away Team",
-        traits: ["AGGRESSIVE SCORERS", "DISCIPLINED BOWLERS", "SKIN SPECIALISTS"],
-        evidence: "Scored 120 runs, swept all 4 skins, and conceded only 63 runs.",
+        traits: ["CLINICAL RUNNING", "BOWLING DISCIPLINE", "PRESSURE ABSORPTION"],
+        evidence: "Swept all four skins, took 6 wickets, and maintained an average contribution of +7.5 per player.",
       },
       {
         team: "Home Team",
-        traits: ["DISMISSAL PRONE", "INCONSISTENT UNDER PRESSURE"],
-        evidence: "Suffered 7 dismissals and posted -3 in Skin 2.",
+        traits: ["FRAGILE MIDDLE ORDER", "COMMUNICATION BREAKDOWN", "HIGH RUN-OUT RISK"],
+        evidence: "Conceded -3 in Skin 2, suffered 4 run-outs, and conceded a 57-run defeat.",
       },
     ],
     finalHardHittingVerdict:
-      "Away Team won by 57 runs because Yash and his bowling partners attacked the stumps with precision, while Home Team handed away 35 runs in unforced dismissals.",
+      "Away Team demonstrated complete mastery of indoor cricket fundamentals; Home Team's inability to prevent consecutive dismissals cost them 16 tournament points.",
   },
 };
-
-export function getMatchAnalysis(matchId: number | string): MatchTacticalAnalysis | null {
-  return MATCH_ANALYSES[String(matchId)] || null;
-}

@@ -207,6 +207,7 @@ function NewScorecardContent() {
             >
               <option value="0" className="text-slate-900">Desisports Regular Practice (#0)</option>
               <option value="1" className="text-slate-900">Desi Boys Tournament May 2026 (#1)</option>
+              <option value="2" className="text-slate-900">DesiBoys Bazooka 4.0 (#2)</option>
             </select>
           </div>
 
@@ -219,55 +220,6 @@ function NewScorecardContent() {
           </button>
         </div>
       </div>
-
-      {/* Duplicate Alert Banner */}
-      {duplicateAlert && (
-        <div className="p-4 rounded-xl border border-amber-500/40 bg-amber-50/80 dark:bg-amber-950/30 text-amber-900 dark:text-amber-200 space-y-3 shadow-sm">
-          <div className="flex items-start gap-2.5">
-            <ShieldAlert className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-            <div className="space-y-1">
-              <h3 className="text-sm font-bold">Duplicate Match Scorecard Detected</h3>
-              <p className="text-xs text-amber-800 dark:text-amber-300">
-                {duplicateAlert.message}
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2.5 pt-1 pl-7 text-xs font-semibold">
-            {duplicateAlert.existingMatchId && (
-              <Link
-                href={`/matches/${duplicateAlert.existingMatchId}`}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200 hover:bg-amber-100 transition"
-              >
-                <span>View Existing Match #{duplicateAlert.existingMatchId}</span>
-                <ExternalLink className="h-3 w-3" />
-              </Link>
-            )}
-
-            <button
-              disabled={extracting}
-              onClick={() => handleProceedToExtraction(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white transition shadow-sm font-bold cursor-pointer"
-            >
-              {extracting ? (
-                <>
-                  <div className="h-3 w-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Extracting & Ingesting…</span>
-                </>
-              ) : (
-                <span>Proceed with Upload (New Match / Override)</span>
-              )}
-            </button>
-
-            <button
-              onClick={() => setDuplicateAlert(null)}
-              className="px-3 py-1.5 text-slate-600 dark:text-slate-400 hover:underline cursor-pointer"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Upload & Camera Buttons */}
       {!previewUrl && (

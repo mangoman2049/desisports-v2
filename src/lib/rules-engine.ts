@@ -138,25 +138,38 @@ export function validateIndoorCricketScorecard(sheet: ParsedScorecard): Validati
   let totalCheckedFields = 0;
   let validFields = 0;
 
-  const validateInnings = (inn: InningsExtraction, label: string) => {
+  if (!sheet) {
+    return {
+      passed: false,
+      confidenceScore: 0,
+      highConfidenceLabel: false,
+      reconciled: false,
+      issues: [{ severity: "error", section: "General", field: "Scorecard", message: "Scorecard sheet is missing or empty" }],
+    };
+  }
+
+  const validateInnings = (inn: InningsExtraction | undefined, label: string) => {
+    if (!inn) return;
+    const skins = inn.skins || [];
+
     // 1. Check 4 skins
     totalCheckedFields++;
-    if (inn.skins.length === 4) {
+    if (skins.length === 4) {
       validFields++;
     } else {
       issues.push({
         severity: "error",
         section: `${label} Innings`,
         field: "Skins Count",
-        message: `Expected 4 skins, found ${inn.skins.length}`,
+        message: `Expected 4 skins, found ${skins.length}`,
         expected: 4,
-        actual: inn.skins.length,
+        actual: skins.length,
       });
     }
 
     // 2. Check 16 overs total
     totalCheckedFields++;
-    const totalOvers = inn.skins.reduce((acc, s) => acc + s.overs.length, 0);
+    const totalOvers = skins.reduce((acc, s) => acc + (s.overs || []).length, 0);
     if (totalOvers === 16) {
       validFields++;
     } else {
@@ -172,9 +185,9 @@ export function validateIndoorCricketScorecard(sheet: ParsedScorecard): Validati
 
     // 3. Check Bowler quota (max 2 overs per bowler)
     const bowlerOverCounts: Record<string, number> = {};
-    inn.skins.forEach((skin) => {
-      skin.overs.forEach((over) => {
-        const b = over.bowlerName.trim().toUpperCase();
+    skins.forEach((skin) => {
+      (skin.overs || []).forEach((over) => {
+        const b = (over.bowlerName || "").trim().toUpperCase();
         if (b) {
           bowlerOverCounts[b] = (bowlerOverCounts[b] || 0) + 1;
         }
@@ -199,70 +212,76 @@ export function validateIndoorCricketScorecard(sheet: ParsedScorecard): Validati
 
     // 4. Skin totals reconciliation
     let computedInningsTotal = 0;
-    inn.skins.forEach((skin) => {
+    skins.forEach((skin) => {
       totalCheckedFields += 2;
       let calculatedSkinRuns = 0;
       let calculatedSkinWkts = 0;
 
-      skin.overs.forEach((over) => {
-        over.balls.forEach((b) => {
+      (skin.overs || []).forEach((over) => {
+        (over.balls || []).forEach((b) => {
           totalCheckedFields++;
-          calculatedSkinRuns += b.runs + b.penaltyRuns;
+          calculatedSkinRuns += (b.runs || 0) + (b.penaltyRuns || 0);
           if (b.dismissalType) calculatedSkinWkts++;
           if (!b.flagged) validFields++;
         });
       });
 
       // Does skin total reconcile?
-      if (skin.skinTotalRuns === calculatedSkinRuns || Math.abs(skin.skinTotalRuns - calculatedSkinRuns) <= 2) {
+      const skinRuns = skin.skinTotalRuns ?? 0;
+      if (skinRuns === calculatedSkinRuns || Math.abs(skinRuns - calculatedSkinRuns) <= 2) {
         validFields++;
       } else {
         issues.push({
           severity: "warning",
-          section: `${label} Skin ${skin.skinNumber}`,
+          section: `${label} Skin ${skin.skinNumber || "?"}`,
           field: "Skin Runs Reconciliation",
-          message: `Reported skin runs (${skin.skinTotalRuns}) does not match ball sum (${calculatedSkinRuns})`,
-          expected: skin.skinTotalRuns,
+          message: `Reported skin runs (${skinRuns}) does not match ball sum (${calculatedSkinRuns})`,
+          expected: skinRuns,
           actual: calculatedSkinRuns,
         });
       }
 
       // Does sum of Batter 1 and Batter 2 equal skin total?
-      if (skin.batter1Total + skin.batter2Total === skin.skinTotalRuns) {
+      const batter1Total = skin.batter1Total || 0;
+      const batter2Total = skin.batter2Total || 0;
+      if (batter1Total + batter2Total === skinRuns) {
         validFields++;
       } else {
         issues.push({
           severity: "warning",
-          section: `${label} Skin ${skin.skinNumber}`,
+          section: `${label} Skin ${skin.skinNumber || "?"}`,
           field: "Batter Sum Reconciliation",
-          message: `${skin.batter1Name} (${skin.batter1Total}) + ${skin.batter2Name} (${skin.batter2Total}) != Skin Total (${skin.skinTotalRuns})`,
-          expected: skin.skinTotalRuns,
-          actual: skin.batter1Total + skin.batter2Total,
+          message: `${skin.batter1Name || "B1"} (${batter1Total}) + ${skin.batter2Name || "B2"} (${batter2Total}) != Skin Total (${skinRuns})`,
+          expected: skinRuns,
+          actual: batter1Total + batter2Total,
         });
       }
 
-      computedInningsTotal += skin.skinTotalRuns;
+      computedInningsTotal += skinRuns;
     });
 
     // 5. Innings total reconcile
     totalCheckedFields++;
-    if (inn.totalRuns === computedInningsTotal) {
+    const reportedTotal = inn.totalRuns ?? 0;
+    if (reportedTotal === computedInningsTotal) {
       validFields++;
     } else {
       issues.push({
         severity: "error",
         section: `${label} Innings`,
         field: "Total Runs",
-        message: `Reported innings total (${inn.totalRuns}) does not match sum of skins (${computedInningsTotal})`,
+        message: `Reported innings total (${reportedTotal}) does not match sum of skins (${computedInningsTotal})`,
         expected: computedInningsTotal,
-        actual: inn.totalRuns,
+        actual: reportedTotal,
       });
     }
 
     // 6. Bottom player summary table reconciliation (RS - RC = C)
-    inn.playerSummaries.forEach((p) => {
+    (inn.playerSummaries || []).forEach((p) => {
       totalCheckedFields++;
-      const expectedC = p.runsScored - p.runsConceded;
+      const rs = p.runsScored || 0;
+      const rc = p.runsConceded || 0;
+      const expectedC = rs - rc;
       if (p.contribution === expectedC) {
         validFields++;
       } else {
@@ -270,7 +289,7 @@ export function validateIndoorCricketScorecard(sheet: ParsedScorecard): Validati
           severity: "warning",
           section: `${label} Summary`,
           field: `${p.name} Contribution`,
-          message: `RS (${p.runsScored}) - RC (${p.runsConceded}) = ${expectedC}, but recorded as ${p.contribution}`,
+          message: `RS (${rs}) - RC (${rc}) = ${expectedC}, but recorded as ${p.contribution}`,
           expected: expectedC,
           actual: p.contribution,
         });
@@ -281,31 +300,35 @@ export function validateIndoorCricketScorecard(sheet: ParsedScorecard): Validati
   validateInnings(sheet.homeInnings, "Home");
   validateInnings(sheet.awayInnings, "Away");
 
-  // Reconcile overall skins summary table with innings skins
-  totalCheckedFields++;
-  const homeSumSkins = sheet.skinsSummary.home.skins.reduce((a, b) => a + b, 0);
-  if (homeSumSkins === sheet.skinsSummary.home.total) {
-    validFields++;
-  } else {
-    issues.push({
-      severity: "error",
-      section: "Skins Table",
-      field: "Home Total",
-      message: `Home skins sum (${homeSumSkins}) does not match total (${sheet.skinsSummary.home.total})`,
-    });
+  // Reconcile overall skins summary table with innings skins if present
+  if (sheet.skinsSummary?.home?.skins) {
+    totalCheckedFields++;
+    const homeSumSkins = sheet.skinsSummary.home.skins.reduce((a, b) => a + b, 0);
+    if (homeSumSkins === (sheet.skinsSummary.home.total ?? 0)) {
+      validFields++;
+    } else {
+      issues.push({
+        severity: "error",
+        section: "Skins Table",
+        field: "Home Total",
+        message: `Home skins sum (${homeSumSkins}) does not match total (${sheet.skinsSummary.home.total})`,
+      });
+    }
   }
 
-  totalCheckedFields++;
-  const awaySumSkins = sheet.skinsSummary.away.skins.reduce((a, b) => a + b, 0);
-  if (awaySumSkins === sheet.skinsSummary.away.total) {
-    validFields++;
-  } else {
-    issues.push({
-      severity: "error",
-      section: "Skins Table",
-      field: "Away Total",
-      message: `Away skins sum (${awaySumSkins}) does not match total (${sheet.skinsSummary.away.total})`,
-    });
+  if (sheet.skinsSummary?.away?.skins) {
+    totalCheckedFields++;
+    const awaySumSkins = sheet.skinsSummary.away.skins.reduce((a, b) => a + b, 0);
+    if (awaySumSkins === (sheet.skinsSummary.away.total ?? 0)) {
+      validFields++;
+    } else {
+      issues.push({
+        severity: "error",
+        section: "Skins Table",
+        field: "Away Total",
+        message: `Away skins sum (${awaySumSkins}) does not match total (${sheet.skinsSummary.away.total})`,
+      });
+    }
   }
 
   const confidenceScore =

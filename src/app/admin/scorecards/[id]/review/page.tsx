@@ -303,7 +303,7 @@ export default function MakerCheckerReviewPage() {
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-mono font-semibold text-slate-500">
-                Match: {scorecard.matchInfo.dateTime}
+                Match: {scorecard.matchInfo?.dateTime || "Recent Match"}
               </span>
               {validation.highConfidenceLabel ? (
                 <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full border border-emerald-500/20">
@@ -318,9 +318,10 @@ export default function MakerCheckerReviewPage() {
               )}
             </div>
             <h1 className="text-lg font-black text-slate-900 dark:text-white mt-0.5">
-              Maker-Checker Verification: {scorecard.homeInnings.teamName} (
-              {scorecard.skinsSummary.home.total}) vs {scorecard.awayInnings.teamName} (
-              {scorecard.skinsSummary.away.total})
+              Maker-Checker Verification: {scorecard.homeInnings?.teamName || "Home Team"} (
+              {scorecard.skinsSummary?.home?.total ?? scorecard.homeInnings?.totalRuns ?? 0}) vs{" "}
+              {scorecard.awayInnings?.teamName || "Away Team"} (
+              {scorecard.skinsSummary?.away?.total ?? scorecard.awayInnings?.totalRuns ?? 0})
             </h1>
           </div>
         </div>
@@ -430,7 +431,7 @@ export default function MakerCheckerReviewPage() {
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
               }`}
             >
-              Away Innings ({scorecard.skinsSummary.away.total} Runs • 4 Skins)
+              Away Innings ({scorecard.skinsSummary?.away?.total ?? scorecard.awayInnings?.totalRuns ?? 0} Runs • {scorecard.skinsSummary?.away?.skinsWon ?? 0} Skins)
             </button>
             <button
               onClick={() => setActiveTab("home")}
@@ -440,7 +441,7 @@ export default function MakerCheckerReviewPage() {
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
               }`}
             >
-              Home Innings ({scorecard.skinsSummary.home.total} Runs • 0 Skins)
+              Home Innings ({scorecard.skinsSummary?.home?.total ?? scorecard.homeInnings?.totalRuns ?? 0} Runs • {scorecard.skinsSummary?.home?.skinsWon ?? 0} Skins)
             </button>
             <button
               onClick={() => setActiveTab("summary")}
@@ -468,7 +469,7 @@ export default function MakerCheckerReviewPage() {
           {/* Skins Accordion View */}
           {(activeTab === "away" || activeTab === "home") && (
             <div className="space-y-3">
-              {currentInnings.skins.map((skin, skinIdx) => {
+              {(currentInnings?.skins || []).map((skin, skinIdx) => {
                 const skinKey = `${activeTab}-${skin.skinNumber}`;
                 const isExpanded = expandedSkins[skinKey];
 
@@ -529,7 +530,7 @@ export default function MakerCheckerReviewPage() {
                             </tr>
                           </thead>
                           <tbody>
-                            {skin.overs.map((over, overIdx) => (
+                            {(skin.overs || []).map((over, overIdx) => (
                               <tr key={over.overNumber}>
                                 <td className="font-mono font-bold text-slate-500">
                                   #{over.overNumber}
@@ -537,7 +538,7 @@ export default function MakerCheckerReviewPage() {
                                 <td className="font-semibold text-slate-800 dark:text-slate-200">
                                   {over.bowlerName}
                                 </td>
-                                {over.balls.map((ball, ballIdx) => {
+                                {(over.balls || []).map((ball, ballIdx) => {
                                   const isDismissal = !!ball.dismissalType;
                                   const isExtra = !!ball.extrasType;
 
@@ -602,16 +603,16 @@ export default function MakerCheckerReviewPage() {
                 </thead>
                 <tbody>
                   {[
-                    ...scorecard.awayInnings.playerSummaries,
-                    ...scorecard.homeInnings.playerSummaries,
+                    ...(scorecard.awayInnings?.playerSummaries || []),
+                    ...(scorecard.homeInnings?.playerSummaries || []),
                   ].map((p, idx) => (
                     <tr key={idx}>
                       <td className="font-bold text-slate-900 dark:text-white">{p.name}</td>
-                      <td className="font-mono">{p.runsScored}</td>
-                      <td className="font-mono">{p.oversBowled.toFixed(1)}</td>
-                      <td className="font-mono">{p.runsConceded}</td>
-                      <td className="font-mono">{p.wickets}</td>
-                      <td className="font-mono">{p.economy.toFixed(1)}</td>
+                      <td className="font-mono">{p.runsScored ?? 0}</td>
+                      <td className="font-mono">{(p.oversBowled || 0).toFixed(1)}</td>
+                      <td className="font-mono">{p.runsConceded ?? 0}</td>
+                      <td className="font-mono">{p.wickets ?? 0}</td>
+                      <td className="font-mono">{(p.economy || 0).toFixed(1)}</td>
                       <td
                         className={`font-mono font-bold text-right ${
                           p.contribution > 0

@@ -5,10 +5,11 @@ import { validateIndoorCricketScorecard } from "@/lib/rules-engine";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
-    const uploadId = params.id;
+    const resolvedParams = await Promise.resolve(params);
+    const uploadId = resolvedParams.id;
     const body = await req.json();
     const parsed: ParsedScorecard = body.parsedScorecard;
     const reviewerNotes = body.reviewerNotes || "Approved via Maker-Checker";
