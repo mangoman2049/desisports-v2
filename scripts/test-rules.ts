@@ -1091,6 +1091,71 @@ async function runTestSuite() {
     passedAll = false;
   }
 
+  // Test 27: 3 Isolated Prompts Architecture & Career-Wide Player Tactical DNA
+  console.log("\n[Test 27] 3 Isolated Prompts Architecture & Career-Wide Player Tactical DNA:");
+  try {
+    const { INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT } = await import(
+      "../src/lib/tactical-prompt"
+    );
+    const { TEAM_DNA_TOURNAMENT_BEGIN_PROMPT, TEAM_DNA_AUTHOR } = await import(
+      "../src/lib/team-dna-prompt"
+    );
+    const { PLAYER_TACTICAL_INTELLIGENCE_PROMPT, PLAYER_TACTICAL_AUTHOR } = await import(
+      "../src/lib/player-dna-prompt"
+    );
+    const { getPlayerCareerDNA } = await import("../src/lib/player-tactical");
+
+    // 1. Verify 3 Isolated Prompts and Author Metadata
+    const matchPromptValid =
+      typeof INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT === "string" &&
+      INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT.includes("Manish Pandey");
+    const teamPromptValid =
+      typeof TEAM_DNA_TOURNAMENT_BEGIN_PROMPT === "string" &&
+      TEAM_DNA_AUTHOR.includes("Manish Pandey");
+    const playerPromptValid =
+      typeof PLAYER_TACTICAL_INTELLIGENCE_PROMPT === "string" &&
+      PLAYER_TACTICAL_AUTHOR.includes("Manish Pandey") &&
+      PLAYER_TACTICAL_INTELLIGENCE_PROMPT.includes("Player Tactical Intelligence Analyst for Team DNAs") &&
+      PLAYER_TACTICAL_INTELLIGENCE_PROMPT.includes("Performance Synergy");
+
+    console.log(`- Prompt 1 (Match Tactical Insights, per-match): ${matchPromptValid ? "ISOLATED & VERIFIED" : "FAILED"}`);
+    console.log(`- Prompt 2 (Team DNA Tournament Begin, per-team/tournament): ${teamPromptValid ? "ISOLATED & VERIFIED" : "FAILED"}`);
+    console.log(`- Prompt 3 (Player Tactical Intelligence, career-wide): ${playerPromptValid ? "ISOLATED & VERIFIED" : "FAILED"}`);
+
+    // 2. Verify Career-Wide Player DNA for Manish Pandey
+    const manishDNA = getPlayerCareerDNA("Manish Pandey");
+    const manishValid =
+      manishDNA.primaryProfile === "Disciplined Anchor" &&
+      manishDNA.confidence === "HIGH" &&
+      manishDNA.playerSynergy.performanceSynergyScore >= 80 &&
+      manishDNA.battingDNA.length >= 3 &&
+      manishDNA.dismissalDNA.patterns.length >= 1 &&
+      manishDNA.bazookaTactics.suitability === "MEDIUM" &&
+      manishDNA.playerDNACard.playerDNA === "Disciplined Anchor";
+
+    console.log(`- Manish Pandey Career DNA Grounding: ${manishValid ? "VERIFIED" : "FAILED"}`);
+
+    // 3. Verify Zero-Hallucination Fallback for 0-Match Players
+    const newPlayerDNA = getPlayerCareerDNA("Unplayed New Player", []);
+    const fallbackValid =
+      newPlayerDNA.confidence === "INSUFFICIENT EVIDENCE" &&
+      newPlayerDNA.battingDNA[0].observation === "Data unavailable" &&
+      newPlayerDNA.dismissalDNA.totalDismissals === "Data unavailable" &&
+      newPlayerDNA.bazookaTactics.suitability === "INSUFFICIENT EVIDENCE";
+
+    console.log(`- 0-Match Player Zero-Hallucination Guard: ${fallbackValid ? "VERIFIED" : "FAILED"}`);
+
+    if (!matchPromptValid || !teamPromptValid || !playerPromptValid || !manishValid || !fallbackValid) {
+      console.error("FAIL: 3 Isolated Prompts architecture or Player Tactical DNA validation failed!");
+      passedAll = false;
+    } else {
+      console.log("PASS: 3 Isolated Prompts architecture and career-wide Player Tactical DNA fully verified.");
+    }
+  } catch (err) {
+    console.error("FAIL: Test 27 encountered error:", err);
+    passedAll = false;
+  }
+
   await prisma.$disconnect();
 
   if (!passedAll) {
@@ -1098,7 +1163,7 @@ async function runTestSuite() {
     process.exit(1);
   } else {
     console.log("\n==================================================");
-    console.log("✅ ALL 26 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
+    console.log("✅ ALL 27 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
     console.log("==================================================");
     process.exit(0);
   }

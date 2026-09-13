@@ -14,7 +14,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import { RunsTrendChart, ContributionMomentumChart } from "./PlayerChart";
-import { getPlayerTacticalInfo } from "@/lib/player-tactical";
+import { getPlayerTacticalInfo, getPlayerCareerDNA } from "@/lib/player-tactical";
+import { AlertTriangle, CheckCircle2, Compass, Target, Zap } from "lucide-react";
 import PlayerAvatar from "@/components/PlayerAvatar";
 import PlayerMatchHistoryTable, { MatchHistoryItem } from "./PlayerMatchHistoryTable";
 
@@ -134,6 +135,7 @@ export default async function PlayerProfilePage({ params }: Props) {
 
   const hasMatchData = player.stats && player.stats.length > 0;
   const tactical = getPlayerTacticalInfo(player.canonicalName);
+  const careerDNA = getPlayerCareerDNA(player.canonicalName, player.stats);
 
   // Chronological sort: oldest to newest for charts (so latest match is on the far right)
   const chronologicalStats = hasMatchData
@@ -604,68 +606,282 @@ export default async function PlayerProfilePage({ params }: Props) {
         </div>
       )}
 
-      {/* Tactical Profile & Batting Synergy */}
-      {hasMatchData ? (
-        <div className="p-6 rounded-3xl border border-purple-200/80 bg-purple-50/40 shadow-xs space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-purple-200/60">
+      {/* SECTION: CAREER-WIDE PLAYER TACTICAL INTELLIGENCE (Prompt Isolated & Grounded) */}
+      <section className="p-6 sm:p-8 rounded-3xl border border-purple-200/90 dark:border-purple-900/60 bg-gradient-to-b from-purple-50/50 via-white to-white dark:from-purple-950/20 dark:via-slate-900 dark:to-slate-900 shadow-xs space-y-6">
+        {/* Module Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-purple-100 dark:border-purple-900/40">
+          <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <Shield className="h-4 w-4 text-purple-600" />
-              <span className="text-xs font-black uppercase tracking-wider text-purple-900">
-                Tactical Profile & Batting Synergy
-              </span>
+              <Sparkles className="w-5 h-5 text-purple-600 animate-pulse" />
+              <h2 className="text-base sm:text-lg font-black tracking-tight text-slate-950 dark:text-white uppercase">
+                Player Tactical Intelligence & Observable Playing DNA
+              </h2>
             </div>
-            <span className="text-[10px] font-bold text-purple-700 bg-white px-2.5 py-0.5 rounded-full border border-purple-200">
-              {tactical.tacticalRole}
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Career-wide analysis across tournaments & practice games • Grounded Indoor Cricket metrics
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-bold px-3 py-1 rounded-full bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 border border-purple-300 dark:border-purple-800">
+              Primary: {careerDNA.primaryProfile}
+            </span>
+            <span className="text-[11px] font-mono font-bold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+              Confidence: {careerDNA.confidence}
             </span>
           </div>
+        </div>
 
-          <p className="text-xs text-purple-950 leading-relaxed font-medium">
-            {player.notes && !player.notes.includes("Tournament squad")
-              ? player.notes
-              : tactical.notes}
+        {/* Profile Description & Form vs Career */}
+        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-purple-100 dark:border-purple-900/40 space-y-2 shadow-2xs">
+          <p className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed font-medium">
+            {careerDNA.profileDescription}
           </p>
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+            <span className="text-purple-700 dark:text-purple-400 font-bold">
+              Form vs Career: <span className="font-semibold text-slate-600 dark:text-slate-300">{careerDNA.currentFormVsCareer.status}</span>
+            </span>
+            <span className="text-slate-500 text-[11px]">{careerDNA.currentFormVsCareer.summary}</span>
+          </div>
+        </div>
 
-          {/* Optimal Batting Partner Highlight */}
-          <div className="p-4 rounded-2xl bg-white border border-purple-200/70 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="space-y-0.5">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
-                Optimal Batting Partner
-              </span>
-              <div className="text-xs font-bold text-slate-900 flex items-center gap-2">
-                <span>Partner: {tactical.optimalPartner}</span>
-                <span className="text-purple-600 font-mono font-black text-xs">
-                  (+{tactical.netSkinAvg} Net Skin Avg)
+        {/* Batting DNA & Dismissal DNA (Two Columns) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Batting DNA */}
+          <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 space-y-3.5 shadow-xs">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-2">
+                <Target className="w-4 h-4 text-sky-600" />
+                <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
+                  Batting DNA & Scoring Behaviour
+                </h3>
+              </div>
+              <span className="text-[10px] font-mono text-slate-400">Indoor Net Mechanics</span>
+            </div>
+
+            <div className="space-y-3">
+              {careerDNA.battingDNA.map((obs, idx) => (
+                <div key={idx} className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 space-y-1.5 text-xs">
+                  <span className="font-bold text-sky-700 dark:text-sky-400 block">{obs.observation}</span>
+                  <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-[11px]">
+                    <span className="font-semibold text-slate-700 dark:text-slate-200">Evidence: </span>{obs.evidence}
+                  </p>
+                  <p className="text-sky-900 dark:text-sky-300 text-[11px] font-medium pt-0.5">
+                    <span className="font-bold">Tactical Meaning: </span>{obs.tacticalMeaning}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Dismissal DNA */}
+          <div className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 space-y-3.5 shadow-xs">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-rose-600" />
+                <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
+                  Dismissal DNA (-5 Run Penalties)
+                </h3>
+              </div>
+              <span className="text-[10px] font-mono text-rose-600 font-bold">{careerDNA.dismissalDNA.rate}</span>
+            </div>
+
+            <div className="space-y-3">
+              <div className="p-3 rounded-2xl bg-rose-50/50 dark:bg-rose-950/20 text-xs flex items-center justify-between">
+                <span className="font-bold text-rose-900 dark:text-rose-300">Total Recorded Dismissals:</span>
+                <span className="font-mono font-bold text-rose-700 dark:text-rose-400">{careerDNA.dismissalDNA.totalDismissals}</span>
+              </div>
+              {careerDNA.dismissalDNA.patterns.map((pat, idx) => (
+                <div key={idx} className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 space-y-1.5 text-xs">
+                  <span className="font-bold text-rose-700 dark:text-rose-400 block">{pat.pattern}</span>
+                  <p className="text-slate-600 dark:text-slate-300 text-[11px]">
+                    <span className="font-semibold text-slate-700 dark:text-slate-200">Evidence: </span>{pat.evidence}
+                  </p>
+                  <p className="text-rose-900 dark:text-rose-300 text-[11px] font-medium pt-0.5">
+                    <span className="font-bold">Interpretation: </span>{pat.interpretation}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Bowling Trade-Offs & Performance Synergy (Two Columns) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Bowling DNA */}
+          <div className="lg:col-span-6 p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 space-y-3.5 shadow-xs">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-2">
+                <Activity className="w-4 h-4 text-purple-600" />
+                <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
+                  Bowling DNA & Discipline Trade-Offs
+                </h3>
+              </div>
+              <span className="text-[10px] font-mono text-purple-600 font-bold">Over Delivery Quality</span>
+            </div>
+
+            {careerDNA.bowlingDNA ? (
+              <div className="space-y-2.5 text-xs">
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-purple-50/60 dark:bg-purple-950/20">
+                  <span className="font-bold text-purple-900 dark:text-purple-300">Identity:</span>
+                  <span className="font-semibold text-purple-700 dark:text-purple-400">{careerDNA.bowlingDNA.identity}</span>
+                </div>
+                <p className="text-slate-600 dark:text-slate-300 text-[11px]">
+                  <span className="font-semibold text-slate-700 dark:text-slate-200">Evidence: </span>{careerDNA.bowlingDNA.evidence}
+                </p>
+                <p className="text-purple-950 dark:text-purple-300 text-[11px] font-medium">
+                  <span className="font-bold">Tactical Meaning: </span>{careerDNA.bowlingDNA.tacticalMeaning}
+                </p>
+                <div className="pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] text-amber-700 dark:text-amber-400">
+                  <span className="font-bold">Discipline Risk: </span>{careerDNA.bowlingDNA.disciplineRisk}
+                </div>
+              </div>
+            ) : (
+              <p className="text-xs text-slate-500 py-3">
+                No sustained bowling spell recorded in tournament or practice database.
+              </p>
+            )}
+          </div>
+
+          {/* Performance Synergy */}
+          <div className="lg:col-span-6 p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 space-y-3.5 shadow-xs flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-emerald-600" />
+                  <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
+                    Player Performance Synergy
+                  </h3>
+                </div>
+                <span className="text-[10px] font-mono text-emerald-600 font-bold">Observable Metrics</span>
+              </div>
+
+              <div className="flex items-center justify-between p-3 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 my-2">
+                <div className="space-y-0.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300 block font-mono">
+                    Performance Synergy Score
+                  </span>
+                  <span className="text-xs font-semibold text-emerald-950 dark:text-emerald-200">Grounded Pairing Chemistry</span>
+                </div>
+                <span className="text-2xl font-black text-emerald-600 font-mono">
+                  {careerDNA.playerSynergy.performanceSynergyScore}/100
                 </span>
               </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
+                {careerDNA.playerSynergy.bestHistoricalPartner && (
+                  <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40">
+                    <span className="text-[10px] font-bold text-slate-400 block uppercase">Best Partner</span>
+                    <span className="font-bold text-slate-900 dark:text-white">{careerDNA.playerSynergy.bestHistoricalPartner}</span>
+                  </div>
+                )}
+                <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/40">
+                  <span className="text-[10px] font-bold text-slate-400 block uppercase">Best Style Complement</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{careerDNA.playerSynergy.bestStyleComplement}</span>
+                </div>
+              </div>
             </div>
-            <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs shrink-0 self-start sm:self-auto font-mono">
-              Synergy Uplift: +{tactical.synergyUplift} Runs
+
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
+              <span className="font-semibold text-slate-700 dark:text-slate-300">Synergy Rationale: </span>
+              {careerDNA.playerSynergy.synergyRationale}
+            </p>
+          </div>
+        </div>
+
+        {/* Bazooka Tactical Option & Captain's Use Case */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Bazooka Option */}
+          <div className="lg:col-span-6 p-5 rounded-3xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/60 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Flame className="w-4 h-4 text-amber-600" />
+                <h3 className="text-xs font-black uppercase tracking-wider text-amber-950 dark:text-amber-200">
+                  Bazooka Tactical Option Suitability
+                </h3>
+              </div>
+              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+                {careerDNA.bazookaTactics.suitability}
+              </span>
+            </div>
+
+            <div className="space-y-2 text-xs">
+              <p className="text-amber-950 dark:text-amber-200 leading-relaxed font-medium">
+                <span className="font-bold">Deployment Advantage: </span>{careerDNA.bazookaTactics.expectedAdvantage}
+              </p>
+              <div className="pt-2 border-t border-amber-200/60 dark:border-amber-800/40 space-y-1">
+                <p className="text-slate-600 dark:text-slate-300 text-[11px]">
+                  <span className="font-semibold text-slate-700 dark:text-slate-200">Ideal Situation: </span>{careerDNA.bazookaTactics.likelySituation}
+                </p>
+                <p className="text-rose-700 dark:text-rose-400 text-[11px]">
+                  <span className="font-bold">Primary Risk: </span>{careerDNA.bazookaTactics.primaryRisk}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Captain's Use Case & Opposition Scouting */}
+          <div className="lg:col-span-6 p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 space-y-3 shadow-xs">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-2">
+                <Compass className="w-4 h-4 text-purple-600" />
+                <h3 className="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">
+                  Captain\'s Blueprint & Opposition Scouting
+                </h3>
+              </div>
+              <span className="text-[10px] font-mono text-purple-600 font-bold">Tactical Matchup</span>
+            </div>
+
+            <div className="space-y-2 text-xs">
+              <p className="text-slate-800 dark:text-slate-200 font-medium">
+                <span className="font-bold text-purple-700 dark:text-purple-400">Best Captain Use: </span>
+                {careerDNA.captainsUseCase.bestRole} — {careerDNA.captainsUseCase.bestPartnershipOrMatchup}
+              </p>
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-1">
+                <span className="font-bold text-rose-700 dark:text-rose-400 text-[11px] block">Opposition Scouting Targets:</span>
+                <ul className="list-disc list-inside text-[11px] text-slate-600 dark:text-slate-300 space-y-0.5">
+                  {careerDNA.oppositionScouting.map((scout, idx) => (
+                    <li key={idx}>{scout}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Compact Player DNA Summary Card */}
+        <div className="p-5 rounded-2xl bg-purple-900 text-white space-y-3 shadow-md">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <Shield className="w-4 h-4 text-purple-300" />
+              <h4 className="text-xs font-black uppercase tracking-wider text-purple-100">
+                PLAYER DNA CARD: {careerDNA.playerDNACard.playerDNA}
+              </h4>
+            </div>
+            <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-purple-800 text-purple-200 border border-purple-700">
+              Confidence: {careerDNA.playerDNACard.confidence}
             </span>
           </div>
 
-          <div className="flex flex-wrap gap-2 pt-1">
-            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white text-emerald-700 border border-emerald-200 shadow-2xs">
-              Optimal Batting Partner: {tactical.optimalPartner} — +{tactical.netSkinAvg} Net Skin Avg with +{tactical.synergyUplift} synergy uplift
-            </span>
-            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white text-purple-700 border border-purple-200 shadow-2xs">
-              ⚡ Elite Boundary Threat in Skin Overs
-            </span>
-            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-white text-sky-700 border border-sky-200 shadow-2xs">
-              🎯 Death Overs Containment Specialist
-            </span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs pt-1">
+            <div className="p-2.5 rounded-xl bg-purple-800/60 border border-purple-700/50 space-y-0.5">
+              <span className="text-[10px] font-bold text-purple-300 uppercase block">Core Strength</span>
+              <p className="text-purple-100 leading-tight">{careerDNA.playerDNACard.strength}</p>
+            </div>
+            <div className="p-2.5 rounded-xl bg-purple-800/60 border border-purple-700/50 space-y-0.5">
+              <span className="text-[10px] font-bold text-rose-300 uppercase block">Main Vulnerability</span>
+              <p className="text-purple-100 leading-tight">{careerDNA.playerDNACard.weakness}</p>
+            </div>
+            <div className="p-2.5 rounded-xl bg-purple-800/60 border border-purple-700/50 space-y-0.5">
+              <span className="text-[10px] font-bold text-sky-300 uppercase block">Best Captain Use</span>
+              <p className="text-purple-100 leading-tight">{careerDNA.playerDNACard.bestUse}</p>
+            </div>
+            <div className="p-2.5 rounded-xl bg-purple-800/60 border border-purple-700/50 space-y-0.5">
+              <span className="text-[10px] font-bold text-amber-300 uppercase block">Key Strategic Risk</span>
+              <p className="text-purple-100 leading-tight">{careerDNA.playerDNACard.keyRisk}</p>
+            </div>
           </div>
         </div>
-      ) : (
-        <div className="p-6 rounded-3xl border border-dashed border-purple-300 dark:border-purple-800 bg-purple-50/30 dark:bg-purple-950/20 text-center space-y-2">
-          <Shield className="w-6 h-6 text-purple-600 mx-auto" />
-          <h3 className="text-sm font-bold text-purple-950 dark:text-purple-200">
-            Minimum 1 match data required
-          </h3>
-          <p className="text-xs text-purple-800 dark:text-purple-300 max-w-md mx-auto">
-            Tactical Profile, Optimal Batting Partner Synergy, and Skin Net Ratings will be dynamically computed after {player.canonicalName} logs their first match.
-          </p>
-        </div>
-      )}
+      </section>
 
       {/* Match History Table (In-line sortable, latest at top by default) */}
       <div className="p-6 rounded-3xl border border-slate-200/80 bg-white shadow-xs space-y-4 overflow-hidden">
