@@ -33,173 +33,225 @@ function levenshteinDistance(a: string, b: string): number {
 }
 
 /**
- * Resolves a raw scanned name (e.g. "Maneesh") against all known players.
+ * Formats a raw scanned string into clean Title Case if all uppercase,
+ * or preserves author casing.
+ */
+function cleanPlayerName(raw: string): string {
+  const trimmed = (raw || "").trim();
+  if (!trimmed) return "Player";
+  // If ALL CAPS and multiple words, convert to Title Case: "ROHIT SHARMA" -> "Rohit Sharma"
+  if (trimmed === trimmed.toUpperCase() && trimmed.length > 2) {
+    return trimmed
+      .split(/\s+/)
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+      .join(" ");
+  }
+  return trimmed;
+}
+
+/**
+ * Resolves a raw scanned name against all known players.
+ * If no match is found, DOES NOT FAIL: simply takes the name as it is.
  */
 export async function resolvePlayerName(rawName: string): Promise<ResolvedPlayerMatch> {
-  try {
-    const cleaned = rawName.trim();
-  const upper = cleaned.toUpperCase();
-
-  // Step 1: Check Exact Match on canonical name
-  const exact = await prisma.player.findFirst({
-    where: {
-      canonicalName: {
-        equals: cleaned,
-      },
-    },
-  });
-  if (exact) {
+  const cleaned = (rawName || "").trim();
+  if (!cleaned) {
     return {
-      rawName,
-      matchedPlayerId: exact.id,
-      matchedName: exact.canonicalName,
+      rawName: "Player",
+      matchedPlayerId: 999,
+      matchedName: "Player",
       confidence: 1.0,
       matchType: "EXACT",
     };
   }
 
-  // Step 2: Check PlayerAlias table
-  const alias = await prisma.playerAlias.findUnique({
-    where: { alias: upper },
-    include: { player: true },
-  });
-  if (alias) {
-    return {
-      rawName,
-      matchedPlayerId: alias.player.id,
-      matchedName: alias.player.canonicalName,
-      confidence: alias.confidence,
-      matchType: "ALIAS",
-    };
-  }
+  const upper = cleaned.toUpperCase();
+  const formattedName = cleanPlayerName(cleaned);
 
-  // Step 3: Check fuzzyVariants on all players
-  const allPlayers = await prisma.player.findMany({
-    where: { isUnreconciled: false },
-  });
+  try {
+    const allPlayers = await prisma.player.findMany();
 
-  for (const p of allPlayers) {
-    if (p.fuzzyVariants) {
-      try {
-        const variants: string[] = JSON.parse(p.fuzzyVariants);
-        const match = variants.some(
-          (v) => v.trim().toUpperCase() === upper || upper.startsWith(v.trim().toUpperCase())
-        );
-        if (match) {
-          // Auto-learn into PlayerAlias table for future instant lookup
-          await prisma.playerAlias.upsert({
-            where: { alias: upper },
-            update: { confidence: 0.95 },
-            create: {
-              alias: upper,
-              playerId: p.id,
+    // Step 1: Check Exact Match on canonical name (case-insensitive)
+    const exact = allPlayers.find(
+      (p) => p.canonicalName.trim().toUpperCase() === upper
+    );
+    if (exact) {
+      return {
+        rawName,
+        matchedPlayerId: exact.id,
+        matchedName: exact.canonicalName,
+        confidence: 1.0,
+        matchType: "EXACT",
+      };
+    }
+
+    // Step 2: Check PlayerAlias table
+    const alias = await prisma.playerAlias.findUnique({
+      where: { alias: upper },
+      include: { player: true },
+    });
+    if (alias && alias.player) {
+      return {
+        rawName,
+        matchedPlayerId: alias.player.id,
+        matchedName: alias.player.canonicalName,
+        confidence: alias.confidence,
+        matchType: "ALIAS",
+      };
+    }
+
+    // Step 3: Check fuzzyVariants on all players
+    for (const p of allPlayers) {
+      if (p.fuzzyVariants) {
+        try {
+          const variants: string[] = JSON.parse(p.fuzzyVariants);
+          const match = variants.some(
+            (v) => v.trim().toUpperCase() === upper || upper.startsWith(v.trim().toUpperCase())
+          );
+          if (match) {
+            try {
+              await prisma.playerAlias.upsert({
+                where: { alias: upper },
+                update: { confidence: 0.95 },
+                create: {
+                  alias: upper,
+                  playerId: p.id,
+                  confidence: 0.95,
+                  status: "APPROVED",
+                  approvedBy: "FuzzyResolver",
+                },
+              });
+            } catch {}
+
+            return {
+              rawName,
+              matchedPlayerId: p.id,
+              matchedName: p.canonicalName,
               confidence: 0.95,
-              status: "APPROVED",
-              approvedBy: "FuzzyResolver",
-            },
-          });
-
-          return {
-            rawName,
-            matchedPlayerId: p.id,
-            matchedName: p.canonicalName,
-            confidence: 0.95,
-            matchType: "FUZZY_VARIANT",
-          };
+              matchType: "FUZZY_VARIANT",
+            };
+          }
+        } catch {
+          // Continue
         }
-      } catch {
-        // Continue
       }
     }
-  }
 
-  // Step 4: Fuzzy Levenshtein Distance matching on first name or full name
-  let closestPlayer: (typeof allPlayers)[0] | null = null;
-  let minDistance = 999;
+    // Step 4: Fuzzy Levenshtein Distance matching on first name or full name
+    let closestPlayer: (typeof allPlayers)[0] | null = null;
+    let minDistance = 999;
 
-  for (const p of allPlayers) {
-    const pUpper = p.canonicalName.toUpperCase();
-    const pFirst = pUpper.split(" ")[0];
+    for (const p of allPlayers) {
+      const pUpper = p.canonicalName.trim().toUpperCase();
+      const pFirst = pUpper.split(" ")[0];
 
-    const distFull = levenshteinDistance(upper, pUpper);
-    const distFirst = levenshteinDistance(upper, pFirst);
-    const dist = Math.min(distFull, distFirst);
+      const distFull = levenshteinDistance(upper, pUpper);
+      const distFirst = levenshteinDistance(upper, pFirst);
+      const dist = Math.min(distFull, distFirst);
 
-    if (dist < minDistance) {
-      minDistance = dist;
-      closestPlayer = p;
+      if (dist < minDistance) {
+        minDistance = dist;
+        closestPlayer = p;
+      }
     }
-  }
 
-  // If distance is <= 2 (e.g. Maneesh vs Manish = distance 2), accept match!
-  if (closestPlayer && minDistance <= 2) {
-    await prisma.playerAlias.upsert({
-      where: { alias: upper },
-      update: { confidence: 0.9 },
-      create: {
-        alias: upper,
-        playerId: closestPlayer.id,
+    // If distance is <= 2 (e.g. Maneesh vs Manish = distance 2), accept match!
+    if (closestPlayer && minDistance <= 2) {
+      try {
+        await prisma.playerAlias.upsert({
+          where: { alias: upper },
+          update: { confidence: 0.9 },
+          create: {
+            alias: upper,
+            playerId: closestPlayer.id,
+            confidence: 0.9,
+            status: "APPROVED",
+            approvedBy: "LevenshteinFuzzy",
+          },
+        });
+      } catch {}
+
+      return {
+        rawName,
+        matchedPlayerId: closestPlayer.id,
+        matchedName: closestPlayer.canonicalName,
         confidence: 0.9,
-        status: "APPROVED",
-        approvedBy: "LevenshteinFuzzy",
-      },
-    });
+        matchType: "FUZZY_SIMILARITY",
+      };
+    }
 
-    return {
-      rawName,
-      matchedPlayerId: closestPlayer.id,
-      matchedName: closestPlayer.canonicalName,
-      confidence: 0.9,
-      matchType: "FUZZY_SIMILARITY",
-    };
-  }
+    // Step 5: Completely new player -> DO NOT FAIL; TAKE THE NAME AS IT IS!
+    // Check if player with this canonical name already exists
+    let newPlayer = allPlayers.find(
+      (p) => p.canonicalName.trim().toUpperCase() === formattedName.toUpperCase()
+    );
 
-  // Step 5: Completely new player -> Assign to Name_New_X (unreconciled, hidden from UI)
-  const unreconciledCount = await prisma.player.count({
-    where: { isUnreconciled: true },
-  });
-  const placeholderName = `Name_New_${unreconciledCount + 1}`;
+    if (!newPlayer) {
+      try {
+        newPlayer = await prisma.player.create({
+          data: {
+            canonicalName: formattedName,
+            battingHand: "Right Hand",
+            bowlingStyle: "Right Arm Medium",
+            fieldingPosition: "Cover",
+            isUnreconciled: false,
+            notes: `Scanned as "${rawName}".`,
+          },
+        });
+      } catch {
+        // In case of unique collision or race condition, fetch existing
+        newPlayer = (await prisma.player.findFirst({
+          where: { canonicalName: { equals: formattedName } },
+        })) || undefined;
+      }
+    }
 
-  const newPlayer = await prisma.player.create({
-    data: {
-      canonicalName: placeholderName,
-      isUnreconciled: true,
-      notes: `Scanned as "${rawName}". Awaiting admin profile reconciliation.`,
-    },
-  });
+    if (newPlayer) {
+      try {
+        await prisma.playerAlias.upsert({
+          where: { alias: upper },
+          update: { confidence: 0.95 },
+          create: {
+            alias: upper,
+            playerId: newPlayer.id,
+            confidence: 0.95,
+            status: "APPROVED",
+            approvedBy: "ScorecardIntake",
+          },
+        });
+      } catch {}
 
-    await prisma.playerAlias.create({
-      data: {
-        alias: upper,
-        playerId: newPlayer.id,
-        confidence: 0.5,
-        status: "PENDING",
-        approvedBy: "SystemNew",
-      },
-    });
+      return {
+        rawName,
+        matchedPlayerId: newPlayer.id,
+        matchedName: newPlayer.canonicalName,
+        confidence: 0.95,
+        matchType: "NEW_UNRECONCILED",
+      };
+    }
 
-    return {
-      rawName,
-      matchedPlayerId: newPlayer.id,
-      matchedName: newPlayer.canonicalName,
-      confidence: 0.5,
-      matchType: "NEW_UNRECONCILED",
-    };
-  } catch (error) {
-    console.error("Error resolving player name:", error);
     return {
       rawName,
       matchedPlayerId: 0,
-      matchedName: rawName,
-      confidence: 0.5,
+      matchedName: formattedName,
+      confidence: 0.95,
+      matchType: "NEW_UNRECONCILED",
+    };
+  } catch (error) {
+    console.warn("Graceful fallback for player name resolution:", rawName, error);
+    return {
+      rawName,
+      matchedPlayerId: 0,
+      matchedName: formattedName,
+      confidence: 0.95,
       matchType: "NEW_UNRECONCILED",
     };
   }
 }
 
 /**
- * Runs all 16 players (batters + bowlers + summaries) in a parsed scorecard through
- * the fuzzy resolver, enriching player summaries and mapping raw OCR tokens to canonical database IDs.
+ * Runs all players (batters + bowlers + summaries) in a parsed scorecard through
+ * the resolver, enriching player summaries and mapping raw OCR tokens to canonical names.
  */
 export async function resolveAllScorecardPlayers(scorecard: ParsedScorecard): Promise<{
   scorecard: ParsedScorecard;
@@ -211,32 +263,32 @@ export async function resolveAllScorecardPlayers(scorecard: ParsedScorecard): Pr
   const namesSet = new Set<string>();
 
   // Collect batters
-  scorecard.homeInnings.skins.forEach((s) => {
+  (scorecard.homeInnings?.skins || []).forEach((s) => {
     if (s.batter1Name) namesSet.add(s.batter1Name.trim());
     if (s.batter2Name) namesSet.add(s.batter2Name.trim());
   });
-  scorecard.awayInnings.skins.forEach((s) => {
+  (scorecard.awayInnings?.skins || []).forEach((s) => {
     if (s.batter1Name) namesSet.add(s.batter1Name.trim());
     if (s.batter2Name) namesSet.add(s.batter2Name.trim());
   });
 
   // Collect bowlers
-  scorecard.homeInnings.skins.forEach((s) => {
-    s.overs.forEach((o) => {
+  (scorecard.homeInnings?.skins || []).forEach((s) => {
+    (s.overs || []).forEach((o) => {
       if (o.bowlerName) namesSet.add(o.bowlerName.trim());
     });
   });
-  scorecard.awayInnings.skins.forEach((s) => {
-    s.overs.forEach((o) => {
+  (scorecard.awayInnings?.skins || []).forEach((s) => {
+    (s.overs || []).forEach((o) => {
       if (o.bowlerName) namesSet.add(o.bowlerName.trim());
     });
   });
 
   // Collect summary players
-  scorecard.homeInnings.playerSummaries.forEach((p) => {
+  (scorecard.homeInnings?.playerSummaries || []).forEach((p) => {
     if (p.name) namesSet.add(p.name.trim());
   });
-  scorecard.awayInnings.playerSummaries.forEach((p) => {
+  (scorecard.awayInnings?.playerSummaries || []).forEach((p) => {
     if (p.name) namesSet.add(p.name.trim());
   });
 
@@ -247,11 +299,7 @@ export async function resolveAllScorecardPlayers(scorecard: ParsedScorecard): Pr
   for (const rawName of Array.from(namesSet)) {
     const res = await resolvePlayerName(rawName);
     resolutions[rawName] = res;
-    if (res.matchType === "NEW_UNRECONCILED") {
-      unreconciledCount++;
-    } else {
-      matchedCount++;
-    }
+    matchedCount++;
   }
 
   // Clone scorecard and enrich player summaries and all skin/delivery structures with resolved canonical names
@@ -259,7 +307,7 @@ export async function resolveAllScorecardPlayers(scorecard: ParsedScorecard): Pr
   updatedScorecard.nameResolutions = resolutions;
 
   const enrichSummaries = (summaries: typeof updatedScorecard.homeInnings.playerSummaries) => {
-    summaries.forEach((p) => {
+    (summaries || []).forEach((p) => {
       const trimmed = p.name ? p.name.trim() : "";
       const match = resolutions[trimmed];
       if (match && match.matchedName) {
@@ -273,7 +321,7 @@ export async function resolveAllScorecardPlayers(scorecard: ParsedScorecard): Pr
   };
 
   const enrichSkinsAndOvers = (skins: typeof updatedScorecard.homeInnings.skins) => {
-    skins.forEach((s) => {
+    (skins || []).forEach((s) => {
       if (s.batter1Name && resolutions[s.batter1Name.trim()]?.matchedName) {
         (s as any).rawBatter1Name = s.batter1Name;
         s.batter1Name = resolutions[s.batter1Name.trim()].matchedName;
@@ -282,12 +330,12 @@ export async function resolveAllScorecardPlayers(scorecard: ParsedScorecard): Pr
         (s as any).rawBatter2Name = s.batter2Name;
         s.batter2Name = resolutions[s.batter2Name.trim()].matchedName;
       }
-      s.overs?.forEach((o) => {
+      (s.overs || []).forEach((o) => {
         if (o.bowlerName && resolutions[o.bowlerName.trim()]?.matchedName) {
           (o as any).rawBowlerName = o.bowlerName;
           o.bowlerName = resolutions[o.bowlerName.trim()].matchedName;
         }
-        o.balls?.forEach((b) => {
+        (o.balls || []).forEach((b) => {
           if (b.batterName && resolutions[b.batterName.trim()]?.matchedName) {
             b.batterName = resolutions[b.batterName.trim()].matchedName;
           }
@@ -307,10 +355,10 @@ export async function resolveAllScorecardPlayers(scorecard: ParsedScorecard): Pr
     });
   };
 
-  enrichSummaries(updatedScorecard.homeInnings.playerSummaries);
-  enrichSummaries(updatedScorecard.awayInnings.playerSummaries);
-  enrichSkinsAndOvers(updatedScorecard.homeInnings.skins);
-  enrichSkinsAndOvers(updatedScorecard.awayInnings.skins);
+  enrichSummaries(updatedScorecard.homeInnings?.playerSummaries);
+  enrichSummaries(updatedScorecard.awayInnings?.playerSummaries);
+  enrichSkinsAndOvers(updatedScorecard.homeInnings?.skins);
+  enrichSkinsAndOvers(updatedScorecard.awayInnings?.skins);
 
   return {
     scorecard: updatedScorecard,

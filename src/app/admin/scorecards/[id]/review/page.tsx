@@ -121,6 +121,7 @@ function MakerCheckerReviewContent() {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [approvedSuccess, setApprovedSuccess] = useState(false);
+  const [approvalError, setApprovalError] = useState<string | null>(null);
 
   const loadScorecardData = useCallback(async (flushCache = false) => {
     setLoading(true);
@@ -375,23 +376,25 @@ function MakerCheckerReviewContent() {
 
   const handleApprove = async () => {
     setSubmitting(true);
+    setApprovalError(null);
     try {
       const res = await fetch(`/api/scorecards/${uploadId}/approve`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ parsedScorecard: scorecard }),
       });
-      if (res.ok) {
-        setApprovedSuccess(true);
-        setTimeout(() => {
-          router.push("/matches");
-        }, 1500);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || `Failed to commit scorecard (Status: ${res.status})`);
       }
-    } catch {
       setApprovedSuccess(true);
+      const destination = data.matchId ? `/matches/${data.matchId}` : "/matches";
       setTimeout(() => {
-        router.push("/matches");
-      }, 1500);
+        router.push(destination);
+      }, 1000);
+    } catch (err: any) {
+      console.error("Scorecard approval failed:", err);
+      setApprovalError(err.message || "Failed to commit match to database");
     } finally {
       setSubmitting(false);
     }
@@ -480,6 +483,13 @@ function MakerCheckerReviewContent() {
           )}
         </div>
       </div>
+
+      {approvalError && (
+        <div className="p-3 bg-red-50 dark:bg-red-950/30 border border-red-500/30 rounded-xl text-xs text-red-700 dark:text-red-400 flex items-center gap-2 shadow-sm animate-in fade-in">
+          <AlertTriangle className="h-4 w-4 shrink-0 text-red-500" />
+          <span className="font-semibold">{approvalError}</span>
+        </div>
+      )}
 
       {/* Main Split Interface */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">

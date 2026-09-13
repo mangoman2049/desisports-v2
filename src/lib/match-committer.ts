@@ -1,0 +1,281 @@
+import { prisma } from "@/lib/prisma";
+import { ParsedScorecard } from "@/types/cricket";
+import { validateIndoorCricketScorecard } from "@/lib/rules-engine";
+import { resolvePlayerName } from "@/lib/name-resolver";
+
+/**
+ * Commits an approved or auto-approved scorecard into the database as a permanent Match,
+ * creating/updating Team records, Player records (with new players registered with their actual name),
+ * and all 16 PlayerMatchStat records.
+ */
+export async function commitScorecardAsApprovedMatch(params: {
+  uploadId: string;
+  parsedScorecard: ParsedScorecard;
+  reviewerNotes?: string;
+  tacticalAnalysisJson?: string;
+}): Promise<{ matchId: number; validation: any }> {
+  const { uploadId, parsedScorecard, reviewerNotes = "Approved revision", tacticalAnalysisJson } = params;
+
+  // 1. Validation report
+  const validation = validateIndoorCricketScorecard(parsedScorecard);
+
+  // 2. Ensure ScorecardUpload record exists
+  let upload = await prisma.scorecardUpload.findUnique({
+    where: { id: uploadId },
+  });
+
+  if (!upload) {
+    try {
+      upload = await prisma.scorecardUpload.create({
+        data: {
+          id: uploadId,
+          filename: parsedScorecard.matchInfo?.title ? `${parsedScorecard.matchInfo.title}.jpg` : "scorecard.jpg",
+          imageUrl: "/uploads/scorecards/sample-scorecard.jpg",
+          status: "APPROVED",
+          validationScore: validation.confidenceScore,
+          reconciledData: JSON.stringify(parsedScorecard),
+          tacticalAnalysis: tacticalAnalysisJson,
+        },
+      });
+    } catch {
+      upload = await prisma.scorecardUpload.findUnique({ where: { id: uploadId } });
+    }
+  } else {
+    upload = await prisma.scorecardUpload.update({
+      where: { id: uploadId },
+      data: {
+        status: "APPROVED",
+        validationScore: validation.confidenceScore,
+        reconciledData: JSON.stringify(parsedScorecard),
+        ...(tacticalAnalysisJson ? { tacticalAnalysis: tacticalAnalysisJson } : {}),
+      },
+    });
+  }
+
+  // Record audit revision
+  if (upload) {
+    try {
+      await prisma.extractionRevision.create({
+        data: {
+          uploadId: upload.id,
+          reviewerId: "admin",
+          diffJson: JSON.stringify({
+            notes: reviewerNotes,
+            timestamp: new Date().toISOString(),
+          }),
+          validationScore: validation.confidenceScore,
+        },
+      });
+    } catch (e) {
+      console.warn("Could not record extraction revision:", e);
+    }
+  }
+
+  // 3. Ensure Teams exist
+  const homeTeamName = (parsedScorecard.homeInnings?.teamName || "Home Team").trim() || "Home Team";
+  const awayTeamName = (parsedScorecard.awayInnings?.teamName || "Away Team").trim() || "Away Team";
+
+  const homeTeam = await prisma.team.upsert({
+    where: { name: homeTeamName },
+    update: {},
+    create: { name: homeTeamName, code: homeTeamName.substring(0, 3).toUpperCase() },
+  });
+
+  const awayTeam = await prisma.team.upsert({
+    where: { name: awayTeamName },
+    update: {},
+    create: { name: awayTeamName, code: awayTeamName.substring(0, 3).toUpperCase() },
+  });
+
+  const homeScore = Number(parsedScorecard.homeInnings?.totalRuns) || 0;
+  const awayScore = Number(parsedScorecard.awayInnings?.totalRuns) || 0;
+  const homeSkins = Number(parsedScorecard.skinsSummary?.home?.skinsWon ?? parsedScorecard.skinsSummary?.home?.total ?? (homeScore > awayScore ? 3 : 1));
+  const awaySkins = Number(parsedScorecard.skinsSummary?.away?.skinsWon ?? parsedScorecard.skinsSummary?.away?.total ?? (awayScore > homeScore ? 3 : 1));
+  const tournamentId = Number(parsedScorecard.matchInfo?.tournamentId) || 0;
+
+  // 4. Create or update Match record
+  let matchId = upload?.matchId;
+  let match: any = null;
+
+  if (matchId) {
+    match = await prisma.match.update({
+      where: { id: matchId },
+      data: {
+        tournamentId,
+        matchDate: parsedScorecard.matchInfo?.dateTime || new Date().toISOString(),
+        homeTeamId: homeTeam.id,
+        awayTeamId: awayTeam.id,
+        homeScore,
+        awayScore,
+        homeSkins,
+        awaySkins,
+        status: "COMPLETED",
+        tacticalAnalysis: upload?.tacticalAnalysis || tacticalAnalysisJson,
+        scorecardUrl: `/matches/${matchId}`,
+      },
+    });
+  } else {
+    match = await prisma.match.create({
+      data: {
+        tournamentId,
+        matchDate: parsedScorecard.matchInfo?.dateTime || new Date().toISOString(),
+        homeTeamId: homeTeam.id,
+        awayTeamId: awayTeam.id,
+        homeScore,
+        awayScore,
+        homeSkins,
+        awaySkins,
+        status: "COMPLETED",
+        tacticalAnalysis: upload?.tacticalAnalysis || tacticalAnalysisJson,
+      },
+    });
+    matchId = match.id;
+    await prisma.match.update({
+      where: { id: match.id },
+      data: { scorecardUrl: `/matches/${match.id}` },
+    });
+    if (upload) {
+      await prisma.scorecardUpload.update({
+        where: { id: upload.id },
+        data: { matchId: match.id },
+      });
+    }
+  }
+
+  // 5. Identify top contributor for POTM
+  const allSummaries = [
+    ...(parsedScorecard.homeInnings?.playerSummaries || []).map((p) => ({ ...p, isHome: true })),
+    ...(parsedScorecard.awayInnings?.playerSummaries || []).map((p) => ({ ...p, isHome: false })),
+  ];
+
+  let bestPerformerName = "";
+  let bestContribution = -999;
+  for (const p of allSummaries) {
+    const c = p.contribution !== undefined ? Number(p.contribution) : (Number(p.runsScored) || 0) - (Number(p.runsConceded) || 0);
+    if (c > bestContribution) {
+      bestContribution = c;
+      bestPerformerName = (p.name || "").trim();
+    }
+  }
+
+  let potmPlayerId: number | null = null;
+
+  // 6. Persist Player records & PlayerMatchStat rows for all players
+  for (const p of allSummaries) {
+    const rawName = (p.name || "").trim();
+    if (!rawName) continue;
+
+    let playerId: number;
+
+    // Use name-resolver which NEVER fails and takes unknown names as they are
+    try {
+      const resolved = await resolvePlayerName(rawName);
+      if (resolved && resolved.matchedPlayerId > 0) {
+        playerId = resolved.matchedPlayerId;
+      } else {
+        // Fallback find or create by rawName
+        let player = await prisma.player.findFirst({
+          where: { canonicalName: { equals: rawName } },
+        });
+        if (!player) {
+          player = await prisma.player.create({
+            data: {
+              canonicalName: rawName,
+              battingHand: "Right Hand",
+              bowlingStyle: "Right Arm Medium",
+              fieldingPosition: "Cover",
+              isUnreconciled: false,
+            },
+          });
+        }
+        playerId = player.id;
+      }
+    } catch (err) {
+      console.warn("Player lookup/creation fallback for:", rawName, err);
+      let player = await prisma.player.findFirst({
+        where: { canonicalName: { equals: rawName } },
+      });
+      if (!player) {
+        player = await prisma.player.create({
+          data: {
+            canonicalName: rawName,
+            battingHand: "Right Hand",
+            bowlingStyle: "Right Arm Medium",
+            fieldingPosition: "Cover",
+            isUnreconciled: false,
+          },
+        });
+      }
+      playerId = player.id;
+    }
+
+    if (rawName === bestPerformerName) {
+      potmPlayerId = playerId;
+    }
+
+    const existingStat = await prisma.playerMatchStat.findFirst({
+      where: {
+        matchId: match.id,
+        playerId: playerId,
+      },
+    });
+
+    const innings = p.isHome ? parsedScorecard.homeInnings : parsedScorecard.awayInnings;
+    const dismissalsCount = (innings?.skins || [])
+      .flatMap((s) => s.overs || [])
+      .flatMap((o) => o.balls || [])
+      .filter((b) => b.batterName === rawName && (b.dismissalType || (b.penaltyRuns || 0) < 0)).length;
+
+    const statData = {
+      matchId: match.id,
+      playerId: playerId,
+      teamId: p.isHome ? homeTeam.id : awayTeam.id,
+      runsScored: Number(p.runsScored) || 0,
+      timesOut:
+        p.timesOut !== undefined
+          ? Number(p.timesOut)
+          : dismissalsCount > 0
+          ? dismissalsCount
+          : (Number(p.runsScored) || 0) < 0
+          ? 2
+          : 1,
+      oversBowled: Number(p.oversBowled) || 0.0,
+      runsConceded: Number(p.runsConceded) || 0,
+      wickets: Number(p.wickets) || 0,
+      economy: Number(p.economy) || 0.0,
+      contribution:
+        p.contribution !== undefined
+          ? Number(p.contribution)
+          : (Number(p.runsScored) || 0) - (Number(p.runsConceded) || 0),
+      isPotm: rawName === bestPerformerName,
+      performanceNote:
+        (p.contribution || 0) >= 15
+          ? `★ +${p.contribution} Contribution`
+          : rawName === bestPerformerName
+          ? "★ Player of the match"
+          : null,
+    };
+
+    if (existingStat) {
+      await prisma.playerMatchStat.update({
+        where: { id: existingStat.id },
+        data: statData,
+      });
+    } else {
+      await prisma.playerMatchStat.create({
+        data: statData,
+      });
+    }
+  }
+
+  if (potmPlayerId) {
+    try {
+      await prisma.match.update({
+        where: { id: match.id },
+        data: { potmPlayerId },
+      });
+    } catch {}
+  }
+
+  return { matchId: match.id, validation };
+}

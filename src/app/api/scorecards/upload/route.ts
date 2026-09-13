@@ -5,6 +5,7 @@ import { getSampleScorecardExtraction, extractScorecardWithLiteLLM } from "@/lib
 import { checkForDuplicateScorecard } from "@/lib/duplicate-detector";
 import { resolveAllScorecardPlayers } from "@/lib/name-resolver";
 import { generateAndSaveMatchAnalysis } from "@/lib/match-analyzer";
+import { commitScorecardAsApprovedMatch } from "@/lib/match-committer";
 import fs from "fs/promises";
 import path from "path";
 import sharp from "sharp";
@@ -16,10 +17,11 @@ export async function POST(req: NextRequest) {
     const file = formData.get("file") as File | null;
     const forceSample = formData.get("forceSample") === "true";
     const forceDuplicate = formData.get("forceDuplicate") === "true";
+    const forceMismatch = formData.get("forceMismatch") === "true";
+    const autoApprove = formData.get("autoApprove") === "true";
     const matchTitle = (formData.get("matchTitle") as string) || undefined;
     const tournamentIdRaw = formData.get("tournamentId") as string | null;
     const tournamentId = tournamentIdRaw ? parseInt(tournamentIdRaw, 10) : 0;
-    const fixtureIdRaw = formData.get("fixtureId") as string | null;
     const expectedHomeTeam = (formData.get("expectedHomeTeam") as string) || undefined;
     const expectedAwayTeam = (formData.get("expectedAwayTeam") as string) || undefined;
 
@@ -72,15 +74,40 @@ export async function POST(req: NextRequest) {
       parsed.matchInfo.tournamentId = tournamentId;
     }
 
+    // If generic "Home Team" / "Away Team" and expected teams are selected from fixture, adopt fixture teams
+    if (
+      expectedHomeTeam &&
+      expectedAwayTeam &&
+      (reconciledScorecardMatchesGeneric(parsed.homeInnings?.teamName) ||
+        reconciledScorecardMatchesGeneric(parsed.awayInnings?.teamName) ||
+        forceMismatch)
+    ) {
+      parsed.homeInnings.teamName = expectedHomeTeam;
+      parsed.awayInnings.teamName = expectedAwayTeam;
+    }
+
     // Reconcile player names across both teams (8 home, 8 away, bowlers)
+    // If a new player has no DB match, it DOES NOT FAIL: it takes the name as it is!
     const { scorecard: reconciledScorecard, resolutions, matchedCount, unreconciledCount } =
       await resolveAllScorecardPlayers(parsed);
+
+    // Ensure team names adopt selected fixture if still generic
+    if (
+      expectedHomeTeam &&
+      expectedAwayTeam &&
+      (reconciledScorecardMatchesGeneric(reconciledScorecard.homeInnings?.teamName) ||
+        reconciledScorecardMatchesGeneric(reconciledScorecard.awayInnings?.teamName) ||
+        forceMismatch)
+    ) {
+      reconciledScorecard.homeInnings.teamName = expectedHomeTeam;
+      reconciledScorecard.awayInnings.teamName = expectedAwayTeam;
+    }
 
     const homeScore = reconciledScorecard.homeInnings.totalRuns || 0;
     const awayScore = reconciledScorecard.awayInnings.totalRuns || 0;
 
-    // STRICT FIXTURE MISMATCH VALIDATION
-    if (expectedHomeTeam && expectedAwayTeam) {
+    // STRICT FIXTURE MISMATCH VALIDATION (Bypassed if user opted to override via forceMismatch)
+    if (!forceMismatch && expectedHomeTeam && expectedAwayTeam) {
       const { validateFixtureTeamsMatch } = await import("@/lib/tournament-fixtures");
       const matchValidation = validateFixtureTeamsMatch(
         { team1: expectedHomeTeam, team2: expectedAwayTeam },
@@ -134,9 +161,10 @@ export async function POST(req: NextRequest) {
     // Create ScorecardUpload record in database
     const upload = await prisma.scorecardUpload.create({
       data: {
+        id: uploadId,
         filename: file ? file.name : "sample_spawtz_scorecard.jpg",
         imageUrl,
-        status: "PENDING_REVIEW",
+        status: autoApprove ? "APPROVED" : "PENDING_REVIEW",
         qualityScore: diagnostics.score,
         qualityDiagnostics: JSON.stringify(diagnostics),
         rawExtraction: JSON.stringify(parsed),
@@ -151,10 +179,23 @@ export async function POST(req: NextRequest) {
       parsedScorecard: reconciledScorecard,
     });
 
+    // If autoApprove requested: commit the match and its 16 player stats immediately!
+    let committedMatchId: number | null = null;
+    if (autoApprove) {
+      const commitResult = await commitScorecardAsApprovedMatch({
+        uploadId: upload.id,
+        parsedScorecard: reconciledScorecard,
+        reviewerNotes: "Auto-approved from scorecard intake",
+        tacticalAnalysisJson: JSON.stringify(tacticalAnalysis),
+      });
+      committedMatchId = commitResult.matchId;
+    }
+
     // Generate comprehensive, auditable JSON file for API/export
     const auditableData = {
       auditMetadata: {
         uploadId: upload.id,
+        matchId: committedMatchId,
         createdAt: new Date().toISOString(),
         originalFilename: file ? file.name : "sample_spawtz_scorecard.jpg",
         optimizedImageUrl: imageUrl,
@@ -165,7 +206,10 @@ export async function POST(req: NextRequest) {
       },
       matchInfo: reconciledScorecard.matchInfo,
       result: {
-        winner: homeScore > awayScore ? reconciledScorecard.homeInnings.teamName : reconciledScorecard.awayInnings.teamName,
+        winner:
+          homeScore > awayScore
+            ? reconciledScorecard.homeInnings.teamName
+            : reconciledScorecard.awayInnings.teamName,
         homeTeam: reconciledScorecard.homeInnings.teamName,
         homeScore,
         awayTeam: reconciledScorecard.awayInnings.teamName,
@@ -185,6 +229,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       uploadId: upload.id,
+      matchId: committedMatchId,
       imageUrl,
       auditableJsonUrl: `/api/scorecards/${upload.id}/json`,
       diagnostics,
@@ -204,4 +249,10 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+function reconciledScorecardMatchesGeneric(name?: string): boolean {
+  if (!name) return true;
+  const n = name.trim().toLowerCase();
+  return n === "home team" || n === "away team" || n === "team 1" || n === "team 2" || n === "home" || n === "away";
 }

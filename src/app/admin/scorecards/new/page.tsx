@@ -403,7 +403,11 @@ function NewScorecardContent() {
     }
   };
 
-  const handleProceedToExtraction = async (forceDuplicate = false) => {
+  const handleProceedToExtraction = async (
+    forceDuplicate = false,
+    forceMismatch = false,
+    autoApprove = false
+  ) => {
     setExtracting(true);
     setErrorMessage(null);
     setFixtureMismatchAlert(null);
@@ -417,6 +421,12 @@ function NewScorecardContent() {
       }
       if (forceDuplicate) {
         formData.append("forceDuplicate", "true");
+      }
+      if (forceMismatch) {
+        formData.append("forceMismatch", "true");
+      }
+      if (autoApprove) {
+        formData.append("autoApprove", "true");
       }
       if (matchTitle) {
         formData.append("matchTitle", matchTitle);
@@ -467,6 +477,12 @@ function NewScorecardContent() {
 
       if (!res.ok || !data.success) {
         throw new Error(data.error || `Failed to process scorecard (Status: ${res.status})`);
+      }
+
+      // If autoApprove was executed and match was created, direct route to the match page
+      if (autoApprove && data.matchId) {
+        router.push(`/matches/${data.matchId}`);
+        return;
       }
 
       // Store parsed result in session cache for maker-checker review safely
@@ -644,6 +660,23 @@ function NewScorecardContent() {
                   </span>
                 </div>
               )}
+
+              <div className="flex flex-wrap items-center gap-3 pt-3">
+                <button
+                  onClick={() => handleProceedToExtraction(false, true, false)}
+                  className="px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-bold transition cursor-pointer shadow-sm flex items-center gap-1.5"
+                >
+                  <FileCheck className="h-3.5 w-3.5" />
+                  <span>Override & Proceed to Review</span>
+                </button>
+                <button
+                  onClick={() => handleProceedToExtraction(false, true, true)}
+                  className="px-3.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition cursor-pointer shadow-sm flex items-center gap-1.5"
+                >
+                  <Zap className="h-3.5 w-3.5 text-amber-300" />
+                  <span>Override & Commit Match Immediately</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -906,32 +939,60 @@ function NewScorecardContent() {
                   </div>
                 )}
 
-                <button
-                  onClick={() => handleProceedToExtraction(false)}
-                  disabled={
-                    extracting ||
-                    analyzingQuality ||
-                    (qualityDiagnostics !== null && qualityDiagnostics.overallPass === false)
-                  }
-                  className={`w-full py-3.5 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition shadow-lg ${
-                    qualityDiagnostics?.overallPass
-                      ? "bg-purple-600 hover:bg-purple-500 text-white shadow-purple-900/30 cursor-pointer"
-                      : "bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed"
-                  }`}
-                >
-                  {extracting ? (
-                    <>
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                      <span>Extracting & Reconciling 16 Players…</span>
-                    </>
-                  ) : (
-                    <>
-                      <FileCheck className="h-4 w-4" />
-                      <span>Proceed to Maker-Checker Review</span>
-                      <ArrowRight className="h-4 w-4" />
-                    </>
-                  )}
-                </button>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <button
+                    onClick={() => handleProceedToExtraction(false, false, false)}
+                    disabled={
+                      extracting ||
+                      analyzingQuality ||
+                      (qualityDiagnostics !== null && qualityDiagnostics.overallPass === false)
+                    }
+                    className={`py-3.5 px-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition shadow-md ${
+                      qualityDiagnostics?.overallPass
+                        ? "bg-slate-800 hover:bg-slate-700 text-white cursor-pointer border border-slate-700"
+                        : "bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed"
+                    }`}
+                  >
+                    {extracting ? (
+                      <>
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        <span>Processing…</span>
+                      </>
+                    ) : (
+                      <>
+                        <FileCheck className="h-4 w-4" />
+                        <span>Review Scorecard</span>
+                        <ArrowRight className="h-4 w-4" />
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    onClick={() => handleProceedToExtraction(false, false, true)}
+                    disabled={
+                      extracting ||
+                      analyzingQuality ||
+                      (qualityDiagnostics !== null && qualityDiagnostics.overallPass === false)
+                    }
+                    className={`py-3.5 px-3 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition shadow-lg ${
+                      qualityDiagnostics?.overallPass
+                        ? "bg-purple-600 hover:bg-purple-500 text-white shadow-purple-900/30 cursor-pointer"
+                        : "bg-slate-200 dark:bg-slate-800 text-slate-400 cursor-not-allowed"
+                    }`}
+                  >
+                    {extracting ? (
+                      <>
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        <span>Committing Match…</span>
+                      </>
+                    ) : (
+                      <>
+                        <Zap className="h-4 w-4 text-amber-300" />
+                        <span>Fast-Track: Commit Now</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
