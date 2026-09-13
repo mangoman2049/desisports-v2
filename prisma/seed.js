@@ -450,7 +450,7 @@ async function main() {
       hSkins: 3,
       aSkins: 1,
       potm: 108, // Shubham
-      scorecardUrl: "/matches/8",
+      scorecardUrl: "/uploads/scorecards/scorecard-8.webp",
     },
   ];
 

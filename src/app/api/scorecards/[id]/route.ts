@@ -97,7 +97,10 @@ export async function GET(
           upload: {
             id: String(match.id),
             filename: `match-${match.id}.jpg`,
-            imageUrl: match.scorecardUrl || `/api/scorecards/${match.id}/image`,
+            imageUrl:
+              match.scorecardUrl && !match.scorecardUrl.startsWith("/matches/")
+                ? match.scorecardUrl
+                : `/api/scorecards/${match.id}/image`,
             status: "APPROVED",
             validationScore: 100,
             createdAt: match.createdAt,

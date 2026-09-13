@@ -145,7 +145,7 @@ export async function commitScorecardAsApprovedMatch(params: {
             awaySkins,
             status: "COMPLETED",
             tacticalAnalysis: upload?.tacticalAnalysis || tacticalAnalysisJson,
-            scorecardUrl: `/matches/${matchId}`,
+            scorecardUrl: upload?.imageUrl || `/api/scorecards/${matchId}/image`,
           },
         });
       } else {
@@ -161,12 +161,13 @@ export async function commitScorecardAsApprovedMatch(params: {
             awaySkins,
             status: "COMPLETED",
             tacticalAnalysis: upload?.tacticalAnalysis || tacticalAnalysisJson,
+            scorecardUrl: upload?.imageUrl || `/api/scorecards/pending/image`,
           },
         });
         matchId = match.id;
         await tx.match.update({
           where: { id: match.id },
-          data: { scorecardUrl: `/matches/${match.id}` },
+          data: { scorecardUrl: upload?.imageUrl || `/api/scorecards/${match.id}/image` },
         });
       }
 

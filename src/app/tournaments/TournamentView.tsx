@@ -693,7 +693,13 @@ export default function TournamentView({ data }: { data: TournamentData }) {
                   <span className="hidden sm:inline">JSON</span>
                 </a>
                 <a
-                  href={selectedScorecard.scorecardUrl}
+                  href={
+                    selectedScorecard.scorecardUrl &&
+                    !selectedScorecard.scorecardUrl.startsWith("/matches/") &&
+                    !selectedScorecard.scorecardUrl.includes("/review")
+                      ? selectedScorecard.scorecardUrl
+                      : `/api/scorecards/${selectedScorecard.id}/image`
+                  }
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition"
@@ -718,9 +724,21 @@ export default function TournamentView({ data }: { data: TournamentData }) {
                 className="transition-transform duration-100 ease-out max-w-full"
               >
                 <img
-                  src={selectedScorecard.scorecardUrl}
+                  src={
+                    selectedScorecard.scorecardUrl &&
+                    !selectedScorecard.scorecardUrl.startsWith("/matches/") &&
+                    !selectedScorecard.scorecardUrl.includes("/review")
+                      ? selectedScorecard.scorecardUrl
+                      : `/api/scorecards/${selectedScorecard.id}/image`
+                  }
                   alt={`Scorecard: ${selectedScorecard.team1} vs ${selectedScorecard.team2}`}
                   className="rounded-lg shadow-2xl max-h-[70vh] object-contain mx-auto"
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    if (!target.src.includes("sample-scorecard.jpg")) {
+                      target.src = "/uploads/scorecards/sample-scorecard.jpg";
+                    }
+                  }}
                 />
               </div>
             </div>

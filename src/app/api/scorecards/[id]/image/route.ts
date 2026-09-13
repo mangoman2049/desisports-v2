@@ -13,6 +13,7 @@ const STATIC_MATCH_SCORECARDS: Record<string, string> = {
   "5": "https://desisports.milanchheda.com/storage/scorecards/JJ4WJyjlzrzj4wUxrNPRifw8lnqx9RHVFIHOqZh1.jpg",
   "6": "https://desisports.milanchheda.com/storage/scorecards/S9vHrbIiDufP0ER2db9P9KNMAA0KELPojHx15lot.jpg",
   "7": "/uploads/scorecards/sample-scorecard.jpg",
+  "8": "/uploads/scorecards/scorecard-8.webp",
 };
 
 export async function GET(
@@ -53,7 +54,11 @@ export async function GET(
           where: { id: matchNum },
           select: { scorecardUrl: true },
         });
-        if (match?.scorecardUrl && !match.scorecardUrl.includes("/review")) {
+        if (
+          match?.scorecardUrl &&
+          !match.scorecardUrl.includes("/review") &&
+          !match.scorecardUrl.startsWith("/matches/")
+        ) {
           sourceUrlOrPath = match.scorecardUrl;
         }
       } catch {}

@@ -56,7 +56,20 @@ export default function MatchViewClient({
   const [activeTab, setActiveTab] = useState<"analysis" | "scorecard">("analysis");
   const [scorecardZoom, setScorecardZoom] = useState(1);
 
-  const resolvedImageUrl = scorecardUrl || `/api/scorecards/${matchId}/image`;
+  const isDirectImage =
+    scorecardUrl &&
+    !scorecardUrl.startsWith("/matches/") &&
+    !scorecardUrl.includes("/review") &&
+    (scorecardUrl.startsWith("http://") ||
+      scorecardUrl.startsWith("https://") ||
+      scorecardUrl.startsWith("data:image/") ||
+      scorecardUrl.startsWith("/uploads/") ||
+      scorecardUrl.endsWith(".webp") ||
+      scorecardUrl.endsWith(".jpg") ||
+      scorecardUrl.endsWith(".jpeg") ||
+      scorecardUrl.endsWith(".png"));
+
+  const resolvedImageUrl = isDirectImage ? scorecardUrl : `/api/scorecards/${matchId}/image`;
 
   const handleShare = async () => {
     const url = typeof window !== "undefined" ? window.location.href : "";
@@ -624,6 +637,12 @@ export default function MatchViewClient({
                   src={resolvedImageUrl}
                   alt={`Official Scorecard for ${matchTitle}`}
                   className="rounded-lg shadow-2xl max-h-[75vh] w-auto max-w-full object-contain mx-auto border border-slate-800"
+                  onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
+                    if (!target.src.includes("scorecard-8.webp") && !target.src.includes("sample-scorecard.jpg")) {
+                      target.src = "/uploads/scorecards/scorecard-8.webp";
+                    }
+                  }}
                 />
               </div>
             </div>

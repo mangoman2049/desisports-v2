@@ -229,10 +229,12 @@ export default async function MatchDetailPage({ params }: Props) {
     "5": "https://desisports.milanchheda.com/storage/scorecards/JJ4WJyjlzrzj4wUxrNPRifw8lnqx9RHVFIHOqZh1.jpg",
     "6": "https://desisports.milanchheda.com/storage/scorecards/S9vHrbIiDufP0ER2db9P9KNMAA0KELPojHx15lot.jpg",
     "7": "/uploads/scorecards/sample-scorecard.jpg",
+    "8": "/uploads/scorecards/scorecard-8.webp",
   };
 
-  let scorecardUrl = MATCH_SCORECARDS[String(id)] || dbMatch?.scorecardUrl;
-  if (!scorecardUrl || scorecardUrl.includes("/review")) {
+  let rawScorecardUrl = MATCH_SCORECARDS[String(id)] || dbMatch?.scorecardUrl;
+  let scorecardUrl = rawScorecardUrl;
+  if (!scorecardUrl || scorecardUrl.includes("/review") || scorecardUrl.startsWith("/matches/")) {
     scorecardUrl = MATCH_SCORECARDS[String(id)] || `/api/scorecards/${id}/image`;
   }
 
