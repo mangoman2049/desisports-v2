@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import {
   CheckCircle2,
@@ -27,6 +27,8 @@ export default function MakerCheckerReviewPage() {
   const uploadId = params.id as string;
 
   const [scorecard, setScorecard] = useState<ParsedScorecard | null>(null);
+  const [scorecardImage, setScorecardImage] = useState<string>(`/api/scorecards/${uploadId}/image`);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"home" | "away" | "summary" | "rules" | "names">("names");
   const [expandedSkins, setExpandedSkins] = useState<Record<string, boolean>>({
     "away-1": true,
@@ -44,21 +46,71 @@ export default function MakerCheckerReviewPage() {
   const [submitting, setSubmitting] = useState(false);
   const [approvedSuccess, setApprovedSuccess] = useState(false);
 
-  useEffect(() => {
-    // Load scorecard data from session cache or fallback sample
-    const cached = sessionStorage.getItem(`scorecard_${uploadId}`);
-    if (cached) {
-      try {
-        const parsed = JSON.parse(cached);
-        setScorecard(parsed);
-        return;
-      } catch {
-        // Fallback
+  const loadScorecardData = useCallback(async (flushCache = false) => {
+    setLoading(true);
+    if (flushCache) {
+      sessionStorage.removeItem(`scorecard_${uploadId}`);
+    }
+
+    // 1. Check session cache first unless flushing
+    if (!flushCache) {
+      const cached = sessionStorage.getItem(`scorecard_${uploadId}`);
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          setScorecard(parsed);
+          setScorecardImage(`/api/scorecards/${uploadId}/image`);
+          setLoading(false);
+          // Background refresh from server to ensure image and reconciledData are fresh
+        } catch {
+          // Fall through
+        }
       }
     }
+
+    // 2. Fetch fresh upload record from server database
+    try {
+      const res = await fetch(`/api/scorecards/${uploadId}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.upload) {
+          const serverScorecard = data.upload.parsedScorecard || data.upload.reconciledData || data.upload.rawExtraction;
+          if (serverScorecard) {
+            setScorecard(serverScorecard);
+            sessionStorage.setItem(`scorecard_${uploadId}`, JSON.stringify(serverScorecard));
+          }
+          if (data.upload.imageUrl) {
+            setScorecardImage(data.upload.imageUrl);
+          } else {
+            setScorecardImage(`/api/scorecards/${uploadId}/image`);
+          }
+          setLoading(false);
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn("Could not fetch scorecard upload from API:", e);
+    }
+
+    // 3. Fallback to sample only if no server data and no cache
+    const existingCache = sessionStorage.getItem(`scorecard_${uploadId}`);
+    if (existingCache) {
+      try {
+        setScorecard(JSON.parse(existingCache));
+        setLoading(false);
+        return;
+      } catch {}
+    }
+
     const sample = getSampleScorecardExtraction();
     setScorecard(sample);
+    setScorecardImage("/uploads/scorecards/sample-scorecard.jpg");
+    setLoading(false);
   }, [uploadId]);
+
+  useEffect(() => {
+    loadScorecardData();
+  }, [loadScorecardData]);
 
   if (!scorecard) {
     return (
@@ -69,6 +121,84 @@ export default function MakerCheckerReviewPage() {
   }
 
   const validation = validateIndoorCricketScorecard(scorecard);
+
+  // Dynamically resolve player rows from scorecard nameResolutions and innings
+  const resolvedPlayerRows = useMemo(() => {
+    if (!scorecard) return [];
+
+    const rows: {
+      token: string;
+      team: string;
+      canonical: string;
+      method: string;
+      conf: string;
+      highlight: boolean;
+    }[] = [];
+    const seenTokens = new Set<string>();
+
+    const addPlayer = (rawName: string, canonicalName: string, team: "Home" | "Away", matchType?: string) => {
+      const trimmed = (rawName || "").trim();
+      if (!trimmed || seenTokens.has(trimmed.toUpperCase())) return;
+      seenTokens.add(trimmed.toUpperCase());
+
+      const res = scorecard.nameResolutions ? scorecard.nameResolutions[trimmed] : null;
+      const canonical = res?.matchedName || canonicalName || trimmed;
+      const mType = res?.matchType || matchType || (trimmed.toUpperCase() === canonical.toUpperCase() ? "EXACT" : "ALIAS");
+      const confidenceNum = res?.confidence ?? (mType === "EXACT" ? 1.0 : mType === "NEW_UNRECONCILED" ? 0.5 : 0.95);
+      const conf = `${Math.round(confidenceNum * 100)}%`;
+
+      let method = "Exact Match";
+      let highlight = false;
+      if (mType === "FUZZY_VARIANT") {
+        method = "Fuzzy Variant (Auto-Resolved)";
+        highlight = true;
+      } else if (mType === "FUZZY_SIMILARITY") {
+        method = "Fuzzy Similarity";
+        highlight = true;
+      } else if (mType === "ALIAS") {
+        method = "Alias Match";
+      } else if (mType === "NEW_UNRECONCILED") {
+        method = "New Player (Pending)";
+        highlight = true;
+      }
+
+      rows.push({
+        token: trimmed,
+        team,
+        canonical,
+        method,
+        conf,
+        highlight,
+      });
+    };
+
+    // Away team players first
+    scorecard.awayInnings?.playerSummaries?.forEach((p) => {
+      addPlayer((p as any).rawName || p.name, p.canonicalName || p.name, "Away", (p as any).matchType);
+    });
+    // Home team players next
+    scorecard.homeInnings?.playerSummaries?.forEach((p) => {
+      addPlayer((p as any).rawName || p.name, p.canonicalName || p.name, "Home", (p as any).matchType);
+    });
+
+    // Also check skins in case summaries had fewer than 16
+    scorecard.awayInnings?.skins?.forEach((s) => {
+      if (s.batter1Name) addPlayer((s as any).rawBatter1Name || s.batter1Name, s.batter1Name, "Away");
+      if (s.batter2Name) addPlayer((s as any).rawBatter2Name || s.batter2Name, s.batter2Name, "Away");
+      s.overs?.forEach((o) => {
+        if (o.bowlerName) addPlayer((o as any).rawBowlerName || o.bowlerName, o.bowlerName, "Home");
+      });
+    });
+    scorecard.homeInnings?.skins?.forEach((s) => {
+      if (s.batter1Name) addPlayer((s as any).rawBatter1Name || s.batter1Name, s.batter1Name, "Home");
+      if (s.batter2Name) addPlayer((s as any).rawBatter2Name || s.batter2Name, s.batter2Name, "Home");
+      s.overs?.forEach((o) => {
+        if (o.bowlerName) addPlayer((o as any).rawBowlerName || o.bowlerName, o.bowlerName, "Away");
+      });
+    });
+
+    return rows;
+  }, [scorecard]);
 
   const toggleSkin = (key: string) => {
     setExpandedSkins((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -196,6 +326,15 @@ export default function MakerCheckerReviewPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => loadScorecardData(true)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer"
+            title="Flush session cache and reload fresh extraction from server"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 text-slate-500 ${loading ? "animate-spin" : ""}`} />
+            <span>Flush & Reload</span>
+          </button>
+
           <a
             href={`/api/scorecards/${uploadId}/json?download=true`}
             target="_blank"
@@ -215,7 +354,7 @@ export default function MakerCheckerReviewPage() {
             <button
               onClick={handleApprove}
               disabled={submitting}
-              className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm transition"
+              className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-sm transition cursor-pointer"
             >
               {submitting ? (
                 <span>Publishing…</span>
@@ -267,9 +406,9 @@ export default function MakerCheckerReviewPage() {
                 className="transition-transform duration-150 relative"
               >
                 <img
-                  src="/uploads/scorecards/sample-scorecard.jpg"
+                  src={scorecardImage}
                   alt="Original Scorecard"
-                  className="max-w-[420px] w-full rounded shadow"
+                  className="max-w-[420px] w-full rounded shadow object-contain"
                 />
               </div>
             </div>
@@ -498,26 +637,28 @@ export default function MakerCheckerReviewPage() {
                 <div>
                   <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                    16-Player Name Reconciliation Gate
+                    Player Name Reconciliation Gate ({resolvedPlayerRows.length} Players)
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Checks all 16 players across both teams against the canonical database with fuzzy & alias matching.
+                    Checks all players across both teams against the canonical database with fuzzy & alias matching.
                   </p>
                 </div>
                 <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 self-start sm:self-auto">
-                  16 / 16 Reconciled
+                  {resolvedPlayerRows.filter(r => r.method !== "New Player (Pending)").length} / {resolvedPlayerRows.length} Reconciled
                 </span>
               </div>
 
-              <div className="p-3 bg-emerald-50/50 dark:bg-emerald-950/20 rounded-xl border border-emerald-500/20 text-xs text-emerald-900 dark:text-emerald-200 flex items-start gap-2.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                <div className="space-y-0.5">
-                  <span className="font-bold">Automated Typos & Variant Matching Verified:</span>
-                  <p className="text-[11px] text-emerald-800 dark:text-emerald-300">
-                    Scanned token <strong>"MANEESH"</strong> matched to <strong>Manish Pandey (#35)</strong> via learned fuzzy alias variants with 95% confidence.
-                  </p>
+              {resolvedPlayerRows.some(r => r.highlight) && (
+                <div className="p-3 bg-emerald-50/50 dark:bg-emerald-950/20 rounded-xl border border-emerald-500/20 text-xs text-emerald-900 dark:text-emerald-200 flex items-start gap-2.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <div className="space-y-0.5">
+                    <span className="font-bold">Automated Typos & Variant Matching Verified:</span>
+                    <p className="text-[11px] text-emerald-800 dark:text-emerald-300">
+                      {resolvedPlayerRows.filter(r => r.highlight).map(r => `"${r.token}" → ${r.canonical} (${r.conf})`).join(" • ")}
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div className="overflow-x-auto">
                 <table className="sports-table text-xs">
@@ -525,31 +666,14 @@ export default function MakerCheckerReviewPage() {
                     <tr>
                       <th>#</th>
                       <th>Scanned Token</th>
-                      <th>Team & Role</th>
+                      <th>Team</th>
                       <th>Canonical Player in DB</th>
                       <th>Match Method</th>
                       <th className="text-right">Confidence</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {[
-                      { token: "MANEESH", team: "Away", canonical: "Manish Pandey (#35)", method: "Fuzzy Variant (Auto-Resolved)", conf: "95%", highlight: true },
-                      { token: "YASH", team: "Away", canonical: "Yash (#12)", method: "Exact Match", conf: "100%", highlight: false },
-                      { token: "SUNNY", team: "Away", canonical: "Sunny (#18)", method: "Exact Match", conf: "100%", highlight: false },
-                      { token: "DEEPAK", team: "Away", canonical: "Deepak (#15)", method: "Exact Match", conf: "100%", highlight: false },
-                      { token: "NARENDRA", team: "Away", canonical: "Narendra Tiwari (#39)", method: "Exact Match", conf: "100%", highlight: false },
-                      { token: "GAGAN", team: "Away", canonical: "Gagandeep Singh (#36)", method: "Alias Match", conf: "95%", highlight: false },
-                      { token: "VIRAL", team: "Away", canonical: "Viral (#22)", method: "Exact Match", conf: "100%", highlight: false },
-                      { token: "SAHIL", team: "Away", canonical: "Sahil (#28)", method: "Exact Match", conf: "100%", highlight: false },
-                      { token: "SHUBHAM", team: "Home", canonical: "Shubham (#19)", method: "Exact Match", conf: "100%", highlight: false },
-                      { token: "ARIF", team: "Home", canonical: "Arif Halai (#4)", method: "Exact Match", conf: "100%", highlight: false },
-                      { token: "MANTHAN", team: "Home", canonical: "Manthan Shah (#36)", method: "Exact Match", conf: "100%", highlight: false },
-                      { token: "PRATEEK", team: "Home", canonical: "Prateek Nahar (#45)", method: "Exact Match", conf: "100%", highlight: false },
-                      { token: "HARDIK", team: "Home", canonical: "Hardik Desai (#24)", method: "Exact Match", conf: "100%", highlight: false },
-                      { token: "AKSHAY", team: "Home", canonical: "Akshay (#2)", method: "Exact Match", conf: "100%", highlight: false },
-                      { token: "JIGAR", team: "Home", canonical: "Jigar (#31)", method: "Exact Match", conf: "100%", highlight: false },
-                      { token: "SAHIL A", team: "Home", canonical: "Sahil A (#29)", method: "Exact Match", conf: "100%", highlight: false },
-                    ].map((row, idx) => (
+                    {resolvedPlayerRows.map((row, idx) => (
                       <tr
                         key={idx}
                         className={row.highlight ? "bg-amber-50/50 dark:bg-amber-950/20 font-bold" : ""}

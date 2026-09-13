@@ -236,7 +236,7 @@ function NewScorecardContent() {
           <div className="flex flex-wrap items-center gap-2.5 pt-1 pl-7 text-xs font-semibold">
             {duplicateAlert.existingMatchId && (
               <Link
-                href="/matches"
+                href={`/matches/${duplicateAlert.existingMatchId}`}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200 hover:bg-amber-100 transition"
               >
                 <span>View Existing Match #{duplicateAlert.existingMatchId}</span>
@@ -245,15 +245,23 @@ function NewScorecardContent() {
             )}
 
             <button
+              disabled={extracting}
               onClick={() => handleProceedToExtraction(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition shadow-sm font-bold"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white transition shadow-sm font-bold cursor-pointer"
             >
-              <span>Proceed with Upload (New Match / Override)</span>
+              {extracting ? (
+                <>
+                  <div className="h-3 w-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span>Extracting & Ingesting…</span>
+                </>
+              ) : (
+                <span>Proceed with Upload (New Match / Override)</span>
+              )}
             </button>
 
             <button
               onClick={() => setDuplicateAlert(null)}
-              className="px-3 py-1.5 text-slate-600 dark:text-slate-400 hover:underline"
+              className="px-3 py-1.5 text-slate-600 dark:text-slate-400 hover:underline cursor-pointer"
             >
               Cancel
             </button>
@@ -461,7 +469,40 @@ function NewScorecardContent() {
                 </span>
               </div>
 
-              <div className="flex items-start justify-between gap-4 pt-2 border-t border-emerald-500/10">
+              {/* Duplicate Alert Notice inside Action Card */}
+              {duplicateAlert && (
+                <div className="p-3.5 rounded-xl border border-amber-500/40 bg-amber-50/90 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 space-y-2.5 shadow-sm">
+                  <div className="flex items-start gap-2">
+                    <ShieldAlert className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                    <div className="space-y-0.5">
+                      <h4 className="text-xs font-bold">Duplicate Match Detected</h4>
+                      <p className="text-[11px] text-amber-800 dark:text-amber-300 leading-snug">
+                        {duplicateAlert.message}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 pt-1 text-xs font-semibold">
+                    {duplicateAlert.existingMatchId && (
+                      <Link
+                        href={`/matches/${duplicateAlert.existingMatchId}`}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200 hover:bg-amber-100 transition text-[11px]"
+                      >
+                        <span>View Match #{duplicateAlert.existingMatchId}</span>
+                        <ExternalLink className="h-3 w-3" />
+                      </Link>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setDuplicateAlert(null)}
+                      className="text-[11px] text-slate-600 dark:text-slate-400 hover:underline px-2 py-1 cursor-pointer"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 border-t border-emerald-500/10">
                 <div>
                   <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                     <Sparkles className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
@@ -472,23 +513,44 @@ function NewScorecardContent() {
                   </p>
                 </div>
 
-                <button
-                  disabled={analyzingQuality || extracting}
-                  onClick={() => handleProceedToExtraction(false)}
-                  className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-sm transition shrink-0"
-                >
-                  {extracting ? (
-                    <>
-                      <div className="h-3 w-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>Extracting…</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Extract & Reconcile</span>
-                      <ArrowRight className="h-3.5 w-3.5" />
-                    </>
-                  )}
-                </button>
+                {duplicateAlert ? (
+                  <button
+                    disabled={analyzingQuality || extracting}
+                    onClick={() => handleProceedToExtraction(true)}
+                    className="flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 disabled:opacity-50 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-sm transition shrink-0 cursor-pointer"
+                  >
+                    {extracting ? (
+                      <>
+                        <div className="h-3 w-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Overriding & Ingesting…</span>
+                      </>
+                    ) : (
+                      <>
+                        <ShieldAlert className="h-3.5 w-3.5" />
+                        <span>Override & Force Ingest</span>
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </>
+                    )}
+                  </button>
+                ) : (
+                  <button
+                    disabled={analyzingQuality || extracting}
+                    onClick={() => handleProceedToExtraction(false)}
+                    className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-sm transition shrink-0 cursor-pointer"
+                  >
+                    {extracting ? (
+                      <>
+                        <div className="h-3 w-3 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span>Extracting…</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Extract & Reconcile</span>
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </>
+                    )}
+                  </button>
+                )}
               </div>
             </div>
           </div>

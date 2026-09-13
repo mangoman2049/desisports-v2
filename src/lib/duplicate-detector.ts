@@ -29,13 +29,33 @@ export async function checkForDuplicateScorecard(
   const normalizedHome = (homeTeamName || "").trim().toLowerCase();
   const normalizedAway = (awayTeamName || "").trim().toLowerCase();
 
-  // Helper to test date similarity
+  // Helper to test date and time similarity
   const isSameDate = (d1: string, d2: string) => {
     if (!d1 || !d2) return false;
-    if (d1 === d2) return true;
-    const p1 = d1.split(",")[0].trim();
-    const p2 = d2.split(",")[0].trim();
-    return p1.length > 3 && p1 === p2;
+    const clean1 = d1.trim().toLowerCase();
+    const clean2 = d2.trim().toLowerCase();
+    if (clean1 === clean2) return true;
+
+    // Compare date parts
+    const p1 = clean1.split(",")[0].trim();
+    const p2 = clean2.split(",")[0].trim();
+    const dateMatch = p1.length > 3 && p1 === p2;
+    if (!dateMatch) return false;
+
+    // If both have time components (e.g., "20:12" or "20:30" after comma), compare times
+    const t1 = clean1.split(",")[1]?.trim();
+    const t2 = clean2.split(",")[1]?.trim();
+    if (t1 && t2) {
+      const timeRegex = /\b(\d{1,2}:\d{2})\b/;
+      const m1 = t1.match(timeRegex);
+      const m2 = t2.match(timeRegex);
+      if (m1 && m2 && m1[1] !== m2[1]) {
+        // Different match time on the same date -> NOT a duplicate match
+        return false;
+      }
+    }
+
+    return true;
   };
 
   // 1. Check existing completed matches in database

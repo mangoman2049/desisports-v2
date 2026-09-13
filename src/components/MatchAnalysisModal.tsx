@@ -127,18 +127,19 @@ export default function MatchAnalysisModal({ analysis, onClose }: Props) {
       <div className="relative w-full max-w-4xl max-h-[92vh] flex flex-col rounded-3xl bg-white dark:bg-slate-900 shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
         
         {/* Modal Header */}
-        <div className="p-5 sm:p-6 pb-4 border-b border-slate-100 dark:border-slate-800 shrink-0 bg-white dark:bg-slate-900 z-10">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-mono">
+        {/* Modal Header */}
+        <div className="p-4 sm:p-6 pb-3 sm:pb-4 border-b border-slate-100 dark:border-slate-800 shrink-0 bg-white dark:bg-slate-900 z-10">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-mono">
                   {analysis.tournamentName}
                 </span>
-                <span className="text-xs text-slate-400 font-mono">
+                <span className="text-[11px] sm:text-xs text-slate-400 font-mono truncate">
                   {analysis.date} • {analysis.venue}
                 </span>
               </div>
-              <h2 className="text-lg sm:text-2xl font-black text-slate-950 dark:text-white tracking-tight">
+              <h2 className="text-base sm:text-2xl font-black text-slate-950 dark:text-white tracking-tight leading-snug break-words">
                 {analysis.editorHeadline}
               </h2>
               <div className="mt-1 text-xs font-bold text-emerald-700 dark:text-emerald-400">
@@ -146,76 +147,78 @@ export default function MatchAnalysisModal({ analysis, onClose }: Props) {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                onClick={async () => {
-                  const matchUrl = `${window.location.origin}/matches/${analysis.matchId}`;
-                  if (navigator.share) {
-                    try {
-                      await navigator.share({
-                        title: `${analysis.matchTitle} — Analysis`,
-                        text: analysis.editorHeadline,
-                        url: matchUrl,
-                      });
-                      return;
-                    } catch {}
-                  }
-                  if (navigator.clipboard) {
-                    await navigator.clipboard.writeText(matchUrl);
-                    setCopied(true);
-                    setTimeout(() => setCopied(false), 2000);
-                  }
-                }}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer"
-                title="Share Match Analysis"
-              >
-                {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Share2 className="w-3.5 h-3.5 text-slate-500" />}
-                <span className="hidden sm:inline">{copied ? "Copied!" : "Share"}</span>
-              </button>
+            <div className="flex items-center justify-between sm:justify-end gap-1.5 sm:gap-2 shrink-0 pt-1 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <button
+                  onClick={async () => {
+                    const matchUrl = `${window.location.origin}/matches/${analysis.matchId}`;
+                    if (navigator.share) {
+                      try {
+                        await navigator.share({
+                          title: `${analysis.matchTitle} — Analysis`,
+                          text: analysis.editorHeadline,
+                          url: matchUrl,
+                        });
+                        return;
+                      } catch {}
+                    }
+                    if (navigator.clipboard) {
+                      await navigator.clipboard.writeText(matchUrl);
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    }
+                  }}
+                  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer"
+                  title="Share Match Analysis"
+                >
+                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Share2 className="w-3.5 h-3.5 text-slate-500" />}
+                  <span className="hidden sm:inline">{copied ? "Copied!" : "Share"}</span>
+                </button>
 
-              <button
-                onClick={() => window.print()}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer"
-                title="Download / Print PDF"
-              >
-                <Printer className="w-3.5 h-3.5 text-slate-500" />
-                <span className="hidden sm:inline">PDF</span>
-              </button>
+                <button
+                  onClick={() => window.print()}
+                  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer"
+                  title="Download / Print PDF"
+                >
+                  <Printer className="w-3.5 h-3.5 text-slate-500" />
+                  <span className="hidden sm:inline">PDF</span>
+                </button>
 
-              <a
-                href={`/api/scorecards/${analysis.matchId}/image?format=webp&download=true`}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-xs font-bold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 transition"
-                title="Download WebP Scorecard"
-              >
-                <Download className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="hidden sm:inline">WebP</span>
-              </a>
+                <a
+                  href={`/api/scorecards/${analysis.matchId}/image?format=webp&download=true`}
+                  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-xs font-bold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 transition"
+                  title="Download WebP Scorecard"
+                >
+                  <Download className="w-3.5 h-3.5 text-emerald-600" />
+                  <span className="hidden sm:inline">WebP</span>
+                </a>
 
-              <a
-                href={`/api/scorecards/${analysis.matchId}/json?download=true`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
-                title="Download Auditable JSON"
-              >
-                <FileDown className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="hidden sm:inline">JSON</span>
-              </a>
+                <a
+                  href={`/api/scorecards/${analysis.matchId}/json?download=true`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+                  title="Download Auditable JSON"
+                >
+                  <FileDown className="w-3.5 h-3.5 text-emerald-600" />
+                  <span className="hidden sm:inline">JSON</span>
+                </a>
 
-              <a
-                href={`/matches/${analysis.matchId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
-                title="Open Dedicated Match Page"
-              >
-                <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
-                <span className="hidden sm:inline">Open</span>
-              </a>
+                <a
+                  href={`/matches/${analysis.matchId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+                  title="Open Dedicated Match Page"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
+                  <span className="hidden sm:inline">Open</span>
+                </a>
+              </div>
 
               <button
                 onClick={onClose}
-                className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer ml-1"
+                className="p-1.5 sm:p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer ml-1 shrink-0"
                 title="Close"
               >
                 <X className="w-5 h-5" />
@@ -223,49 +226,49 @@ export default function MatchAnalysisModal({ analysis, onClose }: Props) {
             </div>
           </div>
 
-          {/* Navigation Tabs */}
-          <div className="flex items-center gap-2 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+          {/* Navigation Tabs - with horizontal scroll on mobile */}
+          <div className="flex items-center gap-2 mt-3 sm:mt-4 pt-2.5 sm:pt-3 border-t border-slate-100 dark:border-slate-800 overflow-x-auto scrollbar-none whitespace-nowrap pb-1">
             <button
               type="button"
               onClick={() => setActiveTab("coach")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-bold transition shrink-0 cursor-pointer ${
                 activeTab === "coach"
                   ? "bg-emerald-600 text-white shadow-sm shadow-emerald-700/20"
                   : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
               }`}
             >
-              <ClipboardList className="w-3.5 h-3.5" />
+              <ClipboardList className="w-3.5 h-3.5 shrink-0" />
               <span>Coach Tactical Breakdown (11 Sections)</span>
             </button>
             <button
               type="button"
               onClick={() => setActiveTab("summary")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-bold transition shrink-0 cursor-pointer ${
                 activeTab === "summary"
                   ? "bg-emerald-600 text-white shadow-sm shadow-emerald-700/20"
                   : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5" />
+              <Sparkles className="w-3.5 h-3.5 shrink-0" />
               <span>Executive Review</span>
             </button>
             <button
               type="button"
               onClick={() => setActiveTab("scorecard")}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-bold transition shrink-0 cursor-pointer ${
                 activeTab === "scorecard"
                   ? "bg-emerald-600 text-white shadow-sm shadow-emerald-700/20"
                   : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
               }`}
             >
-              <Layers className="w-3.5 h-3.5" />
+              <Layers className="w-3.5 h-3.5 shrink-0" />
               <span>Official Scorecard Sheet</span>
             </button>
           </div>
         </div>
 
         {/* Modal Scrollable Body */}
-        <div className="flex-1 overflow-y-auto p-5 sm:p-8 space-y-6">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 sm:p-8 space-y-6">
 
           {/* TAB 1: COACH TACTICAL BREAKDOWN */}
           {activeTab === "coach" && (
@@ -1004,7 +1007,7 @@ export default function MatchAnalysisModal({ analysis, onClose }: Props) {
               </div>
 
               {/* Image Box */}
-              <div className="relative overflow-auto rounded-2xl bg-slate-950 border border-slate-800 p-4 flex items-center justify-center min-h-[480px] max-h-[70vh] shadow-xl">
+              <div className="relative overflow-auto rounded-2xl bg-slate-950 border border-slate-800 p-2 sm:p-4 flex items-center justify-center min-h-[280px] sm:min-h-[480px] max-h-[70vh] shadow-xl">
                 <div
                   style={{ transform: `scale(${scorecardZoom})`, transformOrigin: "top center" }}
                   className="transition-transform duration-150 ease-out max-w-full flex justify-center py-2"
