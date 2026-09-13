@@ -45,6 +45,14 @@ async function main() {
     },
   });
 
+  const tournament2 = await prisma.tournament.create({
+    data: {
+      id: 2,
+      name: "DesiBoys Bazooka 4.0",
+      status: "YET_TO_START",
+    },
+  });
+
   const tournament0 = await prisma.tournament.create({
     data: {
       id: 0,
@@ -110,9 +118,12 @@ async function main() {
       if (!playerMap.has(id) && id !== 35 && id !== 999) {
         playerMap.set(id, {
           id: id,
-          canonicalName: p.name === "Home" ? "Gagandeep Singh" : p.name,
+          canonicalName: p.name,
           team: squad.team,
           avatarUrl: p.avatar || null,
+          batting: p.batting || "Right Hand",
+          bowling: p.bowling || "Right Arm Medium",
+          fielding: p.fielding || "Cover",
         });
       }
     });
@@ -137,9 +148,9 @@ async function main() {
 
   for (const [id, p] of playerMap.entries()) {
     const style = playerStyles[id] || {
-      hand: "Right Hand",
-      bowl: "Right Arm Medium",
-      pos: "Cover",
+      hand: p.batting && p.batting !== "—" ? p.batting : "Right Hand",
+      bowl: p.bowling && p.bowling !== "—" ? (p.bowling.includes("Arm") ? p.bowling : `Right Arm ${p.bowling}`) : "Right Arm Medium",
+      pos: p.fielding && p.fielding !== "—" ? p.fielding : "Cover",
       tags: ["Squad Member"],
     };
 

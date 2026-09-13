@@ -26,7 +26,7 @@ export default function TournamentsDirectoryPage() {
       highlight: true,
     },
     {
-      id: "bazooka",
+      id: "2",
       title: "DesiBoys Bazooka 4.0",
       subtitle: "Upcoming premier championship",
       status: "Yet to Start",
@@ -36,10 +36,10 @@ export default function TournamentsDirectoryPage() {
         { label: "Matches", value: "0" },
         { label: "Players", value: "61" },
       ],
-      footerText: "No fixtures scheduled",
-      href: "#",
-      isClickable: false,
-      highlight: false,
+      footerText: "📅 18 Sep 2026 → 09 Oct 2026",
+      href: "/tournaments/2",
+      isClickable: true,
+      highlight: true,
     },
     {
       id: "1",

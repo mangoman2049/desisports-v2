@@ -412,6 +412,65 @@ async function runTestSuite() {
     passedAll = false;
   }
 
+  // Test 15: Tournament Squad Integrity & Single-Team Assignment
+  console.log("\n[Test 15] Tournament Squad Integrity & Single-Team Assignment Verification:");
+  try {
+    const t2Data = JSON.parse(fs.readFileSync(path.join(process.cwd(), "prisma", "tournament_2_data.json"), "utf-8"));
+    
+    // T1 Check
+    const t1PlayerMap = new Map<string, string[]>();
+    for (const sq of tournament1Data.squads) {
+      for (const p of sq.players) {
+        const list = t1PlayerMap.get(p.name) || [];
+        list.push(sq.team);
+        t1PlayerMap.set(p.name, list);
+      }
+    }
+    const t1Dups = Array.from(t1PlayerMap.entries()).filter(([_, teams]) => teams.length > 1);
+    const manthanT1Teams = t1PlayerMap.get("Manthan Shah") || [];
+
+    console.log(`- Tournament 1 Duplicate Players Count: ${t1Dups.length}`);
+    console.log(`- Manthan Shah Tournament 1 Assignment: ${manthanT1Teams.join(", ")}`);
+
+    if (t1Dups.length > 0) {
+      console.error(`FAIL: Found duplicate players in Tournament 1 squads:`, t1Dups);
+      passedAll = false;
+    } else if (manthanT1Teams.length !== 1 || manthanT1Teams[0] !== "DesiTigers") {
+      console.error(`FAIL: Manthan Shah must only belong to DesiTigers in Tournament 1! Got: ${manthanT1Teams.join(", ")}`);
+      passedAll = false;
+    } else {
+      console.log("PASS: Tournament 1 squads have zero duplicates and Manthan Shah is correctly assigned to DesiTigers.");
+    }
+
+    // T2 Check
+    const t2PlayerMap = new Map<string, string[]>();
+    for (const sq of t2Data.squads) {
+      for (const p of sq.players) {
+        const list = t2PlayerMap.get(p.name) || [];
+        list.push(sq.team);
+        t2PlayerMap.set(p.name, list);
+      }
+    }
+    const t2Dups = Array.from(t2PlayerMap.entries()).filter(([_, teams]) => teams.length > 1);
+    const manthanT2Teams = t2PlayerMap.get("Manthan Shah") || [];
+
+    console.log(`- Tournament 2 Duplicate Players Count: ${t2Dups.length}`);
+    console.log(`- Manthan Shah Tournament 2 Assignment: ${manthanT2Teams.join(", ")}`);
+
+    if (t2Dups.length > 0) {
+      console.error(`FAIL: Found duplicate players in Tournament 2 squads:`, t2Dups);
+      passedAll = false;
+    } else if (manthanT2Teams.length !== 1 || manthanT2Teams[0] !== "Desi Tigers") {
+      console.error(`FAIL: Manthan Shah must only belong to Desi Tigers in Tournament 2! Got: ${manthanT2Teams.join(", ")}`);
+      passedAll = false;
+    } else {
+      console.log("PASS: Tournament 2 squads have zero duplicates and Manthan Shah is correctly assigned to Desi Tigers.");
+    }
+  } catch (err) {
+    console.error("FAIL: Test 15 encountered error:", err);
+    passedAll = false;
+  }
+
   await prisma.$disconnect();
 
   if (!passedAll) {
@@ -419,7 +478,7 @@ async function runTestSuite() {
     process.exit(1);
   } else {
     console.log("\n==================================================");
-    console.log("✅ ALL 14 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
+    console.log("✅ ALL 15 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
     console.log("==================================================");
     process.exit(0);
   }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import tournamentData from "../../../../../../prisma/tournament_1_data.json";
+import tournament1Data from "../../../../../../prisma/tournament_1_data.json";
+import tournament2Data from "../../../../../../prisma/tournament_2_data.json";
 import {
   ArrowLeft,
   Shield,
@@ -24,9 +25,15 @@ interface PageProps {
   };
 }
 
+function getTournamentData(tournamentId: string) {
+  if (tournamentId === "2") return tournament2Data;
+  return tournament1Data;
+}
+
 export async function generateMetadata({ params }: PageProps) {
+  const tData = getTournamentData(params.tournamentId);
   const teamIdNum = parseInt(params.teamId, 10);
-  const squad = tournamentData.squads.find((s) => s.id === teamIdNum);
+  const squad = tData.squads.find((s) => s.id === teamIdNum);
   const teamName = squad ? squad.team : `Team ${params.teamId}`;
   const tactical = getTeamTacticalData(teamName);
 
@@ -44,11 +51,12 @@ export async function generateMetadata({ params }: PageProps) {
 export default function DedicatedTeamPage({ params }: PageProps) {
   const tournamentId = params.tournamentId;
   const teamIdNum = parseInt(params.teamId, 10);
+  const tData = getTournamentData(tournamentId);
 
-  const squad = tournamentData.squads.find((s) => s.id === teamIdNum);
+  const squad = tData.squads.find((s) => s.id === teamIdNum);
   if (!squad) notFound();
 
-  const teamMeta = tournamentData.teams.find((t) => t.name === squad.team) || {
+  const teamMeta = tData.teams.find((t) => t.name === squad.team) || {
     name: squad.team,
     captain: squad.captain,
     badge: squad.team.charAt(0),
@@ -86,7 +94,7 @@ export default function DedicatedTeamPage({ params }: PageProps) {
           className="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-slate-900 transition group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition" />
-          <span>Back to Desi Boys Tournament May 2026</span>
+          <span>Back to {tData.title}</span>
         </Link>
       </div>
 

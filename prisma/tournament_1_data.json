@@ -272,77 +272,128 @@
       "id": 1,
       "team": "DesiDabanggs",
       "captain": "Captain: Darshan Mody",
-      "playerCount": 14,
+      "playerCount": 11,
       "players": [
         {
-          "id": "46",
-          "name": "Preraq Mistry",
-          "avatar": null
-        },
-        {
-          "id": "5",
-          "name": "Ankush Goel",
-          "avatar": null
-        },
-        {
-          "id": "36",
-          "name": "Manthan Shah",
-          "avatar": null
-        },
-        {
-          "id": "47",
-          "name": "Ravi kumar",
-          "avatar": null
-        },
-        {
-          "id": "56",
-          "name": "Sandesh Jagtap",
-          "avatar": null
+          "id": "12",
+          "name": "Chittaranjan Dey",
+          "avatar": null,
+          "batting": "Right Hand",
+          "bowling": "Fast",
+          "arm": "Right Arm",
+          "fielding": "Right Sweeper",
+          "shirt": "—",
+          "isCaptain": false
         },
         {
           "id": "14",
           "name": "Darshan Mody",
-          "avatar": null
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/646b273b-acf3-4326-ac5c-6574a7d0d80e.jpg",
+          "batting": "Right Hand",
+          "bowling": "Off Spin",
+          "arm": "Right Arm",
+          "fielding": "Receiver",
+          "shirt": "M",
+          "isCaptain": true
         },
         {
           "id": "20",
           "name": "Gagandeep Singh",
-          "avatar": null
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/040d5a95-eaf2-4fe8-922e-c52abd56dded.jpg",
+          "batting": "Right Hand",
+          "bowling": "Medium Fast",
+          "arm": "Right Arm",
+          "fielding": "Wicket Keeper",
+          "shirt": "M",
+          "isCaptain": false
         },
         {
           "id": "39",
           "name": "Narendra Tiwari",
-          "avatar": null
-        },
-        {
-          "id": "55",
-          "name": "Sandeep Khedekar",
-          "avatar": null
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/4ZTy0pQY1lLlboptmJrZH3CfR0O7SJ9AYtgmb3Lk.jpg",
+          "batting": "Right Hand",
+          "bowling": "Medium",
+          "arm": "Right Arm",
+          "fielding": "Right Sweeper",
+          "shirt": "L",
+          "isCaptain": false
         },
         {
           "id": "41",
           "name": "Nitesh Lokwani",
-          "avatar": null
+          "avatar": null,
+          "batting": "Right Hand",
+          "bowling": "Medium Fast",
+          "arm": "Right Arm",
+          "fielding": "Cover",
+          "shirt": "XL",
+          "isCaptain": false
         },
         {
-          "id": "57",
-          "name": "Saurabh Ranjan",
-          "avatar": null
+          "id": "46",
+          "name": "Preraq Mistry",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/fab7e9fa-b07b-4768-9427-3929a00beeac.jpg",
+          "batting": "Left Hand",
+          "bowling": "Fast",
+          "arm": "Right Arm",
+          "fielding": "Right Sweeper",
+          "shirt": "L",
+          "isCaptain": false
         },
         {
-          "id": "12",
-          "name": "Chittaranjan Dey",
-          "avatar": null
+          "id": "47",
+          "name": "Ravi kumar",
+          "avatar": "https://desisports.milanchheda.com/storage/profiles/UgDqR5zO1dr6GgevPCYfgQ2A3Lqfwn2kRSje0Kt4.jpg",
+          "batting": "Right Hand",
+          "bowling": "Medium",
+          "arm": "Right Arm",
+          "fielding": "Receiver",
+          "shirt": "L",
+          "isCaptain": false
         },
         {
           "id": "49",
           "name": "Ritesh sarda",
-          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/bde80f6d-5860-457f-9395-c67731be794a.jpg"
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/bde80f6d-5860-457f-9395-c67731be794a.jpg",
+          "batting": "Right Hand",
+          "bowling": "Medium",
+          "arm": "Right Arm",
+          "fielding": "Point",
+          "shirt": "L",
+          "isCaptain": false
         },
         {
-          "id": "35",
-          "name": "Home",
-          "avatar": null
+          "id": "55",
+          "name": "Sandeep Khedekar",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/bd87dc5a-20ae-46a3-b157-2dd272bb9e75.jpg",
+          "batting": "Right Hand",
+          "bowling": "Medium",
+          "arm": "Right Arm",
+          "fielding": "Wicket Keeper",
+          "shirt": "—",
+          "isCaptain": false
+        },
+        {
+          "id": "56",
+          "name": "Sandesh Jagtap",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/ee6d5bba-817e-4e54-86e8-6a06f754f3b3.jpg",
+          "batting": "Right Hand",
+          "bowling": "Medium",
+          "arm": "Right Arm",
+          "fielding": "Cover",
+          "shirt": "M",
+          "isCaptain": false
+        },
+        {
+          "id": "57",
+          "name": "Saurabh Ranjan",
+          "avatar": "https://desisports.milanchheda.com/storage/profiles/Ejq8v8AJD9buDyRDxjoaGWH9WTMrgROxU2ZG6QmL.jpg",
+          "batting": "Right Hand",
+          "bowling": "Fast",
+          "arm": "Right Arm",
+          "fielding": "Receiver",
+          "shirt": "L",
+          "isCaptain": false
         }
       ]
     },
@@ -350,92 +401,139 @@
       "id": 2,
       "team": "DesiTitans",
       "captain": "Captain: Hardik Desai",
-      "playerCount": 17,
+      "playerCount": 12,
       "players": [
-        {
-          "id": "46",
-          "name": "Preraq Mistry",
-          "avatar": null
-        },
-        {
-          "id": "45",
-          "name": "Prateek Nahar",
-          "avatar": null
-        },
-        {
-          "id": "5",
-          "name": "Ankush Goel",
-          "avatar": null
-        },
-        {
-          "id": "44",
-          "name": "Prateek Jain",
-          "avatar": null
-        },
-        {
-          "id": "63",
-          "name": "Vipul Jain",
-          "avatar": null
-        },
-        {
-          "id": "50",
-          "name": "Ronak Jain",
-          "avatar": null
-        },
-        {
-          "id": "64",
-          "name": "Yash sisodia",
-          "avatar": null
-        },
-        {
-          "id": "37",
-          "name": "Mayank Agarwal",
-          "avatar": null
-        },
-        {
-          "id": "24",
-          "name": "Harsh Ramnani",
-          "avatar": null
-        },
-        {
-          "id": "39",
-          "name": "Narendra Tiwari",
-          "avatar": null
-        },
-        {
-          "id": "38",
-          "name": "Milan Chheda",
-          "avatar": null
-        },
         {
           "id": "8",
           "name": "Bhavesh",
-          "avatar": null
+          "avatar": null,
+          "batting": "—",
+          "bowling": "—",
+          "arm": "—",
+          "fielding": "—",
+          "shirt": "—",
+          "isCaptain": false
         },
         {
           "id": "16",
           "name": "Deepak thawani",
-          "avatar": null
-        },
-        {
-          "id": "65",
-          "name": "Shaurya Bhatnagar",
-          "avatar": null
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/57e94350-cc40-4a32-b07c-e70894e86442.png",
+          "batting": "Left Hand",
+          "bowling": "Medium Fast",
+          "arm": "Left Arm",
+          "fielding": "Cover",
+          "shirt": "M",
+          "isCaptain": false
         },
         {
           "id": "23",
           "name": "Hardik Desai",
-          "avatar": null
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/381aad31-49f5-4cb5-b13f-11f26db20e02.webp",
+          "batting": "Right Hand",
+          "bowling": "Medium Fast",
+          "arm": "Right Arm",
+          "fielding": "Cover",
+          "shirt": "M",
+          "isCaptain": true
+        },
+        {
+          "id": "24",
+          "name": "Harsh Ramnani",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/e0e6ebb3-8bfc-43f7-9058-64a466f7d78d.jpg",
+          "batting": "—",
+          "bowling": "—",
+          "arm": "—",
+          "fielding": "—",
+          "shirt": "XL",
+          "isCaptain": false
+        },
+        {
+          "id": "37",
+          "name": "Mayank Agarwal",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/3b338794-ac61-48f6-a89b-cff45041799d.jpg",
+          "batting": "Right Hand",
+          "bowling": "Medium Fast",
+          "arm": "Right Arm",
+          "fielding": "Leg Slide",
+          "shirt": "XL",
+          "isCaptain": false
+        },
+        {
+          "id": "38",
+          "name": "Milan Chheda",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/LoDTPXK3QMGJDBPsurARtqh0x9reIgWzdKY5x1zd.png",
+          "batting": "Right Hand",
+          "bowling": "Medium Fast",
+          "arm": "Left Arm",
+          "fielding": "Wicket Keeper",
+          "shirt": "L",
+          "isCaptain": false
+        },
+        {
+          "id": "44",
+          "name": "Prateek Jain",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/5428e509-5887-42dc-945f-e6640bd4ce90.jpg",
+          "batting": "Right Hand",
+          "bowling": "Medium",
+          "arm": "Right Arm",
+          "fielding": "Leg Slide",
+          "shirt": "L",
+          "isCaptain": false
+        },
+        {
+          "id": "50",
+          "name": "Ronak Jain",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/d3e1fd04-2d56-41fc-b757-869e9ddd010c.jpg",
+          "batting": "Right Hand",
+          "bowling": "Medium Fast",
+          "arm": "Left Arm",
+          "fielding": "Point",
+          "shirt": "M",
+          "isCaptain": false
+        },
+        {
+          "id": "65",
+          "name": "Shaurya Bhatnagar",
+          "avatar": null,
+          "batting": "Right Hand",
+          "bowling": "Fast",
+          "arm": "Right Arm",
+          "fielding": "Left Sweeper",
+          "shirt": "M",
+          "isCaptain": false
         },
         {
           "id": "61",
-          "name": "UUdit Verma",
-          "avatar": null
+          "name": "Udit Verma",
+          "avatar": null,
+          "batting": "—",
+          "bowling": "—",
+          "arm": "—",
+          "fielding": "—",
+          "shirt": "—",
+          "isCaptain": false
         },
         {
-          "id": "35",
-          "name": "Home",
-          "avatar": null
+          "id": "63",
+          "name": "Vipul Jain",
+          "avatar": null,
+          "batting": "—",
+          "bowling": "—",
+          "arm": "—",
+          "fielding": "—",
+          "shirt": "—",
+          "isCaptain": false
+        },
+        {
+          "id": "64",
+          "name": "Yash sisodia",
+          "avatar": null,
+          "batting": "Right Hand",
+          "bowling": "Fast",
+          "arm": "Right Arm",
+          "fielding": "Receiver",
+          "shirt": "XL",
+          "isCaptain": false
         }
       ]
     },
@@ -443,77 +541,150 @@
       "id": 3,
       "team": "VPGR",
       "captain": "Captain: Himanshu Kalyani",
-      "playerCount": 14,
+      "playerCount": 13,
       "players": [
         {
           "id": "2",
           "name": "Abhishek Agarwal",
-          "avatar": null
+          "avatar": null,
+          "batting": "Right Hand",
+          "bowling": "Medium",
+          "arm": "Right Arm",
+          "fielding": "Wicket Keeper",
+          "shirt": "XL",
+          "isCaptain": false
         },
         {
           "id": "5",
           "name": "Ankush Goel",
-          "avatar": null
+          "avatar": null,
+          "batting": "—",
+          "bowling": "—",
+          "arm": "—",
+          "fielding": "—",
+          "shirt": "—",
+          "isCaptain": false
         },
         {
-          "id": "27",
-          "name": "Himanshu Kalyani",
-          "avatar": null
+          "id": "7",
+          "name": "Atul Mishra",
+          "avatar": null,
+          "batting": "—",
+          "bowling": "—",
+          "arm": "—",
+          "fielding": "—",
+          "shirt": "—",
+          "isCaptain": false
         },
         {
-          "id": "53",
-          "name": "Sajid Merchant",
-          "avatar": null
-        },
-        {
-          "id": "59",
-          "name": "Sidhaarth Sashtri",
-          "avatar": null
+          "id": "9",
+          "name": "Chaitanya Shah",
+          "avatar": null,
+          "batting": "—",
+          "bowling": "—",
+          "arm": "—",
+          "fielding": "—",
+          "shirt": "—",
+          "isCaptain": false
         },
         {
           "id": "15",
           "name": "Deepak Kherajani",
-          "avatar": null
+          "avatar": null,
+          "batting": "—",
+          "bowling": "—",
+          "arm": "—",
+          "fielding": "—",
+          "shirt": "—",
+          "isCaptain": false
         },
         {
-          "id": "60",
-          "name": "Tejas Shah",
-          "avatar": null
+          "id": "27",
+          "name": "Himanshu Kalyani",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/84f4409f-5c32-4228-84ad-b8be54e98389.jpg",
+          "batting": "—",
+          "bowling": "—",
+          "arm": "—",
+          "fielding": "—",
+          "shirt": "L",
+          "isCaptain": true
         },
         {
-          "id": "66",
-          "name": "Zaheer Merchant",
-          "avatar": null
+          "id": "33",
+          "name": "Manish Daultani",
+          "avatar": null,
+          "batting": "—",
+          "bowling": "—",
+          "arm": "—",
+          "fielding": "—",
+          "shirt": "—",
+          "isCaptain": false
+        },
+        {
+          "id": "34",
+          "name": "Manish Jain",
+          "avatar": null,
+          "batting": "—",
+          "bowling": "—",
+          "arm": "—",
+          "fielding": "—",
+          "shirt": "—",
+          "isCaptain": false
         },
         {
           "id": "40",
           "name": "Neeraj Bachani",
-          "avatar": null
+          "avatar": null,
+          "batting": "—",
+          "bowling": "—",
+          "arm": "—",
+          "fielding": "—",
+          "shirt": "—",
+          "isCaptain": false
         },
         {
-          "id": "7",
-          "name": "AAtul Mishra",
-          "avatar": null
+          "id": "53",
+          "name": "Sajid Merchant",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/fbe12178-ab3a-4ae8-9cb1-5a4b83e30a1f.jpg",
+          "batting": "—",
+          "bowling": "—",
+          "arm": "—",
+          "fielding": "—",
+          "shirt": "L",
+          "isCaptain": false
         },
         {
-          "id": "9",
-          "name": "CChaitanya Shah",
-          "avatar": null
+          "id": "59",
+          "name": "Sidhaarth Sashtri",
+          "avatar": null,
+          "batting": "—",
+          "bowling": "—",
+          "arm": "—",
+          "fielding": "—",
+          "shirt": "—",
+          "isCaptain": false
         },
         {
-          "id": "33",
-          "name": "MManish Daultani",
-          "avatar": null
+          "id": "60",
+          "name": "Tejas Shah",
+          "avatar": null,
+          "batting": "—",
+          "bowling": "—",
+          "arm": "—",
+          "fielding": "—",
+          "shirt": "—",
+          "isCaptain": false
         },
         {
-          "id": "34",
-          "name": "MManish Jain",
-          "avatar": null
-        },
-        {
-          "id": "35",
-          "name": "Home",
-          "avatar": null
+          "id": "66",
+          "name": "Zaheer Merchant",
+          "avatar": null,
+          "batting": "—",
+          "bowling": "—",
+          "arm": "—",
+          "fielding": "—",
+          "shirt": "—",
+          "isCaptain": false
         }
       ]
     },
@@ -521,72 +692,117 @@
       "id": 4,
       "team": "DesiTigers",
       "captain": "Captain: Manthan Shah",
-      "playerCount": 13,
+      "playerCount": 10,
       "players": [
         {
-          "id": "2",
-          "name": "Abhishek Agarwal",
-          "avatar": null
-        },
-        {
-          "id": "45",
-          "name": "Prateek Nahar",
-          "avatar": null
-        },
-        {
-          "id": "36",
-          "name": "Manthan Shah",
-          "avatar": null
-        },
-        {
-          "id": "25",
-          "name": "Harshal joshi",
-          "avatar": null
-        },
-        {
-          "id": "30",
-          "name": "Kalrav Shah",
-          "avatar": null
-        },
-        {
-          "id": "43",
-          "name": "Prateek Attree",
-          "avatar": null
-        },
-        {
-          "id": "26",
-          "name": "Hemang Shah",
-          "avatar": null
-        },
-        {
-          "id": "58",
-          "name": "Siddharth Gandhi",
-          "avatar": null
-        },
-        {
-          "id": "32",
-          "name": "Kunal soni",
-          "avatar": null
+          "id": "6",
+          "name": "Ashish Sirohi",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/6491f062-49f0-4183-9298-e1197b4ef9f9.jpg",
+          "batting": "Right Hand",
+          "bowling": "Leg Spin",
+          "arm": "Right Arm",
+          "fielding": "Wicket Keeper",
+          "shirt": "L",
+          "isCaptain": false
         },
         {
           "id": "21",
           "name": "Gaurav Arora",
-          "avatar": null
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/1d957f2a-655f-4bc2-8b21-699db98471bd.jpg",
+          "batting": "Right Hand",
+          "bowling": "Off Spin",
+          "arm": "Right Arm",
+          "fielding": "Cover",
+          "shirt": "M",
+          "isCaptain": false
+        },
+        {
+          "id": "25",
+          "name": "Harshal joshi",
+          "avatar": null,
+          "batting": "Left Hand",
+          "bowling": "Medium Fast",
+          "arm": "Left Arm",
+          "fielding": "Point",
+          "shirt": "—",
+          "isCaptain": false
+        },
+        {
+          "id": "26",
+          "name": "Hemang Shah",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/57b3fb35-39d2-4925-bf86-4586bd0051b6.jpg",
+          "batting": "Right Hand",
+          "bowling": "Medium Fast",
+          "arm": "Right Arm",
+          "fielding": "Right Sweeper",
+          "shirt": "M",
+          "isCaptain": false
+        },
+        {
+          "id": "30",
+          "name": "Kalrav Shah",
+          "avatar": "https://desisports.milanchheda.com/storage/profiles/7TVwUhysOFdYJLv56KNSIDeXMZWOktapfrXKqA5r.jpg",
+          "batting": "Right Hand",
+          "bowling": "Off Spin",
+          "arm": "Right Arm",
+          "fielding": "Leg Slide",
+          "shirt": "L",
+          "isCaptain": false
+        },
+        {
+          "id": "32",
+          "name": "Kunal soni",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/c6f1d57b-1305-48fc-a84d-8fa6b334d588.jpg",
+          "batting": "Right Hand",
+          "bowling": "Medium Fast",
+          "arm": "Right Arm",
+          "fielding": "Cover",
+          "shirt": "M",
+          "isCaptain": false
+        },
+        {
+          "id": "36",
+          "name": "Manthan Shah",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/f8e2d2e6-31cf-45f3-89cd-a278bae6a9f2.jpg",
+          "batting": "Right Hand",
+          "bowling": "Medium",
+          "arm": "Right Arm",
+          "fielding": "Wicket Keeper",
+          "shirt": "—",
+          "isCaptain": true
+        },
+        {
+          "id": "43",
+          "name": "Prateek Attree",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/d57dceb5-aa05-4528-9870-5b0dc15983aa.jpg",
+          "batting": "Right Hand",
+          "bowling": "Fast",
+          "arm": "Right Arm",
+          "fielding": "Right Sweeper",
+          "shirt": "XL",
+          "isCaptain": false
+        },
+        {
+          "id": "45",
+          "name": "Prateek Nahar",
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/a481cd9a-8560-4ed8-94ce-4bfb364db8cd.jpg",
+          "batting": "Right Hand",
+          "bowling": "Medium Fast",
+          "arm": "Right Arm",
+          "fielding": "Cover",
+          "shirt": "L",
+          "isCaptain": false
         },
         {
           "id": "51",
           "name": "Sahil Aggarwal",
-          "avatar": null
-        },
-        {
-          "id": "6",
-          "name": "Ashish Sirohi",
-          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/6491f062-49f0-4183-9298-e1197b4ef9f9.jpg"
-        },
-        {
-          "id": "35",
-          "name": "Home",
-          "avatar": null
+          "avatar": "https://desisports.milanchheda.com/storage/profile-photos/54f84c51-8a10-4ee6-aaa4-1e88e3558384.jpg",
+          "batting": "Right Hand",
+          "bowling": "Off Spin",
+          "arm": "Right Arm",
+          "fielding": "Point",
+          "shirt": "L",
+          "isCaptain": false
         }
       ]
     }
