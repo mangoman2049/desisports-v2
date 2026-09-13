@@ -1695,4 +1695,239 @@ export const MATCH_ANALYSES: Record<string, MatchTacticalAnalysis> = {
     finalHardHittingVerdict:
       "Away Team demonstrated complete mastery of indoor cricket fundamentals; Home Team's inability to prevent consecutive dismissals cost them 8 tournament points.",
   },
+
+  // ==========================================
+  // Match 8: Practice Match (10 Sep 2026)
+  // Home Team vs Away Team
+  // ==========================================
+  "8": {
+    matchId: 8,
+    tournamentName: "Desisports Practice Series",
+    matchTitle: "Home Team vs Away Team",
+    date: "10 September 2026, 8:12 PM",
+    venue: "Insportz Club, Dubai (Court 2)",
+    winner: "Home Team",
+    loser: "Away Team",
+    scoreSummary: "Home Team 117 def. Away Team 49 (+68 run margin, 3-1 skins, 7-1 tournament pts)",
+    editorHeadline:
+      "Shubham's +28 Masterclass Powers Home Team to 117-49 Demolition Over Away Team",
+    editorSummary:
+      "Home Team mounted an overwhelming performance in Match 8, defeating Away Team 117 to 49 with a 3-1 skin advantage. Player of the Match Shubham produced a near-flawless display, scoring 28 runs without dismissal and capturing 3 wickets for zero runs in his 2 overs (+28 net contribution). Strong supporting partnerships by Mayank Agarwal (+14) and Manthan Shah (+13) sealed decisive wins in Skins 1, 3, and 4. Away Team secured Skin 1 (26-21) behind Daman Singh (+11) and Sunny (+8), but collapsed in Skin 2 (-7 runs) due to relentless bowling pressure.",
+    whatWentRightWinner: {
+      title: "Tactical Wins for Home Team",
+      points: [
+        "Shubham delivered the individual performance of the tournament: 28 runs, 0 dismissals, 3 wickets conceded for 0 runs (+28 contribution).",
+        "Home Team swept Skins 2 (11 vs -7), 3 (38 vs 10), and 4 (47 vs 20) with dominant ground-running and net placement.",
+        "Strict bowling discipline: conceded only 49 total runs across 16 overs while enforcing 11 dismissals (-55 penalty runs).",
+      ],
+    },
+    whatWentWrongLoser: {
+      title: "Critical Breakdowns for Away Team",
+      points: [
+        "Catastrophic Skin 2 collapse: restricted to -7 net runs after 3 dismissals against disciplined seam bowling.",
+        "Suffered 11 total dismissals across the innings (-55 runs in penalties), squandering any attacking momentum.",
+        "Middle order failed to adjust to Court 2's tight side nets, offering 4 caught dismissals off mistimed lofted shots.",
+      ],
+    },
+    turningPoint: {
+      phase: "Skin 2 (Overs 5-8)",
+      nature: "Bowling Mastery",
+      description:
+        "Home Team's bowlers completely suffocated Away Team's second batting pair, conceding -7 runs and widening the gap beyond reach before the second half.",
+    },
+    skinsBreakdown: [
+      { skin: 1, winnerRuns: 26, loserRuns: 21, margin: 5, summary: "Away Team's Daman & Sunny narrowly took Skin 1 despite Manthan & Brijesh's 21 runs." },
+      { skin: 2, winnerRuns: 11, loserRuns: -7, margin: 18, summary: "Home Team dominated Skin 2, plunging Away Team into negative territory (-7)." },
+      { skin: 3, winnerRuns: 38, loserRuns: 10, margin: 28, summary: "Shubham & Mayank exploded for 38 runs in a decisive 28-run blowout." },
+      { skin: 4, winnerRuns: 47, loserRuns: 20, margin: 27, summary: "Sam & Ronak closed out the match with a blistering 47-run final skin." },
+    ],
+    matchVerdict: {
+      verdict: "TACTICAL DOMINATION",
+      explanation:
+        "Home Team executed superior indoor cricket strategy across both disciplines. After dropping a tight first skin, Home Team conceded only 23 runs across the final 12 overs while amassing 96 runs.",
+    },
+    whyWinningTeamWon: [
+      {
+        observation: "Shubham's elite all-round masterclass (+28 net contribution)",
+        evidence: "Scored 28 runs without dismissal in Skin 3 and bowled 2 maiden overs taking 3 wickets for 0 runs.",
+        impact: "Created an insurmountable +28 run swing single-handedly in Skin 3.",
+      },
+      {
+        observation: "Flawless second-half partnership execution in Skins 3 & 4",
+        evidence: "Mayank & Shubham posted 38 runs, followed by Sam & Ronak adding 47 runs.",
+        impact: "Amassed 85 runs in the final 8 overs to blow the contest wide open.",
+      },
+      {
+        observation: "Disciplined straight-line bowling inducing 11 total dismissals",
+        evidence: "Enforced 11 dismissals (-55 runs) on Away Team, limiting them to 49 total runs.",
+        impact: "Completely demoralized Away Team's middle-order chase.",
+      },
+    ],
+    whyLosingTeamLost: [
+      {
+        observation: "Skin 2 catastrophic batting implosion (-7 net runs)",
+        evidence: "Suffered 3 dismissals while scoring only 8 gross runs in overs 5-8.",
+        impact: "Surrendered match control and 18 skin margin runs in 4 overs.",
+      },
+      {
+        observation: "Excessive bowling extras and failure to control length",
+        evidence: "Conceded 22 unearned penalty runs via 8 wides and 3 no-balls.",
+        impact: "Allowed Home Team to maintain scoreboard momentum without taking risks.",
+      },
+      {
+        observation: "Cross-bat aggression on tight court boundaries",
+        evidence: "Lost 5 wickets to caught-behind and bowled off attempted cross-court pulls.",
+        impact: "Turned positive scoring phases into negative net tallies.",
+      },
+    ],
+    skinsAnalysisDetailed: {
+      pairs: [
+        {
+          pairNumber: 1,
+          winnerPair: "Daman Singh & Sunny",
+          winnerRuns: 26,
+          winnerDismissals: 1,
+          loserPair: "Manthan Shah & Brijesh",
+          loserRuns: 21,
+          loserDismissals: 2,
+          skinMargin: 5,
+          skinWinner: "Away Team",
+          analysis: "Away Team secured Skin 1 behind composed ground strokes from Daman (+11) and Sunny (+8).",
+        },
+        {
+          pairNumber: 2,
+          winnerPair: "Devang & Hemang",
+          winnerRuns: 11,
+          winnerDismissals: 2,
+          loserPair: "Away Pair 2",
+          loserRuns: -7,
+          loserDismissals: 3,
+          skinMargin: 18,
+          skinWinner: "Home Team",
+          analysis: "Home Team bowlers suffocated Away Team into -7 net runs, swinging the entire match momentum.",
+        },
+        {
+          pairNumber: 3,
+          winnerPair: "Shubham & Mayank Agarwal",
+          winnerRuns: 38,
+          winnerDismissals: 0,
+          loserPair: "Away Pair 3",
+          loserRuns: 10,
+          loserDismissals: 3,
+          skinMargin: 28,
+          skinWinner: "Home Team",
+          analysis: "A flawless 38-run exhibition with zero wickets lost against Away Team's frontline attack.",
+        },
+        {
+          pairNumber: 4,
+          winnerPair: "Sam & Ronak",
+          winnerRuns: 47,
+          winnerDismissals: 1,
+          loserPair: "Away Pair 4",
+          loserRuns: 20,
+          loserDismissals: 2,
+          skinMargin: 27,
+          skinWinner: "Home Team",
+          analysis: "Ruthless acceleration and sharp running between wickets yielded 47 runs to seal the 117-49 victory.",
+        },
+      ],
+      skinsStory:
+        "Away Team took an early lead in Skin 1 (26-21), but Home Team responded with three consecutive landslide skins (11 vs -7, 38 vs 10, 47 vs 20) to win 3-1 in skins.",
+    },
+    turningPointDetailed: {
+      matchStateBefore: "Away Team led 26-21 after Skin 1 and looked confident.",
+      event: "Home Team seamers bowled 3 consecutive dot-ball overs and induced 3 dismissals in Skin 2.",
+      matchStateAfter: "Away Team plummeted to -7 in the skin, giving Home Team an aggregate 32-19 lead.",
+      whyItMattered: "Broke Away Team's morale and forced their remaining pairs to bat under extreme deficit pressure.",
+    },
+    fatalMistake: {
+      mistake: "Away Team batters repeatedly swiped at full wide deliveries instead of rotating strike into side drop nets.",
+      impact: "Yielded 5 preventable caught dismissals (-25 runs) directly turning winning positions into collapses.",
+    },
+    playerImpact: [
+      {
+        player: "Shubham",
+        label: "MATCH WINNER",
+        explanation: "Player of the Match: 28 runs scored (0 outs), 3 wickets for 0 runs in 2 overs (+28 net contribution).",
+      },
+      {
+        player: "Mayank Agarwal",
+        label: "PARTNERSHIP BUILDER",
+        explanation: "Solid 14 runs without dismissal in Skin 3, enabling Shubham's explosive scoring.",
+      },
+      {
+        player: "Sam",
+        label: "GAME CHANGER",
+        explanation: "Bludgeoned 25 runs in Skin 4 with crisp front-court net drives to seal the win.",
+      },
+      {
+        player: "Daman Singh",
+        label: "SILENT CONTRIBUTOR",
+        explanation: "Top-scored for Away Team with 14 runs (+11 net) and showed model indoor cricket technique.",
+      },
+      {
+        player: "Away Team Skin 2 Pair",
+        label: "DISCIPLINE PROBLEM",
+        explanation: "Conceded 3 wickets (-15 penalty runs) and finished with -7 net runs.",
+      },
+    ],
+    battingBehaviour: [
+      {
+        team: "Home Team",
+        observations: [
+          "Shubham anchored the innings with zero dismissals, converting 70% of scoring opportunities into 2s and net boundaries.",
+          "Mayank Agarwal and Sam provided aggressive boundary hitting into net zone D.",
+          "Aggressive calling on second runs pressured Away Team fielders into 3 overthrows.",
+        ],
+      },
+      {
+        team: "Away Team",
+        observations: [
+          "Daman Singh and Sunny showed positive intent in Skin 1 (26 runs).",
+          "Excessive cross-bat swipes in Skins 2 and 3 resulted in 5 bowled/caught-behind dismissals.",
+          "Reluctance to take physical singles stranded non-strikers and raised dot-ball pressure.",
+        ],
+      },
+    ],
+    bowlingBehaviour: [
+      {
+        team: "Home Team",
+        observations: [
+          "Shubham bowled 2 maiden overs, taking 3 wickets for 0 runs.",
+          "Disciplined straight lines targeting middle and off stump.",
+          "Fielders maintained sharp backing-up discipline, preventing any bonus overthrow runs.",
+        ],
+      },
+      {
+        team: "Away Team",
+        observations: [
+          "Bowled 8 wides and 3 no-balls, giving away 22 unearned penalty runs.",
+          "Struggled to adjust length against Home Team's front-foot drives in Skins 3 and 4.",
+        ],
+      },
+    ],
+    captainAnalysis: {
+      evaluation:
+        "Home Team's captain rotated Shubham and Mayank into the critical third skin to extend the lead, while Away Team failed to alter field placements when Home Team attacked the front drop nets.",
+      captainTakeaways: [
+        "Deploy your best partnership pair in Skin 3 when momentum is up for grabs.",
+        "Under Bazooka / Spawtz rules, eliminating -5 dismissals is worth more than boundary attempts.",
+        "Focus on net zone singles rather than attempting lofted shots into the top net.",
+      ],
+    },
+    teamDnaAssessment: [
+      {
+        team: "Home Team",
+        traits: ["CLINICAL FINISHING", "ACCUMULATION DISCIPLINE", "ELITE RUN-SAVING"],
+        evidence: "Scored 117 runs, won 3 skins, conceded only 7 dismissals, and held Away Team to 49.",
+      },
+      {
+        team: "Away Team",
+        traits: ["EARLY PROMISE", "COLLAPSE PRONE", "DISCIPLINE BREAKDOWN"],
+        evidence: "Won Skin 1 with 26 runs but conceded -7 in Skin 2 and gave away 11 wickets.",
+      },
+    ],
+    finalHardHittingVerdict:
+      "Home Team's 117-49 victory was powered by Shubham's masterclass and an ironclad 3-skin recovery; Away Team's discipline collapse in Skin 2 determined the outcome.",
+  },
 };

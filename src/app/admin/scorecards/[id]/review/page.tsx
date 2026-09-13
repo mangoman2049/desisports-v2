@@ -137,12 +137,18 @@ function MakerCheckerReviewContent() {
     // 1. Check session cache first unless flushing
     if (!flushCache && uploadId) {
       try {
+        const cachedImg = sessionStorage.getItem(`scorecard_image_${uploadId}`);
+        if (cachedImg) {
+          setScorecardImage(cachedImg);
+        }
         const cached = sessionStorage.getItem(`scorecard_${uploadId}`);
         if (cached) {
           const parsed = JSON.parse(cached);
           if (parsed && (parsed.homeInnings || parsed.awayInnings)) {
             setScorecard(parsed);
-            setScorecardImage(`/api/scorecards/${uploadId}/image`);
+            if (!cachedImg) {
+              setScorecardImage(`/api/scorecards/${uploadId}/image`);
+            }
             setLoading(false);
           }
         }
@@ -170,8 +176,11 @@ function MakerCheckerReviewContent() {
                 // ignore
               }
             }
-            if (data.upload.imageUrl) {
+            if (data.upload.imageUrl && (data.upload.imageUrl.startsWith("data:") || data.upload.imageUrl.startsWith("http"))) {
               setScorecardImage(data.upload.imageUrl);
+              try {
+                sessionStorage.setItem(`scorecard_image_${uploadId}`, data.upload.imageUrl);
+              } catch {}
             } else {
               setScorecardImage(`/api/scorecards/${uploadId}/image`);
             }
@@ -540,6 +549,12 @@ function MakerCheckerReviewContent() {
                 <img
                   src={scorecardImage}
                   alt="Original Scorecard"
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    if (!target.src.includes("sample-scorecard.jpg")) {
+                      target.src = "/uploads/scorecards/sample-scorecard.jpg";
+                    }
+                  }}
                   className="max-w-[420px] w-full rounded shadow object-contain"
                 />
               </div>

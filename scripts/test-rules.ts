@@ -125,7 +125,7 @@ async function runTestSuite() {
       console.log("PASS: Rematch correctly allowed because final scores differed.");
     }
 
-    // Brand new 10 September match (117-49) -> NOT DUPLICATE!
+    // 10 September match (117-49) -> Now officially committed as Match #8 in DB!
     const sep10Sample = get10SepScorecardExtraction();
     const sep10Report = validateIndoorCricketScorecard(sep10Sample);
     console.log(`- 10-Sept Scorecard Validation: passed=${sep10Report.passed}, score=${sep10Report.confidenceScore}%`);
@@ -141,9 +141,9 @@ async function runTestSuite() {
       sep10Sample.homeInnings.totalRuns,
       sep10Sample.awayInnings.totalRuns
     );
-    console.log(`- 10-Sept Brand New Match Duplicate Check: ${sep10DupCheck.isDuplicate}`);
-    if (sep10DupCheck.isDuplicate) {
-      console.error("FAIL: 10-Sept match falsely flagged as duplicate!");
+    console.log(`- 10-Sept Match #8 Duplicate Check: isDuplicate=${sep10DupCheck.isDuplicate} (Match #${sep10DupCheck.existingMatchId})`);
+    if (!sep10DupCheck.isDuplicate || sep10DupCheck.existingMatchId !== 8) {
+      console.error("FAIL: 10-Sept scorecard should be identified as existing Match #8!");
       passedAll = false;
     }
 

@@ -100,11 +100,16 @@ export async function POST(req: NextRequest) {
       height = preprocessResult.height;
       base64Image = preprocessResult.buffer.toString("base64");
 
-      // Save optimized WebP file
+      // Save optimized WebP file to disk for cache
       const filename = `${uploadId}.webp`;
       const filePath = path.join(uploadDir, filename);
-      await fs.writeFile(filePath, preprocessResult.buffer);
-      imageUrl = `/uploads/scorecards/${filename}`;
+      try {
+        await fs.writeFile(filePath, preprocessResult.buffer);
+      } catch (writeErr) {
+        console.warn("Could not write WebP to disk, proceeding with in-memory/DB storage:", writeErr);
+      }
+      // Store data URI directly in DB for ACID persistence across ephemeral server restarts
+      imageUrl = `data:image/webp;base64,${base64Image}`;
     }
 
     // Run quality diagnostics
@@ -292,6 +297,7 @@ export async function POST(req: NextRequest) {
       uploadId: upload.id,
       matchId: committedMatchId,
       imageUrl,
+      apiImageUrl: `/api/scorecards/${upload.id}/image`,
       auditableJsonUrl: `/api/scorecards/${upload.id}/json`,
       diagnostics,
       parsedScorecard: reconciledScorecard,

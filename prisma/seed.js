@@ -6,103 +6,136 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("Seeding DesiSports V2 database with complete tournament rosters and players...");
 
-  // Clean existing tables in reverse dependency order
-  await prisma.deliveryEvent.deleteMany();
-  await prisma.skin.deleteMany();
-  await prisma.innings.deleteMany();
-  await prisma.playerMatchStat.deleteMany();
-  await prisma.extractionRevision.deleteMany();
-  await prisma.scorecardUpload.deleteMany();
-  await prisma.match.deleteMany();
-  await prisma.playerAlias.deleteMany();
-  await prisma.player.deleteMany();
-  await prisma.team.deleteMany();
-  await prisma.tournament.deleteMany();
-  await prisma.user.deleteMany();
+  const shouldForceReset = process.env.FORCE_RESET === "true";
+  if (shouldForceReset) {
+    console.log("FORCE_RESET=true: Cleaning existing database tables...");
+    await prisma.deliveryEvent.deleteMany();
+    await prisma.skin.deleteMany();
+    await prisma.innings.deleteMany();
+    await prisma.playerMatchStat.deleteMany();
+    await prisma.extractionRevision.deleteMany();
+    await prisma.scorecardUpload.deleteMany();
+    await prisma.match.deleteMany();
+    await prisma.playerAlias.deleteMany();
+    await prisma.player.deleteMany();
+    await prisma.team.deleteMany();
+    await prisma.tournament.deleteMany();
+    await prisma.user.deleteMany();
+  } else {
+    console.log("Preserving existing matches and uploads (idempotent seed)...");
+  }
 
-  // Create Users
-  const adminUser = await prisma.user.create({
-    data: {
+  // Upsert Users
+  await prisma.user.upsert({
+    where: { email: "manish.pandey@desisports.com" },
+    update: { name: "Manish Pandey", role: "ADMIN" },
+    create: {
       email: "manish.pandey@desisports.com",
       name: "Manish Pandey",
       role: "ADMIN",
     },
   });
 
-  await prisma.user.create({
-    data: {
+  await prisma.user.upsert({
+    where: { email: "captain@desisports.com" },
+    update: { name: "Team Captain", role: "CAPTAIN" },
+    create: {
       email: "captain@desisports.com",
       name: "Team Captain",
       role: "CAPTAIN",
     },
   });
 
-  // Create Tournaments
-  const tournament1 = await prisma.tournament.create({
-    data: {
+  // Upsert Tournaments
+  const tournament1 = await prisma.tournament.upsert({
+    where: { id: 1 },
+    update: { name: "Desi Boys Tournament May 2026", status: "ACTIVE" },
+    create: {
       id: 1,
       name: "Desi Boys Tournament May 2026",
       status: "ACTIVE",
     },
   });
 
-  const tournament2 = await prisma.tournament.create({
-    data: {
+  const tournament2 = await prisma.tournament.upsert({
+    where: { id: 2 },
+    update: { name: "DesiBoys Bazooka 4.0", status: "YET_TO_START" },
+    create: {
       id: 2,
       name: "DesiBoys Bazooka 4.0",
       status: "YET_TO_START",
     },
   });
 
-  const tournament0 = await prisma.tournament.create({
-    data: {
+  const tournament0 = await prisma.tournament.upsert({
+    where: { id: 0 },
+    update: { name: "Desisports Regular Practice", status: "ACTIVE" },
+    create: {
       id: 0,
       name: "Desisports Regular Practice",
       status: "ACTIVE",
     },
   });
 
-  // Create Teams
-  const desiTigers = await prisma.team.create({
-    data: { id: 1, name: "DesiTigers", code: "DTG" },
+  // Upsert Teams
+  const desiTigers = await prisma.team.upsert({
+    where: { name: "DesiTigers" },
+    update: { id: 1, code: "DTG" },
+    create: { id: 1, name: "DesiTigers", code: "DTG" },
   });
-  const vpgrTeam = await prisma.team.create({
-    data: { id: 2, name: "VPGR", code: "VPG" },
+  const vpgrTeam = await prisma.team.upsert({
+    where: { name: "VPGR" },
+    update: { id: 2, code: "VPG" },
+    create: { id: 2, name: "VPGR", code: "VPG" },
   });
-  const desiDabanggs = await prisma.team.create({
-    data: { id: 3, name: "DesiDabanggs", code: "DDB" },
+  const desiDabanggs = await prisma.team.upsert({
+    where: { name: "DesiDabanggs" },
+    update: { id: 3, code: "DDB" },
+    create: { id: 3, name: "DesiDabanggs", code: "DDB" },
   });
-  const desiTitans = await prisma.team.create({
-    data: { id: 4, name: "DesiTitans", code: "DTT" },
+  const desiTitans = await prisma.team.upsert({
+    where: { name: "DesiTitans" },
+    update: { id: 4, code: "DTT" },
+    create: { id: 4, name: "DesiTitans", code: "DTT" },
   });
-  const homeTeam = await prisma.team.create({
-    data: { id: 5, name: "Home Team", code: "HOM" },
+  const homeTeam = await prisma.team.upsert({
+    where: { name: "Home Team" },
+    update: { id: 5, code: "HOM" },
+    create: { id: 5, name: "Home Team", code: "HOM" },
   });
-  const awayTeam = await prisma.team.create({
-    data: { id: 6, name: "Away Team", code: "AWY" },
+  const awayTeam = await prisma.team.upsert({
+    where: { name: "Away Team" },
+    update: { id: 6, code: "AWY" },
+    create: { id: 6, name: "Away Team", code: "AWY" },
   });
-  const desiChallengers = await prisma.team.create({
-    data: { id: 7, name: "Desi Challengers", code: "DCH" },
+  const desiChallengers = await prisma.team.upsert({
+    where: { name: "Desi Challengers" },
+    update: { id: 7, code: "DCH" },
+    create: { id: 7, name: "Desi Challengers", code: "DCH" },
   });
 
   // 1. Seed Manish Pandey (ID 35)
-  await prisma.player.create({
-    data: {
+  await prisma.player.upsert({
+    where: { id: 35 },
+    update: {},
+    create: {
       id: 35,
       canonicalName: "Manish Pandey",
-      battingHand: "Left Hand",
+      battingHand: "Right Hand",
       bowlingStyle: "Right Arm Off Spin",
       fieldingPosition: "Cover",
-      captainTags: JSON.stringify(["Anchor", "Reliable Floor", "Matchup Specialist"]),
-      fuzzyVariants: JSON.stringify(["Maneesh", "Manis", "Maanes", "Manish P", "M Pandey", "Maneesh Pandey"]),
-      notes: "Steady anchor batter with high running chemistry and disciplined off-spin line.",
-      avatarUrl: "https://desisports.milanchheda.com/storage/profile-photos/manish-pandey.jpg",
+      captainTags: JSON.stringify(["Anchor", "Partnership Builder", "Economical Bowler"]),
+      avatarUrl: "https://desisports.milanchheda.com/storage/avatars/manish-pandey.jpg",
+      fuzzyVariants: JSON.stringify(["Maneesh Pandey", "Manish P", "M Pandey"]),
+      notes: "Disciplined top-order accumulator who prioritizes strike rotation and low-risk indoor cricket ground singles.",
     },
   });
 
   // 2. Seed Fallback Player "Extra" (ID 999) for unmapped/missing scorecards
-  await prisma.player.create({
-    data: {
+  await prisma.player.upsert({
+    where: { id: 999 },
+    update: {},
+    create: {
       id: 999,
       canonicalName: "Extra",
       battingHand: "Right Hand",
@@ -175,17 +208,20 @@ async function main() {
       tags: ["Squad Member"],
     };
 
-    await prisma.player.create({
-      data: {
-        id: p.id,
-        canonicalName: p.canonicalName,
-        battingHand: style.hand,
-        bowlingStyle: style.bowl,
-        fieldingPosition: style.pos,
-        captainTags: JSON.stringify(style.tags),
-        avatarUrl: p.avatarUrl,
-        fuzzyVariants: JSON.stringify([p.canonicalName, p.canonicalName.split(" ")[0]]),
-      },
+    const playerData = {
+      id: p.id,
+      canonicalName: p.canonicalName,
+      battingHand: style.hand,
+      bowlingStyle: style.bowl,
+      fieldingPosition: style.pos,
+      captainTags: JSON.stringify(style.tags),
+      avatarUrl: p.avatarUrl,
+      fuzzyVariants: JSON.stringify([p.canonicalName, p.canonicalName.split(" ")[0]]),
+    };
+    await prisma.player.upsert({
+      where: { id: p.id },
+      update: playerData,
+      create: playerData,
     });
   }
 
@@ -251,7 +287,7 @@ async function main() {
       battingHand: "Right Hand",
       bowlingStyle: "Right Arm Fast",
       fieldingPosition: "Mid On",
-      captainTags: JSON.stringify(["Boundary Hunter"]),
+      captainTags: JSON.stringify(["Boundary Hunter", "POTM Specialist"]),
       fuzzyVariants: JSON.stringify(["Shubham", "Subham"]),
     },
     {
@@ -299,10 +335,23 @@ async function main() {
       captainTags: JSON.stringify(["All-Rounder", "Boundary Striker"]),
       fuzzyVariants: JSON.stringify(["Gagan"]),
     },
+    {
+      id: 114,
+      canonicalName: "Devang",
+      battingHand: "Right Hand",
+      bowlingStyle: "Right Arm Medium",
+      fieldingPosition: "Cover",
+      captainTags: JSON.stringify(["All-Rounder"]),
+      fuzzyVariants: JSON.stringify(["Devang", "Devang S"]),
+    },
   ];
 
   for (const p of practicePlayersToSeed) {
-    await prisma.player.create({ data: p });
+    await prisma.player.upsert({
+      where: { id: p.id },
+      update: p,
+      create: p,
+    });
   }
 
   // Seed All 6 Tournament Matches from tournament_1_data.json
@@ -381,7 +430,7 @@ async function main() {
     },
     {
       id: 7,
-      date: "09 September 2026, 20:17", // Practice Match
+      date: "09 September 2026, 20:17", // Practice Match 1
       home: homeTeam.id,
       away: awayTeam.id,
       hScore: 63,
@@ -391,13 +440,39 @@ async function main() {
       potm: 101, // Yash
       scorecardUrl: "/admin/scorecards/1/review",
     },
+    {
+      id: 8,
+      date: "10 September 2026, 20:12", // Practice Match 2
+      home: homeTeam.id,
+      away: awayTeam.id,
+      hScore: 117,
+      aScore: 49,
+      hSkins: 3,
+      aSkins: 1,
+      potm: 108, // Shubham
+      scorecardUrl: "/matches/8",
+    },
   ];
 
   for (const m of tournamentMatchesData) {
-    await prisma.match.create({
-      data: {
+    await prisma.match.upsert({
+      where: { id: m.id },
+      update: {
+        tournamentId: m.id >= 7 ? 0 : 1,
+        matchDate: m.date,
+        homeTeamId: m.home,
+        awayTeamId: m.away,
+        homeScore: m.hScore,
+        awayScore: m.aScore,
+        homeSkins: m.hSkins,
+        awaySkins: m.aSkins,
+        potmPlayerId: m.potm,
+        status: "COMPLETED",
+        scorecardUrl: m.scorecardUrl,
+      },
+      create: {
         id: m.id,
-        tournamentId: m.id === 7 ? 0 : 1,
+        tournamentId: m.id >= 7 ? 0 : 1,
         matchDate: m.date,
         homeTeamId: m.home,
         awayTeamId: m.away,
@@ -412,24 +487,35 @@ async function main() {
     });
   }
 
-  // Helper to create PlayerMatchStat cleanly without excess properties
+  // Helper to upsert PlayerMatchStat cleanly without duplicate key violations
   async function addStat(matchId, playerId, teamId, rs, ob, rc, wkts, econ, c, isPotm = false, note = null, timesOut = 1) {
-    await prisma.playerMatchStat.create({
-      data: {
-        matchId,
-        playerId,
-        teamId,
-        runsScored: rs,
-        timesOut: timesOut !== undefined ? timesOut : 1,
-        oversBowled: ob,
-        runsConceded: rc,
-        wickets: wkts,
-        economy: econ,
-        contribution: c,
-        isPotm: !!isPotm,
-        performanceNote: note,
-      },
+    const existing = await prisma.playerMatchStat.findFirst({
+      where: { matchId, playerId },
     });
+    const statData = {
+      matchId,
+      playerId,
+      teamId,
+      runsScored: rs,
+      timesOut: timesOut !== undefined ? timesOut : 1,
+      oversBowled: ob,
+      runsConceded: rc,
+      wickets: wkts,
+      economy: econ,
+      contribution: c,
+      isPotm: !!isPotm,
+      performanceNote: note,
+    };
+    if (existing) {
+      await prisma.playerMatchStat.update({
+        where: { id: existing.id },
+        data: statData,
+      });
+    } else {
+      await prisma.playerMatchStat.create({
+        data: statData,
+      });
+    }
   }
 
   // 1. Prateek Nahar (ID 45) — Top Scorer (74 RS, 44 C)
@@ -499,7 +585,6 @@ async function main() {
   await addStat(7, 113, awayTeam.id, 16, 2.0, 7, 3, 3.5, 9, false, "⚡ 3 wickets & 16 runs", 1); // Gagan
   await addStat(7, 112, awayTeam.id, 3, 2.0, -4, 3, -2.0, 7, false, "⚡ -2.0 economy & 3 wickets", 1); // Sahil
   await addStat(7, 110, awayTeam.id, 18, 2.0, 12, 2, 6.0, 6, false, "18 runs scored", 1); // Viral
-  // Note: Manish Pandey (ID 35) already added above for Match 7: 20 RS, 2 OB, 14 RC, 1 WKT, +6 C
   await addStat(7, 111, awayTeam.id, 16, 2.0, 27, 0, 13.5, -11, false, null, 1); // Sunny
 
   // Home Team (63 runs, 0 skins won, 17 wickets conceded)
@@ -511,6 +596,27 @@ async function main() {
   await addStat(7, 108, homeTeam.id, 13, 2.0, 29, 0, 14.5, -16, false, null, 2); // Shubham
   await addStat(7, 103, homeTeam.id, 2, 2.0, 21, 0, 10.5, -19, false, null, 3); // Akshay
   await addStat(7, 104, homeTeam.id, -5, 2.0, 20, 0, 10.0, -25, false, null, 4); // Jigar
+
+  // --- MATCH 8 (PRACTICE MATCH - 10 Sep 2026) FULL 16-PLAYER ROSTER ---
+  // Home Team (117 runs, 3 skins won, 7 wickets conceded)
+  await addStat(8, 108, homeTeam.id, 28, 2.0, 0, 3, 0.0, 28, true, "★ Player of the match (+28 contribution)", 0); // Shubham (POTM)
+  await addStat(8, 37, homeTeam.id, 17, 2.0, 3, 2, 1.5, 14, false, "⚡ 2 wickets & 1.5 economy", 0); // Mayank Agarwal
+  await addStat(8, 36, homeTeam.id, 17, 2.0, 4, 1, 2.0, 13, false, "17 runs scored", 0); // Manthan Shah
+  await addStat(8, 54, homeTeam.id, 14, 2.0, 3, 2, 1.5, 11, false, "⚡ 2 wickets", 0); // Sam (Sameer Gohel)
+  await addStat(8, 75, homeTeam.id, 16, 2.0, 7, 2, 3.5, 9, false, "16 runs scored", 1); // Brijesh Gopinathan
+  await addStat(8, 50, homeTeam.id, 12, 2.0, 7, 1, 3.5, 5, false, null, 1); // Ronak Jain
+  await addStat(8, 26, homeTeam.id, 8, 2.0, 7, 1, 3.5, 1, false, null, 1); // Hemang Shah
+  await addStat(8, 38, homeTeam.id, 5, 2.0, 9, 0, 4.5, -4, false, null, 1); // Milan Chheda
+
+  // Away Team (49 runs, 1 skin won, 11 wickets conceded)
+  await addStat(8, 13, awayTeam.id, 16, 2.0, 5, 2, 2.5, 11, false, "⭐ Top contributor for Away (+11)", 1); // Daman Singh
+  await addStat(8, 76, awayTeam.id, 14, 2.0, 6, 2, 3.0, 8, false, "14 runs scored", 1); // Sunny Vaswani
+  await addStat(8, 23, awayTeam.id, 12, 2.0, 6, 1, 3.0, 6, false, null, 1); // Hardik Desai
+  await addStat(8, 55, awayTeam.id, 9, 2.0, 6, 1, 3.0, 3, false, null, 1); // Sandeep Khedekar
+  await addStat(8, 32, awayTeam.id, 8, 2.0, 7, 1, 3.5, 1, false, null, 1); // Kunal soni
+  await addStat(8, 110, awayTeam.id, 7, 2.0, 9, 0, 4.5, -2, false, null, 1); // Viral / Ronak
+  await addStat(8, 48, awayTeam.id, 4, 2.0, 15, 0, 7.5, -11, false, null, 2); // Ritesh Mehta
+  await addStat(8, 114, awayTeam.id, -12, 2.0, 24, 0, 12.0, -36, false, null, 3); // Devang
 
   // Seed Canonical Aliases for OCR resolution (e.g. MANEESH -> Manish Pandey)
   const aliasesToSeed = [
@@ -531,6 +637,18 @@ async function main() {
     { alias: "VIRAL", playerId: 110 },
     { alias: "SUNNY", playerId: 111 },
     { alias: "SAHIL", playerId: 112 },
+    { alias: "DHANAN", playerId: 13 },
+    { alias: "SANDEEP", playerId: 55 },
+    { alias: "SUNIL", playerId: 32 },
+    { alias: "RONAK", playerId: 50 },
+    { alias: "RITESH", playerId: 48 },
+    { alias: "DEVANG", playerId: 114 },
+    { alias: "SAM", playerId: 54 },
+    { alias: "MAYANK", playerId: 37 },
+    { alias: "BRIJESH", playerId: 75 },
+    { alias: "BRUJESH", playerId: 75 },
+    { alias: "MILAN", playerId: 38 },
+    { alias: "HEMANG", playerId: 26 },
   ];
 
   for (const a of aliasesToSeed) {
@@ -557,6 +675,39 @@ async function main() {
           });
         } catch (e) {}
       }
+    }
+  }
+
+  // Replay any durable committed matches from ledger (ensuring ACID durability across rebuilds)
+  const fs = require("fs");
+  const path = require("path");
+  const ledgerPath = path.join(__dirname, "committed_matches.json");
+  if (fs.existsSync(ledgerPath)) {
+    try {
+      const ledger = JSON.parse(fs.readFileSync(ledgerPath, "utf-8"));
+      console.log(`Replaying ${ledger.length} matches from committed_matches.json ledger...`);
+      for (const entry of ledger) {
+        const existing = await prisma.match.findUnique({ where: { id: entry.matchId } });
+        if (!existing) {
+          await prisma.match.create({
+            data: {
+              id: entry.matchId,
+              tournamentId: entry.tournamentId || 0,
+              matchDate: entry.matchDate,
+              homeTeamId: homeTeam.id,
+              awayTeamId: awayTeam.id,
+              homeScore: entry.homeScore,
+              awayScore: entry.awayScore,
+              homeSkins: entry.homeSkins,
+              awaySkins: entry.awaySkins,
+              status: "COMPLETED",
+              scorecardUrl: `/matches/${entry.matchId}`,
+            },
+          });
+        }
+      }
+    } catch (err) {
+      console.warn("Could not replay committed_matches ledger:", err);
     }
   }
 

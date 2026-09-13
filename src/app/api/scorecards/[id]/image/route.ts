@@ -95,7 +95,23 @@ export async function GET(
 
     // 3. Obtain raw image buffer
     let rawBuffer: Buffer;
-    if (sourceUrlOrPath.startsWith("http://") || sourceUrlOrPath.startsWith("https://")) {
+    if (sourceUrlOrPath.startsWith("data:image/")) {
+      const commaIdx = sourceUrlOrPath.indexOf(",");
+      const b64 = commaIdx >= 0 ? sourceUrlOrPath.substring(commaIdx + 1) : sourceUrlOrPath;
+      rawBuffer = Buffer.from(b64, "base64");
+
+      // If already WebP from client preprocessor, serve directly for speed
+      if (sourceUrlOrPath.startsWith("data:image/webp")) {
+        const headers: Record<string, string> = {
+          "Content-Type": "image/webp",
+          "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800",
+        };
+        if (download) {
+          headers["Content-Disposition"] = `attachment; filename="scorecard-${id}.webp"`;
+        }
+        return new NextResponse(new Uint8Array(rawBuffer), { status: 200, headers });
+      }
+    } else if (sourceUrlOrPath.startsWith("http://") || sourceUrlOrPath.startsWith("https://")) {
       const resp = await fetch(sourceUrlOrPath);
       if (!resp.ok) {
         throw new Error(`Failed to fetch remote scorecard image: ${resp.statusText}`);
@@ -115,8 +131,14 @@ export async function GET(
     }
 
     // 4. Crop to paper boundaries, convert to grayscale, normalize contrast, and generate WebP Q75
-    const preprocessRes = await preprocessScorecardImage(rawBuffer);
-    const webpBuffer = preprocessRes.buffer;
+    let webpBuffer: Buffer;
+    try {
+      const preprocessRes = await preprocessScorecardImage(rawBuffer);
+      webpBuffer = preprocessRes.buffer;
+    } catch {
+      // If preprocessing fails on raw buffer, use rawBuffer directly
+      webpBuffer = rawBuffer;
+    }
 
     // Cache the WebP buffer for future requests
     try {
@@ -138,7 +160,20 @@ export async function GET(
 
     return new NextResponse(new Uint8Array(webpBuffer), { status: 200, headers });
   } catch (err: any) {
-    console.error("Scorecard image route error:", err);
+    console.error("Scorecard image route error, returning sample fallback:", err);
+    try {
+      const samplePath = path.join(process.cwd(), "public", "uploads", "scorecards", "sample-scorecard.jpg");
+      if (fs.existsSync(samplePath)) {
+        const sampleBuf = await fs.promises.readFile(samplePath);
+        return new NextResponse(new Uint8Array(sampleBuf), {
+          status: 200,
+          headers: {
+            "Content-Type": "image/jpeg",
+            "Cache-Control": "public, max-age=86400",
+          },
+        });
+      }
+    } catch {}
     return NextResponse.json({ error: err.message || "Failed to load scorecard image" }, { status: 500 });
   }
 }

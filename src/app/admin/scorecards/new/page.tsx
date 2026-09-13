@@ -503,13 +503,18 @@ function NewScorecardContent() {
         return;
       }
 
-      // Store parsed result in session cache for maker-checker review safely
-      if (data.uploadId && data.parsedScorecard) {
+      // Store parsed result and image in session cache for instantaneous maker-checker review
+      if (data.uploadId) {
         try {
-          sessionStorage.setItem(
-            `scorecard_${data.uploadId}`,
-            JSON.stringify(data.parsedScorecard)
-          );
+          if (data.parsedScorecard) {
+            sessionStorage.setItem(
+              `scorecard_${data.uploadId}`,
+              JSON.stringify(data.parsedScorecard)
+            );
+          }
+          if (data.imageUrl && (data.imageUrl.startsWith("data:") || data.imageUrl.startsWith("http"))) {
+            sessionStorage.setItem(`scorecard_image_${data.uploadId}`, data.imageUrl);
+          }
         } catch (storageErr) {
           console.warn("Could not write scorecard to sessionStorage:", storageErr);
         }
