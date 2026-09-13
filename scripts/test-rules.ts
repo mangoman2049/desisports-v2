@@ -945,6 +945,40 @@ async function runTestSuite() {
     passedAll = false;
   }
 
+  // Test 24: Tournament 2 Pre-Tournament Data Hygiene & Pristine Placeholders
+  console.log("\n[Test 24] Tournament 2 Pre-Tournament Data Hygiene & Pristine Placeholders:");
+  try {
+    const t2Json = (await import("../prisma/tournament_2_data.json")).default;
+    const { getTournamentDetails } = await import("../src/lib/tournament-service");
+    const t2Details = await getTournamentDetails(2);
+
+    const hasNoRegisteredPool = (t2Json as any).registeredPlayers === undefined && (t2Json as any).registeredPlayersCount === undefined;
+    const hasEmptyStandings = t2Details.standings.length === 0;
+    const hasEmptyLeaderboards =
+      t2Details.topRunGetters.length === 0 &&
+      t2Details.topWicketTakers.length === 0 &&
+      t2Details.topContributors.length === 0;
+    const hasNoPrematureHonors =
+      t2Details.mvp === null &&
+      t2Details.champions === null &&
+      t2Details.runnerUp === null;
+
+    console.log(`- Registered Players Pool (61) Removed: ${hasNoRegisteredPool}`);
+    console.log(`- Standings Count Prior to Match Start: ${t2Details.standings.length} (Expected: 0)`);
+    console.log(`- Empty Leaderboard Placeholders Verified: ${hasEmptyLeaderboards}`);
+    console.log(`- No Premature Champions/MVP: ${hasNoPrematureHonors}`);
+
+    if (!hasNoRegisteredPool || !hasEmptyStandings || !hasEmptyLeaderboards || !hasNoPrematureHonors) {
+      console.error("FAIL: Tournament 2 data hygiene failed! Found leftover or premature data.");
+      passedAll = false;
+    } else {
+      console.log("PASS: Tournament 2 data hygiene verified (no 61 pool, empty points table, pristine leaderboards).");
+    }
+  } catch (err) {
+    console.error("FAIL: Test 24 encountered error:", err);
+    passedAll = false;
+  }
+
   await prisma.$disconnect();
 
   if (!passedAll) {
@@ -952,7 +986,7 @@ async function runTestSuite() {
     process.exit(1);
   } else {
     console.log("\n==================================================");
-    console.log("✅ ALL 23 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
+    console.log("✅ ALL 24 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
     console.log("==================================================");
     process.exit(0);
   }

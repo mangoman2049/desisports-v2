@@ -433,35 +433,47 @@ export default function TournamentView({ data }: { data: TournamentData }) {
               </div>
             </div>
 
-            <div className="divide-y divide-slate-100 dark:divide-slate-800 flex-1">
-              {runGettersDisplay.map((p, idx) => (
-                <Link
-                  key={p.playerId}
-                  href={`/player/${p.playerId}`}
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition group"
-                >
-                  <span className="w-6 text-center font-mono font-bold text-xs text-slate-400 group-hover:text-emerald-600">
-                    {p.rank || idx + 1}
-                  </span>
-                  {p.avatar ? (
-                    <img
-                      src={p.avatar}
-                      alt={p.name}
-                      className="w-8 h-8 rounded-full object-cover border border-slate-200 dark:border-slate-700"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-xs">
-                      {p.name.charAt(0)}
-                    </div>
-                  )}
-                  <span className="flex-1 truncate text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">
-                    {p.name}
-                  </span>
-                  <span className="text-xs font-mono font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded border border-emerald-500/20">
-                    {p.value} runs
-                  </span>
-                </Link>
-              ))}
+            <div className="divide-y divide-slate-100 dark:divide-slate-800 flex-1 flex flex-col justify-center min-h-[160px]">
+              {runGettersDisplay.length > 0 ? (
+                runGettersDisplay.map((p, idx) => (
+                  <Link
+                    key={p.playerId}
+                    href={`/player/${p.playerId}`}
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition group"
+                  >
+                    <span className="w-6 text-center font-mono font-bold text-xs text-slate-400 group-hover:text-emerald-600">
+                      {p.rank || idx + 1}
+                    </span>
+                    {p.avatar ? (
+                      <img
+                        src={p.avatar}
+                        alt={p.name}
+                        className="w-8 h-8 rounded-full object-cover border border-slate-200 dark:border-slate-700"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-xs">
+                        {p.name.charAt(0)}
+                      </div>
+                    )}
+                    <span className="flex-1 truncate text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">
+                      {p.name}
+                    </span>
+                    <span className="text-xs font-mono font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded border border-emerald-500/20">
+                      {p.value} runs
+                    </span>
+                  </Link>
+                ))
+              ) : (
+                <div className="p-8 text-center flex flex-col items-center justify-center">
+                  <span className="text-3xl mb-2 opacity-30">🏏</span>
+                  <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    No Batting Records Yet
+                  </p>
+                  <p className="text-[11px] text-slate-400 mt-1 max-w-[200px]">
+                    Top run-getters will populate automatically once match scorecards are approved.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -479,35 +491,47 @@ export default function TournamentView({ data }: { data: TournamentData }) {
               </div>
             </div>
 
-            <div className="divide-y divide-slate-100 dark:divide-slate-800 flex-1">
-              {wicketTakersDisplay.map((p, idx) => (
-                <Link
-                  key={p.playerId}
-                  href={`/player/${p.playerId}`}
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition group"
-                >
-                  <span className="w-6 text-center font-mono font-bold text-xs text-slate-400 group-hover:text-purple-600">
-                    {p.rank || idx + 1}
-                  </span>
-                  {p.avatar ? (
-                    <img
-                      src={p.avatar}
-                      alt={p.name}
-                      className="w-8 h-8 rounded-full object-cover border border-slate-200 dark:border-slate-700"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-xs">
-                      {p.name.charAt(0)}
-                    </div>
-                  )}
-                  <span className="flex-1 truncate text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition">
-                    {p.name}
-                  </span>
-                  <span className="text-xs font-mono font-black text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/50 px-2 py-0.5 rounded border border-purple-500/20">
-                    {p.value} wkts
-                  </span>
-                </Link>
-              ))}
+            <div className="divide-y divide-slate-100 dark:divide-slate-800 flex-1 flex flex-col justify-center min-h-[160px]">
+              {wicketTakersDisplay.length > 0 ? (
+                wicketTakersDisplay.map((p, idx) => (
+                  <Link
+                    key={p.playerId}
+                    href={`/player/${p.playerId}`}
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition group"
+                  >
+                    <span className="w-6 text-center font-mono font-bold text-xs text-slate-400 group-hover:text-purple-600">
+                      {p.rank || idx + 1}
+                    </span>
+                    {p.avatar ? (
+                      <img
+                        src={p.avatar}
+                        alt={p.name}
+                        className="w-8 h-8 rounded-full object-cover border border-slate-200 dark:border-slate-700"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-xs">
+                        {p.name.charAt(0)}
+                      </div>
+                    )}
+                    <span className="flex-1 truncate text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition">
+                      {p.name}
+                    </span>
+                    <span className="text-xs font-mono font-black text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/50 px-2 py-0.5 rounded border border-purple-500/20">
+                      {p.value} wkts
+                    </span>
+                  </Link>
+                ))
+              ) : (
+                <div className="p-8 text-center flex flex-col items-center justify-center">
+                  <span className="text-3xl mb-2 opacity-30">🎳</span>
+                  <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    No Bowling Records Yet
+                  </p>
+                  <p className="text-[11px] text-slate-400 mt-1 max-w-[200px]">
+                    Top wicket-takers will populate automatically once match scorecards are approved.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -525,35 +549,47 @@ export default function TournamentView({ data }: { data: TournamentData }) {
               </div>
             </div>
 
-            <div className="divide-y divide-slate-100 dark:divide-slate-800 flex-1">
-              {contributorsDisplay.map((p, idx) => (
-                <Link
-                  key={p.playerId}
-                  href={`/player/${p.playerId}`}
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition group"
-                >
-                  <span className="w-6 text-center font-mono font-bold text-xs text-slate-400 group-hover:text-amber-600">
-                    {p.rank || idx + 1}
-                  </span>
-                  {p.avatar ? (
-                    <img
-                      src={p.avatar}
-                      alt={p.name}
-                      className="w-8 h-8 rounded-full object-cover border border-slate-200 dark:border-slate-700"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-xs">
-                      {p.name.charAt(0)}
-                    </div>
-                  )}
-                  <span className="flex-1 truncate text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition">
-                    {p.name}
-                  </span>
-                  <span className="text-xs font-mono font-black text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded border border-amber-500/20">
-                    +{p.value} pts
-                  </span>
-                </Link>
-              ))}
+            <div className="divide-y divide-slate-100 dark:divide-slate-800 flex-1 flex flex-col justify-center min-h-[160px]">
+              {contributorsDisplay.length > 0 ? (
+                contributorsDisplay.map((p, idx) => (
+                  <Link
+                    key={p.playerId}
+                    href={`/player/${p.playerId}`}
+                    className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition group"
+                  >
+                    <span className="w-6 text-center font-mono font-bold text-xs text-slate-400 group-hover:text-amber-600">
+                      {p.rank || idx + 1}
+                    </span>
+                    {p.avatar ? (
+                      <img
+                        src={p.avatar}
+                        alt={p.name}
+                        className="w-8 h-8 rounded-full object-cover border border-slate-200 dark:border-slate-700"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-xs">
+                        {p.name.charAt(0)}
+                      </div>
+                    )}
+                    <span className="flex-1 truncate text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition">
+                      {p.name}
+                    </span>
+                    <span className="text-xs font-mono font-black text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded border border-amber-500/20">
+                      +{p.value} pts
+                    </span>
+                  </Link>
+                ))
+              ) : (
+                <div className="p-8 text-center flex flex-col items-center justify-center">
+                  <span className="text-3xl mb-2 opacity-30">⭐</span>
+                  <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    No MVP Standings Yet
+                  </p>
+                  <p className="text-[11px] text-slate-400 mt-1 max-w-[200px]">
+                    Top contributors will populate automatically once match scorecards are approved.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>

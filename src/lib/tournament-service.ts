@@ -348,7 +348,8 @@ export async function getTournamentDetails(
       console.warn("Could not query DB matches for Tournament 2:", e);
     }
 
-    const standings = computeStandingsFromMatches(teamNames, dbMatches);
+    // Data Hygiene: If no matches have been played yet, standings are empty (tournament yet to start)
+    const standings = dbMatches.length > 0 ? computeStandingsFromMatches(teamNames, dbMatches) : [];
     const leaderboards = computeLeaderboardsFromStats(dbStats);
 
     const scheduledFixtures: any[] = (tournament2Json as any).fixtures || [];
