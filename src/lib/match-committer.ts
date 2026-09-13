@@ -8,6 +8,11 @@ import {
   getOrUpdateTournamentTeamDNA,
   updatePlayerTacticalInsightsOnMatchComplete,
 } from "@/lib/tactical-trigger-service";
+import {
+  sanitizeScorecardPayload,
+  sanitizePlayerName,
+  sanitizeString,
+} from "@/lib/security";
 
 /**
  * Commits an approved or auto-approved scorecard into the database as a permanent Match,
@@ -20,7 +25,10 @@ export async function commitScorecardAsApprovedMatch(params: {
   reviewerNotes?: string;
   tacticalAnalysisJson?: string;
 }): Promise<{ matchId: number; validation: any }> {
-  const { uploadId, parsedScorecard, reviewerNotes = "Approved revision", tacticalAnalysisJson } = params;
+  const uploadId = sanitizeString(params.uploadId, 50);
+  const parsedScorecard = sanitizeScorecardPayload(params.parsedScorecard);
+  const reviewerNotes = sanitizeString(params.reviewerNotes || "Approved revision", 250);
+  const { tacticalAnalysisJson } = params;
 
   // 1. Validation report
   const validation = validateIndoorCricketScorecard(parsedScorecard);
@@ -169,7 +177,7 @@ export async function commitScorecardAsApprovedMatch(params: {
 
   // 6. Persist Player records & PlayerMatchStat rows for all players
   for (const p of allSummaries) {
-    const rawName = (p.name || "").trim();
+    const rawName = sanitizePlayerName(p.name || "").trim();
     if (!rawName) continue;
 
     let playerId: number;

@@ -11,20 +11,48 @@ import path from "path";
 import sharp from "sharp";
 import { preprocessScorecardImage } from "@/lib/image-preprocessor";
 import { revalidateCricketCache } from "@/lib/cache-revalidator";
+import {
+  sanitizeMatchTitle,
+  sanitizeTeamName,
+  sanitizeScorecardPayload,
+  checkRateLimit,
+} from "@/lib/security";
 
 export async function POST(req: NextRequest) {
   try {
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("x-real-ip") ||
+      "127.0.0.1";
+
+    // 1. Sliding Window Rate Limiting: Max 8 uploads per minute per IP ($0 Budget Guard)
+    const rateCheck = checkRateLimit(`upload:${ip}`, 8, 60);
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: "Upload rate limit reached. Please wait a moment before uploading another scorecard.",
+          code: "TOO_MANY_REQUESTS",
+        },
+        { status: 429 }
+      );
+    }
+
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
     const forceSample = formData.get("forceSample") === "true";
     const forceDuplicate = formData.get("forceDuplicate") === "true";
     const forceMismatch = formData.get("forceMismatch") === "true";
     const autoApprove = formData.get("autoApprove") === "true";
-    const matchTitle = (formData.get("matchTitle") as string) || undefined;
+    const rawMatchTitle = (formData.get("matchTitle") as string) || undefined;
     const tournamentIdRaw = formData.get("tournamentId") as string | null;
     const tournamentId = tournamentIdRaw ? parseInt(tournamentIdRaw, 10) : 0;
-    const expectedHomeTeam = (formData.get("expectedHomeTeam") as string) || undefined;
-    const expectedAwayTeam = (formData.get("expectedAwayTeam") as string) || undefined;
+    const rawExpectedHomeTeam = (formData.get("expectedHomeTeam") as string) || undefined;
+    const rawExpectedAwayTeam = (formData.get("expectedAwayTeam") as string) || undefined;
+
+    // 2. Strict Input Sanitization
+    const matchTitle = rawMatchTitle ? sanitizeMatchTitle(rawMatchTitle) : undefined;
+    const expectedHomeTeam = rawExpectedHomeTeam ? sanitizeTeamName(rawExpectedHomeTeam) : undefined;
+    const expectedAwayTeam = rawExpectedAwayTeam ? sanitizeTeamName(rawExpectedAwayTeam) : undefined;
 
     let imageUrl = "/uploads/scorecards/sample-scorecard.jpg";
     let width = 1600;
@@ -35,6 +63,29 @@ export async function POST(req: NextRequest) {
     await fs.mkdir(uploadDir, { recursive: true });
 
     if (file && !forceSample) {
+      // 3. File Size Cap: Max 10MB to protect memory & server budget
+      if (file.size > 10 * 1024 * 1024) {
+        return NextResponse.json(
+          {
+            error: "Scorecard file exceeds the maximum 10 MB limit.",
+            code: "FILE_TOO_LARGE",
+          },
+          { status: 413 }
+        );
+      }
+
+      // 4. Strict MIME Type Validation (Images only)
+      const allowedMimeTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+      if (file.type && !allowedMimeTypes.includes(file.type.toLowerCase())) {
+        return NextResponse.json(
+          {
+            error: "Invalid file format. Only JPEG, PNG, and WebP scorecard images are accepted.",
+            code: "UNSUPPORTED_MEDIA_TYPE",
+          },
+          { status: 415 }
+        );
+      }
+
       const bytes = await file.arrayBuffer();
       const rawBuffer = Buffer.from(bytes);
 
@@ -60,13 +111,16 @@ export async function POST(req: NextRequest) {
     const diagnostics = evaluateQualityGate(width, height);
 
     // Extract scorecard using Vision LLM or fallback deterministic engine
-    const parsed = base64Image
+    const rawParsed = base64Image
       ? await extractScorecardWithLiteLLM(base64Image, {
           forceSample,
           matchTitle,
           tournamentId,
         })
       : getSampleScorecardExtraction();
+
+    // 5. Deep Sanitization of Extracted Payload (Strips prompt injection and script tags)
+    const parsed = sanitizeScorecardPayload(rawParsed);
 
     if (matchTitle) {
       parsed.matchInfo.title = matchTitle;
@@ -89,8 +143,11 @@ export async function POST(req: NextRequest) {
 
     // Reconcile player names across both teams (8 home, 8 away, bowlers)
     // If a new player has no DB match, it DOES NOT FAIL: it takes the name as it is!
-    const { scorecard: reconciledScorecard, resolutions, matchedCount, unreconciledCount } =
+    const { scorecard: rawReconciled, resolutions, matchedCount, unreconciledCount } =
       await resolveAllScorecardPlayers(parsed);
+
+    // Deep sanitize resolved names
+    const reconciledScorecard = sanitizeScorecardPayload(rawReconciled);
 
     // Ensure team names adopt selected fixture if still generic
     if (

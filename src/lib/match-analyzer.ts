@@ -11,6 +11,7 @@ import {
   INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT,
   buildMatchPromptContext,
 } from "@/lib/tactical-prompt";
+import { sanitizeScorecardPayload } from "@/lib/security";
 
 export { INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT, buildMatchPromptContext };
 
@@ -28,7 +29,8 @@ export async function generateMatchAnalysisWithLLM(
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 10000);
 
-    const matchContext = buildMatchPromptContext(scorecard);
+    const safeScorecard = sanitizeScorecardPayload(scorecard);
+    const matchContext = buildMatchPromptContext(safeScorecard);
 
     const response = await fetch(`${apiBase}/v1/chat/completions`, {
       method: "POST",

@@ -23,7 +23,10 @@ export default function PurgeControls() {
     try {
       const res = await fetch("/api/admin/purge", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-key": "desi-cricket-admin-2026",
+        },
         body: JSON.stringify({ mode }),
       });
 

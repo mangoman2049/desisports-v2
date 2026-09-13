@@ -3,11 +3,37 @@ import { prisma } from "@/lib/prisma";
 import { exec } from "child_process";
 import util from "util";
 import { revalidateCricketCache } from "@/lib/cache-revalidator";
+import { verifyAdminKey, checkRateLimit } from "@/lib/security";
 
 const execPromise = util.promisify(exec);
 
 export async function POST(req: NextRequest) {
   try {
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("x-real-ip") ||
+      "127.0.0.1";
+
+    // 1. Strict Rate Limiting: Max 3 purge requests per 5 minutes per IP
+    const rateCheck = checkRateLimit(`purge:${ip}`, 3, 300);
+    if (!rateCheck.allowed) {
+      return NextResponse.json(
+        { error: "Too many admin requests. Please wait before retrying." },
+        { status: 429 }
+      );
+    }
+
+    // 2. Authorization Check: Require valid x-admin-key header
+    if (!verifyAdminKey(req)) {
+      return NextResponse.json(
+        {
+          error: "Unauthorized: Invalid or missing administrator authorization key.",
+          code: "ADMIN_KEY_REQUIRED",
+        },
+        { status: 401 }
+      );
+    }
+
     const { mode } = await req.json();
 
     if (mode === "uploads") {
