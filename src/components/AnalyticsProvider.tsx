@@ -7,7 +7,7 @@ import { trackPageView, UserPersona } from "@/lib/analytics";
 function inferPersonaFromPath(path: string): UserPersona {
   if (path.startsWith("/captain")) return "CAPTAIN";
   if (path.startsWith("/admin/scorecards/new") || path.includes("/review")) return "REVIEWER";
-  if (path.startsWith("/admin")) return "ADMIN";
+  if (path.startsWith("/admin") || path.startsWith("/prompts")) return "ADMIN";
   if (path.startsWith("/player/")) return "PLAYER";
   if (path.startsWith("/matches/") || path.includes("/teams/")) return "ANALYST";
   return "VISITOR";

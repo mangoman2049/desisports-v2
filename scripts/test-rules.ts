@@ -1217,6 +1217,49 @@ async function runTestSuite() {
     passedAll = false;
   }
 
+  // Test 29: Unlisted /prompts Console & Observability Dashboard
+  console.log("\n[Test 29] Unlisted /prompts Console & Observability Dashboard:");
+  try {
+    const promptsPagePath = path.join(__dirname, "../src/app/prompts/page.tsx");
+    const promptsClientPath = path.join(__dirname, "../src/app/prompts/PromptsClient.tsx");
+
+    const pageExists = fs.existsSync(promptsPagePath);
+    const clientExists = fs.existsSync(promptsClientPath);
+
+    const pageContent = fs.readFileSync(promptsPagePath, "utf-8");
+    const clientContent = fs.readFileSync(promptsClientPath, "utf-8");
+
+    // 1. Verify unlisted security: robots { index: false, follow: false }
+    const isUnlistedNoIndex = pageContent.includes("index: false") && pageContent.includes("follow: false");
+    console.log(`- Unlisted Route Security (Noindex, Nofollow): ${isUnlistedNoIndex ? "PASS" : "FAIL"}`);
+
+    // 2. Verify subtabs for all 3 prompts
+    const hasMatchPrompt = pageContent.includes("INDOOR_CRICKET_ANALYST_SYSTEM_PROMPT") && clientContent.includes('"match"');
+    const hasTeamPrompt = pageContent.includes("TEAM_DNA_TOURNAMENT_BEGIN_PROMPT") && clientContent.includes('"team"');
+    const hasPlayerPrompt = pageContent.includes("PLAYER_TACTICAL_INTELLIGENCE_PROMPT") && clientContent.includes('"player"');
+    console.log(`- Subtab 1 (Match Tactical Analysis): ${hasMatchPrompt ? "PASS" : "FAIL"}`);
+    console.log(`- Subtab 2 (Team DNA Tournament Begin & Evolving): ${hasTeamPrompt ? "PASS" : "FAIL"}`);
+    console.log(`- Subtab 3 (Player Tactical Intelligence Career-Wide): ${hasPlayerPrompt ? "PASS" : "FAIL"}`);
+
+    // 3. Verify Code Embed UI & Observability KPIs
+    const hasCodeEmbed = clientContent.includes("Line Numbers Gutter") || clientContent.includes("promptLines.map");
+    const hasCopyAction = clientContent.includes("handleCopy") && clientContent.includes("handleDownload");
+    const hasKpis = clientContent.includes("totalInvocations") && clientContent.includes("gemini-1.5-pro");
+    console.log(`- Code Embed UI (Gutter, line numbers, monospace): ${hasCodeEmbed ? "PASS" : "FAIL"}`);
+    console.log(`- Actions (Copy Prompt, Download txt): ${hasCopyAction ? "PASS" : "FAIL"}`);
+    console.log(`- Observability KPIs (Invocations, LLM model, Cache hit): ${hasKpis ? "PASS" : "FAIL"}`);
+
+    if (!pageExists || !clientExists || !isUnlistedNoIndex || !hasMatchPrompt || !hasTeamPrompt || !hasPlayerPrompt || !hasCodeEmbed || !hasCopyAction || !hasKpis) {
+      console.error("FAIL: /prompts observability console test assertions failed!");
+      passedAll = false;
+    } else {
+      console.log("PASS: Unlisted /prompts console, 3 subtabs, code embed UI, and observability KPIs verified.");
+    }
+  } catch (err) {
+    console.error("FAIL: Test 29 encountered error:", err);
+    passedAll = false;
+  }
+
   await prisma.$disconnect();
 
   if (!passedAll) {
@@ -1224,7 +1267,7 @@ async function runTestSuite() {
     process.exit(1);
   } else {
     console.log("\n==================================================");
-    console.log("✅ ALL 28 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
+    console.log("✅ ALL 29 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
     console.log("==================================================");
     process.exit(0);
   }
