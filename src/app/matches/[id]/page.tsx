@@ -4,6 +4,9 @@ import { MATCH_ANALYSES, MatchTacticalAnalysis } from "@/lib/match-analyses";
 import { generateDeterministicMatchAnalysis } from "@/lib/match-analyzer";
 import MatchViewClient from "./MatchViewClient";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 interface Props {
   params: Promise<{ id: string }>;
 }

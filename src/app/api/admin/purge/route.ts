@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { exec } from "child_process";
 import util from "util";
+import { revalidateCricketCache } from "@/lib/cache-revalidator";
 
 const execPromise = util.promisify(exec);
 
@@ -13,6 +14,7 @@ export async function POST(req: NextRequest) {
       // Purge only pending / test uploads
       const deletedRevisions = await prisma.extractionRevision.deleteMany({});
       const deletedUploads = await prisma.scorecardUpload.deleteMany({});
+      revalidateCricketCache();
 
       return NextResponse.json({
         success: true,
@@ -21,6 +23,7 @@ export async function POST(req: NextRequest) {
     } else if (mode === "reset") {
       // Complete reset to clean seeded demo state
       await execPromise("node prisma/seed.js", { cwd: process.cwd() });
+      revalidateCricketCache();
 
       return NextResponse.json({
         success: true,

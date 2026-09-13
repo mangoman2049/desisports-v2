@@ -479,9 +479,10 @@ function NewScorecardContent() {
         throw new Error(data.error || `Failed to process scorecard (Status: ${res.status})`);
       }
 
-      // If autoApprove was executed and match was created, direct route to the match page
+      // If autoApprove was executed and match was created, direct route to the match page with fresh server data
       if (autoApprove && data.matchId) {
-        router.push(`/matches/${data.matchId}`);
+        router.refresh();
+        window.location.href = `/matches/${data.matchId}`;
         return;
       }
 

@@ -390,7 +390,8 @@ function MakerCheckerReviewContent() {
       setApprovedSuccess(true);
       const destination = data.matchId ? `/matches/${data.matchId}` : "/matches";
       setTimeout(() => {
-        router.push(destination);
+        router.refresh();
+        window.location.href = destination;
       }, 1000);
     } catch (err: any) {
       console.error("Scorecard approval failed:", err);

@@ -10,6 +10,7 @@ import fs from "fs/promises";
 import path from "path";
 import sharp from "sharp";
 import { preprocessScorecardImage } from "@/lib/image-preprocessor";
+import { revalidateCricketCache } from "@/lib/cache-revalidator";
 
 export async function POST(req: NextRequest) {
   try {
@@ -225,6 +226,9 @@ export async function POST(req: NextRequest) {
 
     const auditableJsonPath = path.join(uploadDir, `${upload.id}.json`);
     await fs.writeFile(auditableJsonPath, JSON.stringify(auditableData, null, 2), "utf8");
+
+    // Purge cache on upload so that fresh uploads and auto-approvals immediately reflect
+    revalidateCricketCache(tournamentId, committedMatchId || undefined);
 
     return NextResponse.json({
       success: true,

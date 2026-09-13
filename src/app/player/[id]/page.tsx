@@ -22,6 +22,9 @@ interface Props {
   params: { id: string };
 }
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function PlayerProfilePage({ params }: Props) {
   const playerId = parseInt(params.id, 10);
   if (isNaN(playerId)) notFound();

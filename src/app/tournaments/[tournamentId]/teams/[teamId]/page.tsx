@@ -25,6 +25,9 @@ interface PageProps {
   };
 }
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 function getTournamentData(tournamentId: string) {
   if (tournamentId === "2") return tournament2Data;
   return tournament1Data;

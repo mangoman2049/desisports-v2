@@ -21,6 +21,9 @@ export const metadata = {
     "Official tracking for weekly net sessions, practice matches & friendly indoor cricket games.",
 };
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 // Ground truth 16-player list from the 09-Sep-2026 scorecard (reconciled Spawtz sheet)
 const DEFAULT_PRACTICE_STANDINGS: PracticePlayerStat[] = [
   { id: 101, name: "Yash", matchesPlayed: 1, runsScored: 18, oversBowled: 2.0, runsConceded: -1, wickets: 3, economy: -0.5, contribution: 19, potmCount: 1, role: "All-Rounder" },
@@ -43,64 +46,121 @@ const DEFAULT_PRACTICE_STANDINGS: PracticePlayerStat[] = [
 
 export default async function TournamentZeroPage() {
   let practiceStandingsData: PracticePlayerStat[] = DEFAULT_PRACTICE_STANDINGS;
+  let practiceFixtures: any[] = [];
 
   try {
+    const dbMatches = await prisma.match.findMany({
+      where: { tournamentId: 0 },
+      include: {
+        homeTeam: true,
+        awayTeam: true,
+        potmPlayer: true,
+      },
+      orderBy: { id: "desc" },
+    });
+
+    if (dbMatches && dbMatches.length > 0) {
+      practiceFixtures = dbMatches.map((m) => {
+        const timePart = m.matchDate.includes(",") ? m.matchDate.split(",")[1]?.trim() : "";
+        return {
+          id: String(m.id),
+          date: m.matchDate.split(",")[0] || m.matchDate,
+          time: timePart || "20:00",
+          venue: "Insportz Club, Dubai (Court 1)",
+          team1: m.homeTeam.name,
+          score1: m.homeScore,
+          team2: m.awayTeam.name,
+          score2: m.awayScore,
+          potm: m.potmPlayer ? `${m.potmPlayer.canonicalName} (POTM)` : undefined,
+          status: m.status === "COMPLETED" ? "Completed" : m.status,
+          scorecardUrl: `/matches/${m.id}`,
+        };
+      });
+    }
+
     const dbStats = await prisma.playerMatchStat.findMany({
       where: {
-        matchId: 7,
+        match: { tournamentId: 0 },
       },
       include: {
         player: true,
       },
-      orderBy: {
-        contribution: "desc",
-      },
     });
 
-    if (dbStats && dbStats.length >= 10) {
-      practiceStandingsData = dbStats.map((s) => ({
-        id: s.playerId,
-        name: s.player.canonicalName,
-        matchesPlayed: 1,
-        runsScored: s.runsScored,
-        oversBowled: s.oversBowled,
-        runsConceded: s.runsConceded,
-        wickets: s.wickets,
-        economy: s.economy,
-        contribution: s.contribution,
-        potmCount: s.isPotm ? 1 : 0,
-        role: s.player.fieldingPosition || (s.wickets >= 2 && s.runsScored >= 10 ? "All-Rounder" : s.wickets >= 2 ? "Bowler" : "Batter"),
-      }));
+    if (dbStats && dbStats.length > 0) {
+      const playerMap = new Map<number, PracticePlayerStat>();
+      for (const s of dbStats) {
+        const existing = playerMap.get(s.playerId);
+        if (!existing) {
+          playerMap.set(s.playerId, {
+            id: s.playerId,
+            name: s.player.canonicalName,
+            matchesPlayed: 1,
+            runsScored: s.runsScored,
+            oversBowled: s.oversBowled,
+            runsConceded: s.runsConceded,
+            wickets: s.wickets,
+            economy: s.economy,
+            contribution: s.contribution,
+            potmCount: s.isPotm ? 1 : 0,
+            role:
+              s.player.fieldingPosition ||
+              (s.wickets >= 2 && s.runsScored >= 10
+                ? "All-Rounder"
+                : s.wickets >= 2
+                ? "Bowler"
+                : "Batter"),
+          });
+        } else {
+          existing.matchesPlayed += 1;
+          existing.runsScored += s.runsScored;
+          existing.oversBowled += s.oversBowled;
+          existing.runsConceded += s.runsConceded;
+          existing.wickets += s.wickets;
+          existing.contribution += s.contribution;
+          existing.economy =
+            existing.oversBowled > 0
+              ? Number((existing.runsConceded / existing.oversBowled).toFixed(1))
+              : 0;
+          if (s.isPotm) existing.potmCount += 1;
+        }
+      }
+
+      practiceStandingsData = Array.from(playerMap.values()).sort(
+        (a, b) => b.contribution - a.contribution
+      );
     }
   } catch (err) {
     console.warn("Could not query DB for practice stats, using grounded defaults:", err);
   }
 
-  // Top 4 impact performers from the practice match
+  if (practiceFixtures.length === 0) {
+    practiceFixtures = [
+      {
+        id: "7",
+        date: "09 Sep 2026",
+        time: "20:17",
+        venue: "Insportz Club, Dubai (Court 1)",
+        team1: "Home Team",
+        score1: 63,
+        team2: "Away Team",
+        score2: 120,
+        potm: "Yash (+19 contribution)",
+        status: "Completed",
+        scorecardUrl: "/matches/7",
+      },
+    ];
+  }
+
+  // Top 4 impact performers from practice matches
   const topPracticePerformers = practiceStandingsData.slice(0, 4).map((p) => ({
     id: p.id,
     name: p.name,
     runs: p.runsScored,
     wickets: p.wickets,
     contribution: p.contribution > 0 ? `+${p.contribution}` : `${p.contribution}`,
-    potm: p.potmCount > 0 ? "1 Award" : "0",
+    potm: p.potmCount > 0 ? `${p.potmCount} Award${p.potmCount === 1 ? "" : "s"}` : "0",
   }));
-
-  const practiceFixtures = [
-    {
-      id: "7",
-      date: "09 Sep 2026",
-      time: "20:17",
-      venue: "Insportz Club, Dubai (Court 1)",
-      team1: "Home Team",
-      score1: 63,
-      team2: "Away Team",
-      score2: 120,
-      potm: "Yash (+19 contribution)",
-      status: "Completed",
-      scorecardUrl: "/matches/7",
-    },
-  ];
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12">
@@ -167,7 +227,7 @@ export default async function TournamentZeroPage() {
             </h2>
           </div>
           <span className="text-xs text-slate-500 font-mono">
-            {practiceFixtures.length} Match Recorded • 16 Players Participated
+            {practiceFixtures.length} Match{practiceFixtures.length === 1 ? "" : "es"} Recorded • {practiceStandingsData.length} Players Participated
           </span>
         </div>
 
@@ -175,7 +235,7 @@ export default async function TournamentZeroPage() {
           {practiceFixtures.map((fix) => (
             <MatchCard
               key={fix.id}
-              id="7"
+              id={fix.id}
               date={fix.date}
               time={fix.time}
               tournamentName="Regular Practice"

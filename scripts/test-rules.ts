@@ -1031,6 +1031,66 @@ async function runTestSuite() {
     passedAll = false;
   }
 
+  // -------------------------------------------------------------
+  // Test 26: Real-Time Cache Revalidation & Dynamic Route Guard
+  // -------------------------------------------------------------
+  console.log("\n[Test 26] Real-Time Cache Revalidation & Dynamic Route Guard:");
+  try {
+    const { revalidateCricketCache } = await import("../src/lib/cache-revalidator");
+    const { getTournamentDetails } = await import("../src/lib/tournament-service");
+
+    // 1. Ensure revalidateCricketCache executes safely without crashing
+    let cacheRevalidated = false;
+    try {
+      revalidateCricketCache(0, 7, 35);
+      cacheRevalidated = true;
+    } catch {
+      cacheRevalidated = false;
+    }
+    console.log(`- Cache Revalidation Engine Invocation: ${cacheRevalidated ? "SUCCESS" : "FAILED"}`);
+
+    // 2. Ensure Tournament 0 dynamic details query DB matches
+    const t0Details = await getTournamentDetails(0);
+    const t0DynamicFixtures = Array.isArray(t0Details.fixtures) && t0Details.fixtures.length > 0;
+    console.log(`- Tournament 0 Dynamic Fixtures Count: ${t0Details.fixtures.length} (Expected >= 1)`);
+    console.log(`- Tournament 0 Points Table Guard: hasPointsTable = ${t0Details.hasPointsTable} (Expected: false)`);
+
+    // 3. Ensure core pages have force-dynamic and revalidate = 0 to prevent static staleness
+    const pagesToCheck = [
+      "src/app/matches/page.tsx",
+      "src/app/matches/[id]/page.tsx",
+      "src/app/tournaments/0/page.tsx",
+      "src/app/tournaments/1/page.tsx",
+      "src/app/tournaments/2/page.tsx",
+      "src/app/players/page.tsx",
+      "src/app/player/[id]/page.tsx",
+      "src/app/tournaments/page.tsx",
+    ];
+
+    let allPagesDynamic = true;
+    for (const pagePath of pagesToCheck) {
+      const fullPath = path.join(process.cwd(), pagePath);
+      const content = fs.readFileSync(fullPath, "utf-8");
+      const hasDynamic = content.includes('export const dynamic = "force-dynamic"');
+      const hasZeroReval = content.includes("export const revalidate = 0");
+      if (!hasDynamic || !hasZeroReval) {
+        console.error(`FAIL: ${pagePath} missing dynamic or revalidate=0 configuration!`);
+        allPagesDynamic = false;
+      }
+    }
+    console.log(`- All 8 Core Data Pages Verified as force-dynamic (Zero Stale Cache): ${allPagesDynamic}`);
+
+    if (!cacheRevalidated || !t0DynamicFixtures || t0Details.hasPointsTable !== false || !allPagesDynamic) {
+      console.error("FAIL: Cache revalidation or dynamic page guard failed!");
+      passedAll = false;
+    } else {
+      console.log("PASS: Real-time cache revalidation and zero-stale-cache dynamic route guard verified.");
+    }
+  } catch (err) {
+    console.error("FAIL: Test 26 encountered error:", err);
+    passedAll = false;
+  }
+
   await prisma.$disconnect();
 
   if (!passedAll) {
@@ -1038,7 +1098,7 @@ async function runTestSuite() {
     process.exit(1);
   } else {
     console.log("\n==================================================");
-    console.log("✅ ALL 25 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
+    console.log("✅ ALL 26 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
     console.log("==================================================");
     process.exit(0);
   }

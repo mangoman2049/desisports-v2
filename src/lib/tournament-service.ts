@@ -292,19 +292,63 @@ export async function getTournamentDetails(
   tournamentId: number
 ): Promise<DynamicTournamentData> {
   if (tournamentId === 0) {
-    // Regular practice: Strictly NO Teams Points Table
+    // Regular practice: Strictly NO Teams Points Table, but dynamic fixtures and leaderboards
+    let dbMatches: any[] = [];
+    let dbStats: any[] = [];
+    try {
+      dbMatches = await prisma.match.findMany({
+        where: { tournamentId: 0 },
+        include: {
+          homeTeam: true,
+          awayTeam: true,
+          potmPlayer: true,
+        },
+        orderBy: { id: "desc" },
+      });
+      if (dbMatches.length > 0) {
+        dbStats = await prisma.playerMatchStat.findMany({
+          where: {
+            match: { tournamentId: 0 },
+          },
+          include: {
+            player: true,
+          },
+        });
+      }
+    } catch (e) {
+      console.warn("Could not query DB matches for Tournament 0:", e);
+    }
+
+    const leaderboards = computeLeaderboardsFromStats(dbStats);
+    const fixtures = dbMatches.map((m) => ({
+      id: m.id,
+      date: m.matchDate,
+      time: m.matchDate.includes(",") ? m.matchDate.split(",")[1]?.trim() : "20:00",
+      stage: "Practice Match",
+      venue: "Insportz Club, Dubai (Court 1)",
+      team1: m.homeTeam?.name || "Home Team",
+      score1: m.homeScore,
+      winner1: m.homeScore > m.awayScore,
+      team2: m.awayTeam?.name || "Away Team",
+      score2: m.awayScore,
+      winner2: m.awayScore > m.homeScore,
+      potm: m.potmPlayer ? `${m.potmPlayer.canonicalName} (POTM)` : undefined,
+      scorecardUrl: `/matches/${m.id}`,
+      status: m.status === "COMPLETED" ? "COMPLETED" : m.status,
+    }));
+
     return {
       id: 0,
       title: "Desisports Regular Practice",
       hasPointsTable: false,
       teams: [],
       standings: [],
-      topRunGetters: [],
-      topWicketTakers: [],
-      topContributors: [],
-      fixtures: [],
+      topRunGetters: leaderboards.topRunGetters,
+      topWicketTakers: leaderboards.topWicketTakers,
+      topContributors: leaderboards.topContributors,
+      fixtures,
       squads: [],
-      mvp: null,
+      mvp: leaderboards.mvp,
       champions: null,
       runnerUp: null,
     };

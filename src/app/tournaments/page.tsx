@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Trophy, Calendar, Users, ArrowRight, Shield, Sparkles } from "lucide-react";
+import { prisma } from "@/lib/prisma";
 
 export const metadata = {
   title: "Tournaments",
@@ -7,7 +8,22 @@ export const metadata = {
     "Explore official indoor cricket tournaments, squad rosters, and regular practice matches on DesiSports V2.",
 };
 
-export default function TournamentsDirectoryPage() {
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+export default async function TournamentsDirectoryPage() {
+  let t0MatchCount = 1;
+  let t1MatchCount = 6;
+  let t2MatchCount = 0;
+
+  try {
+    t0MatchCount = await prisma.match.count({ where: { tournamentId: 0 } });
+    t1MatchCount = await prisma.match.count({ where: { tournamentId: 1 } });
+    t2MatchCount = await prisma.match.count({ where: { tournamentId: 2 } });
+  } catch (e) {
+    console.warn("Could not query match counts:", e);
+  }
+
   const tournaments = [
     {
       id: "0",
@@ -17,8 +33,8 @@ export default function TournamentsDirectoryPage() {
       statusColor: "bg-emerald-500/10 text-emerald-600 border border-emerald-500/30",
       stats: [
         { label: "Format", value: "Practice" },
-        { label: "Matches", value: "1+" },
-        { label: "Players", value: "64+" },
+        { label: "Matches", value: String(t0MatchCount) },
+        { label: "Players", value: "16+" },
       ],
       footerText: "Non-tournament practice games & friendly matches",
       href: "/tournaments/0",
@@ -29,12 +45,15 @@ export default function TournamentsDirectoryPage() {
       id: "2",
       title: "DesiBoys Bazooka 4.0",
       subtitle: "Upcoming premier championship",
-      status: "Yet to Start",
-      statusColor: "bg-amber-500/10 text-amber-600 border border-amber-500/30",
+      status: t2MatchCount > 0 ? "Active Tournament" : "Yet to Start",
+      statusColor:
+        t2MatchCount > 0
+          ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/30"
+          : "bg-amber-500/10 text-amber-600 border border-amber-500/30",
       stats: [
         { label: "Teams", value: "4" },
-        { label: "Matches", value: "0" },
-        { label: "Players", value: "61" },
+        { label: "Matches", value: String(t2MatchCount) },
+        { label: "Players", value: "52" },
       ],
       footerText: "📅 18 Sep 2026 → 09 Oct 2026",
       href: "/tournaments/2",
@@ -49,8 +68,8 @@ export default function TournamentsDirectoryPage() {
       statusColor: "bg-sky-500/10 text-sky-600 border border-sky-500/30",
       stats: [
         { label: "Teams", value: "4" },
-        { label: "Matches", value: "6" },
-        { label: "Players", value: "64" },
+        { label: "Matches", value: String(t1MatchCount) },
+        { label: "Players", value: "52" },
       ],
       footerText: "📅 11 May 2026 → 18 May 2026",
       href: "/tournaments/1",

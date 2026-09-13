@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { ParsedScorecard } from "@/types/cricket";
 import { validateIndoorCricketScorecard } from "@/lib/rules-engine";
 import { resolvePlayerName } from "@/lib/name-resolver";
+import { revalidateCricketCache } from "@/lib/cache-revalidator";
 
 /**
  * Commits an approved or auto-approved scorecard into the database as a permanent Match,
@@ -276,6 +277,9 @@ export async function commitScorecardAsApprovedMatch(params: {
       });
     } catch {}
   }
+
+  // Purge any stale cache across matches, tournaments, players, and leaderboards
+  revalidateCricketCache(tournamentId, match.id);
 
   return { matchId: match.id, validation };
 }

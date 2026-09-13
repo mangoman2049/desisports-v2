@@ -2,6 +2,9 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import MatchCard from "@/components/MatchCard";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function MatchesPage() {
   const matches = await prisma.match.findMany({
     include: {

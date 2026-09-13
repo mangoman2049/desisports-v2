@@ -7,6 +7,9 @@ export const metadata = {
     "Official Spawtz 16-Over Indoor Cricket standings, squads, statistics, and scorecards for Desi Boys Tournament May 2026.",
 };
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function TournamentOnePage() {
   const data = await getTournamentDetails(1);
 

@@ -2,6 +2,9 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Users, Search, ArrowRight, Activity } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function PlayersDirectoryPage() {
   const players = await prisma.player.findMany({
     include: {

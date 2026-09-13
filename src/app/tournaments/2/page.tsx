@@ -19,6 +19,9 @@ export const metadata = {
     "Official squads, Bazooka rules, and match schedule for DesiBoys Bazooka 4.0.",
 };
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function TournamentTwoPage() {
   const data = tournament2Data;
   const dynamicData = await getTournamentDetails(2);
