@@ -979,6 +979,58 @@ async function runTestSuite() {
     passedAll = false;
   }
 
+  // -------------------------------------------------------------
+  // Test 25: Scorecard Intake Null Safety & Exception Hardening
+  // -------------------------------------------------------------
+  console.log("\n[Test 25] Scorecard Intake Null Safety & Exception Hardening:");
+  try {
+    const { evaluateQualityGate } = await import("../src/lib/quality-gate");
+    const { getTournamentFixtures, getNextUpcomingFixture } = await import("../src/lib/tournament-fixtures");
+
+    // 1. Quality gate edge cases: 0x0 dimensions, negative values, missing luminosity stats
+    const zeroDiag = evaluateQualityGate(0, 0);
+    const extremeDiag = evaluateQualityGate(4000, 3000, {
+      meanLuminosity: 250,
+      specularFraction: 0.15,
+      laplacianVariance: 40,
+    });
+    const qualityGateResilient =
+      typeof zeroDiag.score === "number" &&
+      Array.isArray(zeroDiag.retakePrompts) &&
+      typeof extremeDiag.score === "number" &&
+      Array.isArray(extremeDiag.retakePrompts);
+
+    console.log(`- Quality Gate Resilient to 0x0 and extreme metrics: ${qualityGateResilient}`);
+
+    // 2. Tournament 1 & 2 fixtures date integrity (no undefined dates that could crash .split)
+    const t1Fixtures = getTournamentFixtures(1);
+    const t2Fixtures = getTournamentFixtures(2);
+    const t0Fixtures = getTournamentFixtures(0);
+
+    const allFixturesHaveValidDates = [...t1Fixtures, ...t2Fixtures, ...t0Fixtures].every(
+      (f) => typeof f.date === "string" && f.date.length > 0 && typeof f.team1 === "string" && typeof f.team2 === "string"
+    );
+
+    console.log(`- All Tournament 0, 1, 2 Fixtures have Valid Non-Empty Date Strings: ${allFixturesHaveValidDates}`);
+    console.log(`- Tournament 1 Fixture Count: ${t1Fixtures.length} (Expected: 6)`);
+    console.log(`- Tournament 2 Fixture Count: ${t2Fixtures.length} (Expected: 9)`);
+
+    const nextT1 = getNextUpcomingFixture(1);
+    const nextT2 = getNextUpcomingFixture(2);
+    const nextFixturesValid = nextT1 !== null && nextT2 !== null && typeof nextT2.stage === "string";
+    console.log(`- Next Fixture Defaults Valid: ${nextFixturesValid}`);
+
+    if (!qualityGateResilient || !allFixturesHaveValidDates || !nextFixturesValid) {
+      console.error("FAIL: Scorecard intake null safety check failed!");
+      passedAll = false;
+    } else {
+      console.log("PASS: Scorecard intake null safety, fixture dates, and quality gate resilience verified.");
+    }
+  } catch (err) {
+    console.error("FAIL: Test 25 encountered error:", err);
+    passedAll = false;
+  }
+
   await prisma.$disconnect();
 
   if (!passedAll) {
@@ -986,7 +1038,7 @@ async function runTestSuite() {
     process.exit(1);
   } else {
     console.log("\n==================================================");
-    console.log("✅ ALL 24 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
+    console.log("✅ ALL 25 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
     console.log("==================================================");
     process.exit(0);
   }

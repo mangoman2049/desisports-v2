@@ -49,6 +49,75 @@ export const PRACTICE_FIXTURES: FixtureOption[] = [
   },
 ];
 
+export const TOURNAMENT_1_FIXTURES: FixtureOption[] = [
+  {
+    id: 1,
+    tournamentId: 1,
+    matchNumber: 1,
+    stage: "Group Match 1",
+    team1: "Desi Titans",
+    team2: "VPGR",
+    date: "11 May 2026, 8:00 PM",
+    venue: "Insportz Club, Dubai (Court 1)",
+    hasScorecard: true,
+  },
+  {
+    id: 2,
+    tournamentId: 1,
+    matchNumber: 2,
+    stage: "Group Match 2",
+    team1: "Desi Dabanggs",
+    team2: "Desi Tigers",
+    date: "11 May 2026, 9:30 PM",
+    venue: "Insportz Club, Dubai (Court 1)",
+    hasScorecard: true,
+  },
+  {
+    id: 3,
+    tournamentId: 1,
+    matchNumber: 3,
+    stage: "Group Match 3",
+    team1: "Desi Titans",
+    team2: "Desi Dabanggs",
+    date: "18 May 2026, 7:00 PM",
+    venue: "Insportz Club, Dubai (Court 1)",
+    hasScorecard: true,
+  },
+  {
+    id: 4,
+    tournamentId: 1,
+    matchNumber: 4,
+    stage: "Group Match 4",
+    team1: "Desi Tigers",
+    team2: "VPGR",
+    date: "18 May 2026, 8:15 PM",
+    venue: "Insportz Club, Dubai (Court 1)",
+    hasScorecard: true,
+  },
+  {
+    id: 5,
+    tournamentId: 1,
+    matchNumber: 5,
+    stage: "Championship Final",
+    team1: "Desi Tigers",
+    team2: "VPGR",
+    date: "18 May 2026, 9:30 PM",
+    venue: "Insportz Club, Dubai (Court 1)",
+    hasScorecard: true,
+  },
+  {
+    id: 6,
+    tournamentId: 1,
+    matchNumber: 6,
+    stage: "3rd Place Playoff",
+    team1: "Desi Titans",
+    team2: "Desi Dabanggs",
+    date: "18 May 2026, 9:30 PM",
+    venue: "Insportz Club, Dubai (Court 2)",
+    hasScorecard: true,
+  },
+];
+
 /**
  * Returns available fixtures for a given tournament ID
  */
@@ -60,27 +129,30 @@ export function getTournamentFixtures(tournamentId: number): FixtureOption[] {
       tournamentId: 2,
       matchNumber: f.matchNumber || idx + 1,
       stage: f.stage || `Match #${idx + 1}`,
-      team1: f.team1,
-      team2: f.team2,
-      date: f.date,
+      team1: f.team1 || "Team 1",
+      team2: f.team2 || "Team 2",
+      date: f.date || "Scheduled",
       venue: f.venue || "Insportz Club, Dubai (Court 1)",
       hasScorecard: f.status === "COMPLETED",
     }));
   }
 
   if (tournamentId === 1) {
-    const raw = (tournament1Json as any).fixtures || [];
-    return raw.map((f: any, idx: number) => ({
-      id: f.id,
-      tournamentId: 1,
-      matchNumber: idx + 1,
-      stage: f.stage || `Match #${idx + 1}`,
-      team1: f.team1,
-      team2: f.team2,
-      date: f.date,
-      venue: "Insportz Club, Dubai (Court 1)",
-      hasScorecard: true,
-    }));
+    const raw = (tournament1Json as any).fixtures;
+    if (Array.isArray(raw) && raw.length > 0) {
+      return raw.map((f: any, idx: number) => ({
+        id: f.id || idx + 1,
+        tournamentId: 1,
+        matchNumber: idx + 1,
+        stage: f.stage || `Match #${idx + 1}`,
+        team1: f.team1 || "Team 1",
+        team2: f.team2 || "Team 2",
+        date: f.date || "11 May 2026",
+        venue: f.venue || "Insportz Club, Dubai (Court 1)",
+        hasScorecard: true,
+      }));
+    }
+    return TOURNAMENT_1_FIXTURES;
   }
 
   return PRACTICE_FIXTURES;
@@ -91,6 +163,7 @@ export function getTournamentFixtures(tournamentId: number): FixtureOption[] {
  */
 export function getNextUpcomingFixture(tournamentId: number): FixtureOption | null {
   const fixtures = getTournamentFixtures(tournamentId);
+  if (!fixtures || fixtures.length === 0) return null;
   // Find first fixture without a scorecard
   const next = fixtures.find((f) => !f.hasScorecard);
   return next || fixtures[0] || null;
@@ -120,7 +193,12 @@ export function validateFixtureTeamsMatch(
   const ea = normalizeTeamName(extractedAway);
 
   // Allow TBD or Playoff placeholders
-  if (fixture.team1.includes("Place") || fixture.team1.includes("TBD") || fixture.team2.includes("Place") || fixture.team2.includes("TBD")) {
+  if (
+    fixture.team1.includes("Place") ||
+    fixture.team1.includes("TBD") ||
+    fixture.team2.includes("Place") ||
+    fixture.team2.includes("TBD")
+  ) {
     return { isMatch: true };
   }
 

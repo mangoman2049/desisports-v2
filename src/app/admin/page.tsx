@@ -140,7 +140,7 @@ export default async function AdminDashboardPage() {
                   </td>
                   <td className="font-mono">
                     <span className="inline-flex items-center gap-1 font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded text-[11px] border border-emerald-500/20">
-                      {up.validationScore.toFixed(0)}% Verified
+                      {(Number(up.validationScore) || 0).toFixed(0)}% Verified
                     </span>
                   </td>
                   <td>

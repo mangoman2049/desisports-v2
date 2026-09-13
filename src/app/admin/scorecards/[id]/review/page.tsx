@@ -1,33 +1,110 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useMemo, useCallback, Component, ErrorInfo, ReactNode } from "react";
 import { useRouter, useParams } from "next/navigation";
+import Link from "next/link";
 import {
   CheckCircle2,
   AlertTriangle,
   ChevronDown,
   ChevronRight,
   ShieldCheck,
-  Edit2,
   Save,
   ZoomIn,
   ZoomOut,
   RefreshCw,
-  Sparkles,
   ArrowLeft,
   Check,
 } from "lucide-react";
-import { ParsedScorecard, SkinExtraction, BallExtraction } from "@/types/cricket";
-import { validateIndoorCricketScorecard, KNOWN_DISMISSAL_TOKENS } from "@/lib/rules-engine";
+import { ParsedScorecard, BallExtraction } from "@/types/cricket";
+import { validateIndoorCricketScorecard } from "@/lib/rules-engine";
 import { getSampleScorecardExtraction } from "@/lib/extractor-service";
 
+interface ErrorBoundaryProps {
+  children: ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+}
+
+class ReviewErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error("Scorecard review caught client error:", error, errorInfo);
+  }
+
+  handleReset = () => {
+    this.setState({ hasError: false, error: null });
+    if (typeof window !== "undefined") {
+      window.location.reload();
+    }
+  };
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="max-w-xl mx-auto p-6 my-8 rounded-2xl border border-red-200 dark:border-red-900/50 bg-red-50/50 dark:bg-red-950/30 text-center space-y-4 shadow-lg">
+          <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-400 flex items-center justify-center mx-auto">
+            <AlertTriangle className="w-6 h-6" />
+          </div>
+          <div className="space-y-1">
+            <h2 className="text-lg font-bold text-red-900 dark:text-red-200">
+              Scorecard Review Interface Error
+            </h2>
+            <p className="text-xs text-red-700 dark:text-red-400">
+              {this.state.error?.message || "An unexpected error occurred while rendering the scorecard review interface."}
+            </p>
+          </div>
+          <div className="flex items-center justify-center gap-3 pt-2">
+            <button
+              onClick={this.handleReset}
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold transition shadow"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>Retry Interface</span>
+            </button>
+            <Link
+              href="/admin/scorecards/new"
+              className="px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-semibold hover:bg-slate-50 transition"
+            >
+              Back to Scorecard Intake
+            </Link>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 export default function MakerCheckerReviewPage() {
+  return (
+    <ReviewErrorBoundary>
+      <MakerCheckerReviewContent />
+    </ReviewErrorBoundary>
+  );
+}
+
+function MakerCheckerReviewContent() {
   const router = useRouter();
   const params = useParams();
-  const uploadId = params.id as string;
+  const uploadId = (params?.id as string) || "";
 
   const [scorecard, setScorecard] = useState<ParsedScorecard | null>(null);
-  const [scorecardImage, setScorecardImage] = useState<string>(`/api/scorecards/${uploadId}/image`);
+  const [scorecardImage, setScorecardImage] = useState<string>(
+    uploadId ? `/api/scorecards/${uploadId}/image` : "/uploads/scorecards/sample-scorecard.jpg"
+  );
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"home" | "away" | "summary" | "rules" | "names">("names");
   const [expandedSkins, setExpandedSkins] = useState<Record<string, boolean>>({
@@ -41,65 +118,82 @@ export default function MakerCheckerReviewPage() {
     "home-4": false,
   });
 
-  const [selectedBall, setSelectedBall] = useState<BallExtraction | null>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [approvedSuccess, setApprovedSuccess] = useState(false);
 
   const loadScorecardData = useCallback(async (flushCache = false) => {
     setLoading(true);
-    if (flushCache) {
-      sessionStorage.removeItem(`scorecard_${uploadId}`);
+    if (flushCache && uploadId) {
+      try {
+        sessionStorage.removeItem(`scorecard_${uploadId}`);
+      } catch {
+        // ignore
+      }
     }
 
     // 1. Check session cache first unless flushing
-    if (!flushCache) {
-      const cached = sessionStorage.getItem(`scorecard_${uploadId}`);
-      if (cached) {
-        try {
+    if (!flushCache && uploadId) {
+      try {
+        const cached = sessionStorage.getItem(`scorecard_${uploadId}`);
+        if (cached) {
           const parsed = JSON.parse(cached);
-          setScorecard(parsed);
-          setScorecardImage(`/api/scorecards/${uploadId}/image`);
-          setLoading(false);
-          // Background refresh from server to ensure image and reconciledData are fresh
-        } catch {
-          // Fall through
+          if (parsed && (parsed.homeInnings || parsed.awayInnings)) {
+            setScorecard(parsed);
+            setScorecardImage(`/api/scorecards/${uploadId}/image`);
+            setLoading(false);
+          }
         }
+      } catch {
+        // Fall through
       }
     }
 
     // 2. Fetch fresh upload record from server database
-    try {
-      const res = await fetch(`/api/scorecards/${uploadId}`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success && data.upload) {
-          const serverScorecard = data.upload.parsedScorecard || data.upload.reconciledData || data.upload.rawExtraction;
-          if (serverScorecard) {
-            setScorecard(serverScorecard);
-            sessionStorage.setItem(`scorecard_${uploadId}`, JSON.stringify(serverScorecard));
+    if (uploadId) {
+      try {
+        const res = await fetch(`/api/scorecards/${uploadId}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.upload) {
+            const serverScorecard =
+              data.upload.parsedScorecard ||
+              data.upload.reconciledData ||
+              data.upload.rawExtraction;
+            if (serverScorecard) {
+              setScorecard(serverScorecard);
+              try {
+                sessionStorage.setItem(`scorecard_${uploadId}`, JSON.stringify(serverScorecard));
+              } catch {
+                // ignore
+              }
+            }
+            if (data.upload.imageUrl) {
+              setScorecardImage(data.upload.imageUrl);
+            } else {
+              setScorecardImage(`/api/scorecards/${uploadId}/image`);
+            }
+            setLoading(false);
+            return;
           }
-          if (data.upload.imageUrl) {
-            setScorecardImage(data.upload.imageUrl);
-          } else {
-            setScorecardImage(`/api/scorecards/${uploadId}/image`);
-          }
-          setLoading(false);
-          return;
         }
+      } catch (e) {
+        console.warn("Could not fetch scorecard upload from API:", e);
       }
-    } catch (e) {
-      console.warn("Could not fetch scorecard upload from API:", e);
     }
 
     // 3. Fallback to sample only if no server data and no cache
-    const existingCache = sessionStorage.getItem(`scorecard_${uploadId}`);
-    if (existingCache) {
+    if (uploadId) {
       try {
-        setScorecard(JSON.parse(existingCache));
-        setLoading(false);
-        return;
-      } catch {}
+        const existingCache = sessionStorage.getItem(`scorecard_${uploadId}`);
+        if (existingCache) {
+          setScorecard(JSON.parse(existingCache));
+          setLoading(false);
+          return;
+        }
+      } catch {
+        // ignore
+      }
     }
 
     const sample = getSampleScorecardExtraction();
@@ -112,15 +206,18 @@ export default function MakerCheckerReviewPage() {
     loadScorecardData();
   }, [loadScorecardData]);
 
-  if (!scorecard) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="h-6 w-6 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  const validation = validateIndoorCricketScorecard(scorecard);
+  const validation = useMemo(() => {
+    if (!scorecard) {
+      return {
+        passed: false,
+        confidenceScore: 0,
+        highConfidenceLabel: false,
+        reconciled: false,
+        issues: [],
+      };
+    }
+    return validateIndoorCricketScorecard(scorecard);
+  }, [scorecard]);
 
   // Dynamically resolve player rows from scorecard nameResolutions and innings
   const resolvedPlayerRows = useMemo(() => {
@@ -173,32 +270,41 @@ export default function MakerCheckerReviewPage() {
     };
 
     // Away team players first
-    scorecard.awayInnings?.playerSummaries?.forEach((p) => {
+    (scorecard.awayInnings?.playerSummaries || []).forEach((p) => {
       addPlayer((p as any).rawName || p.name, p.canonicalName || p.name, "Away", (p as any).matchType);
     });
     // Home team players next
-    scorecard.homeInnings?.playerSummaries?.forEach((p) => {
+    (scorecard.homeInnings?.playerSummaries || []).forEach((p) => {
       addPlayer((p as any).rawName || p.name, p.canonicalName || p.name, "Home", (p as any).matchType);
     });
 
     // Also check skins in case summaries had fewer than 16
-    scorecard.awayInnings?.skins?.forEach((s) => {
+    (scorecard.awayInnings?.skins || []).forEach((s) => {
       if (s.batter1Name) addPlayer((s as any).rawBatter1Name || s.batter1Name, s.batter1Name, "Away");
       if (s.batter2Name) addPlayer((s as any).rawBatter2Name || s.batter2Name, s.batter2Name, "Away");
-      s.overs?.forEach((o) => {
+      (s.overs || []).forEach((o) => {
         if (o.bowlerName) addPlayer((o as any).rawBowlerName || o.bowlerName, o.bowlerName, "Home");
       });
     });
-    scorecard.homeInnings?.skins?.forEach((s) => {
+    (scorecard.homeInnings?.skins || []).forEach((s) => {
       if (s.batter1Name) addPlayer((s as any).rawBatter1Name || s.batter1Name, s.batter1Name, "Home");
       if (s.batter2Name) addPlayer((s as any).rawBatter2Name || s.batter2Name, s.batter2Name, "Home");
-      s.overs?.forEach((o) => {
+      (s.overs || []).forEach((o) => {
         if (o.bowlerName) addPlayer((o as any).rawBowlerName || o.bowlerName, o.bowlerName, "Away");
       });
     });
 
     return rows;
   }, [scorecard]);
+
+  if (loading || !scorecard) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] space-y-3">
+        <div className="h-7 w-7 border-2 border-purple-600 border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs text-slate-500 font-mono">Loading scorecard inspection...</p>
+      </div>
+    );
+  }
 
   const toggleSkin = (key: string) => {
     setExpandedSkins((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -214,15 +320,20 @@ export default function MakerCheckerReviewPage() {
     const nextScorecard = JSON.parse(JSON.stringify(scorecard)) as ParsedScorecard;
     const targetInnings =
       inningsType === "home" ? nextScorecard.homeInnings : nextScorecard.awayInnings;
-    const ball = targetInnings.skins[skinIdx].overs[overIdx].balls[ballIdx];
+    
+    if (!targetInnings?.skins?.[skinIdx]?.overs?.[overIdx]?.balls?.[ballIdx]) {
+      return;
+    }
 
+    const ball = targetInnings.skins[skinIdx].overs[overIdx].balls[ballIdx];
     ball.rawToken = newToken;
+
     // Recalculate ball net runs
     let penalty = 0;
     let dismissal = undefined;
     let runs = 0;
 
-    const upper = newToken.toUpperCase();
+    const upper = (newToken || "").toUpperCase();
     if (upper.includes("(R)") || upper.includes("RO")) {
       dismissal = "RO";
       penalty = -5;
@@ -252,9 +363,9 @@ export default function MakerCheckerReviewPage() {
 
     // Recalculate skin runs
     let sumSkin = 0;
-    targetInnings.skins[skinIdx].overs.forEach((o) => {
-      o.balls.forEach((b) => {
-        sumSkin += b.runs + b.penaltyRuns;
+    (targetInnings.skins[skinIdx].overs || []).forEach((o) => {
+      (o.balls || []).forEach((b) => {
+        sumSkin += (b.runs || 0) + (b.penaltyRuns || 0);
       });
     });
     targetInnings.skins[skinIdx].skinTotalRuns = sumSkin;
@@ -296,7 +407,7 @@ export default function MakerCheckerReviewPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push("/admin/scorecards/new")}
-            className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition"
+            className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition cursor-pointer"
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
@@ -313,7 +424,7 @@ export default function MakerCheckerReviewPage() {
               ) : (
                 <span className="flex items-center gap-1 text-[11px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-full border border-amber-500/20">
                   <AlertTriangle className="h-3.5 w-3.5" />
-                  Review Flagged Cells ({validation.confidenceScore}%)
+                  Review Flagged Cells ({validation.confidenceScore ?? 90}%)
                 </span>
               )}
             </div>
@@ -382,19 +493,19 @@ export default function MakerCheckerReviewPage() {
               <div className="flex items-center gap-1">
                 <button
                   onClick={() => setZoomLevel((z) => Math.min(2.0, z + 0.25))}
-                  className="p-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+                  className="p-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 cursor-pointer"
                 >
                   <ZoomIn className="h-3.5 w-3.5" />
                 </button>
                 <button
                   onClick={() => setZoomLevel((z) => Math.max(0.75, z - 0.25))}
-                  className="p-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+                  className="p-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 cursor-pointer"
                 >
                   <ZoomOut className="h-3.5 w-3.5" />
                 </button>
                 <button
                   onClick={() => setZoomLevel(1)}
-                  className="px-1.5 py-0.5 text-[10px] rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-mono"
+                  className="px-1.5 py-0.5 text-[10px] rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-mono cursor-pointer"
                 >
                   Reset
                 </button>
@@ -425,7 +536,7 @@ export default function MakerCheckerReviewPage() {
           <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 text-xs font-semibold">
             <button
               onClick={() => setActiveTab("away")}
-              className={`flex-1 py-1.5 px-3 rounded-lg transition ${
+              className={`flex-1 py-1.5 px-3 rounded-lg transition cursor-pointer ${
                 activeTab === "away"
                   ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm"
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
@@ -435,7 +546,7 @@ export default function MakerCheckerReviewPage() {
             </button>
             <button
               onClick={() => setActiveTab("home")}
-              className={`flex-1 py-1.5 px-3 rounded-lg transition ${
+              className={`flex-1 py-1.5 px-3 rounded-lg transition cursor-pointer ${
                 activeTab === "home"
                   ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm"
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
@@ -445,7 +556,7 @@ export default function MakerCheckerReviewPage() {
             </button>
             <button
               onClick={() => setActiveTab("summary")}
-              className={`py-1.5 px-3 rounded-lg transition ${
+              className={`py-1.5 px-3 rounded-lg transition cursor-pointer ${
                 activeTab === "summary"
                   ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm"
                   : "text-slate-600 dark:text-slate-400 hover:text-slate-900"
@@ -455,14 +566,14 @@ export default function MakerCheckerReviewPage() {
             </button>
             <button
               onClick={() => setActiveTab("names")}
-              className={`py-1.5 px-3 rounded-lg transition flex items-center gap-1.5 ${
+              className={`py-1.5 px-3 rounded-lg transition flex items-center gap-1.5 cursor-pointer ${
                 activeTab === "names"
                   ? "bg-emerald-600 text-white shadow-sm font-bold"
                   : "text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300"
               }`}
             >
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Name Resolver (16)</span>
+              <span>Name Resolver ({resolvedPlayerRows.length})</span>
             </button>
           </div>
 
@@ -493,7 +604,7 @@ export default function MakerCheckerReviewPage() {
                           Skin {skin.skinNumber}
                         </span>
                         <span className="text-xs font-bold text-slate-900 dark:text-white">
-                          {skin.batter1Name} & {skin.batter2Name}
+                          {skin.batter1Name || "Batter 1"} & {skin.batter2Name || "Batter 2"}
                         </span>
                         {skin.won && (
                           <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.2 rounded border border-emerald-500/20">
@@ -504,10 +615,10 @@ export default function MakerCheckerReviewPage() {
 
                       <div className="flex items-center gap-3 text-xs font-mono">
                         <span className="text-slate-500">
-                          {skin.batter1Name}: <b>{skin.batter1Total}</b> | {skin.batter2Name}: <b>{skin.batter2Total}</b>
+                          {skin.batter1Name || "B1"}: <b>{skin.batter1Total ?? 0}</b> | {skin.batter2Name || "B2"}: <b>{skin.batter2Total ?? 0}</b>
                         </span>
                         <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                          Total: {skin.skinTotalRuns}
+                          Total: {skin.skinTotalRuns ?? 0}
                         </span>
                       </div>
                     </div>
@@ -531,22 +642,22 @@ export default function MakerCheckerReviewPage() {
                           </thead>
                           <tbody>
                             {(skin.overs || []).map((over, overIdx) => (
-                              <tr key={over.overNumber}>
+                              <tr key={over.overNumber || overIdx}>
                                 <td className="font-mono font-bold text-slate-500">
-                                  #{over.overNumber}
+                                  #{over.overNumber || overIdx + 1}
                                 </td>
                                 <td className="font-semibold text-slate-800 dark:text-slate-200">
-                                  {over.bowlerName}
+                                  {over.bowlerName || "Bowler"}
                                 </td>
                                 {(over.balls || []).map((ball, ballIdx) => {
                                   const isDismissal = !!ball.dismissalType;
                                   const isExtra = !!ball.extrasType;
 
                                   return (
-                                    <td key={ball.id} className="p-1">
+                                    <td key={ball.id || ballIdx} className="p-1">
                                       <input
                                         type="text"
-                                        value={ball.rawToken}
+                                        value={ball.rawToken || ""}
                                         onChange={(e) =>
                                           handleCellUpdate(
                                             activeTab,
@@ -563,13 +674,13 @@ export default function MakerCheckerReviewPage() {
                                             ? "bg-amber-50 dark:bg-amber-950/40 border-amber-300 dark:border-amber-800 text-amber-700 dark:text-amber-400"
                                             : "bg-slate-50 dark:bg-slate-800/80 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 hover:border-emerald-500"
                                         }`}
-                                        title={`${ball.batterName} vs ${ball.bowlerName}: Net ${ball.netRuns}`}
+                                        title={`${ball.batterName || "Batter"} vs ${ball.bowlerName || "Bowler"}: Net ${ball.netRuns ?? 0}`}
                                       />
                                     </td>
                                   );
                                 })}
                                 <td className="text-right font-mono font-bold text-slate-700 dark:text-slate-300">
-                                  {over.overTotalRuns}
+                                  {over.overTotalRuns ?? 0}
                                 </td>
                               </tr>
                             ))}
@@ -607,22 +718,22 @@ export default function MakerCheckerReviewPage() {
                     ...(scorecard.homeInnings?.playerSummaries || []),
                   ].map((p, idx) => (
                     <tr key={idx}>
-                      <td className="font-bold text-slate-900 dark:text-white">{p.name}</td>
+                      <td className="font-bold text-slate-900 dark:text-white">{p.name || "Player"}</td>
                       <td className="font-mono">{p.runsScored ?? 0}</td>
-                      <td className="font-mono">{(p.oversBowled || 0).toFixed(1)}</td>
+                      <td className="font-mono">{(Number(p.oversBowled) || 0).toFixed(1)}</td>
                       <td className="font-mono">{p.runsConceded ?? 0}</td>
                       <td className="font-mono">{p.wickets ?? 0}</td>
-                      <td className="font-mono">{(p.economy || 0).toFixed(1)}</td>
+                      <td className="font-mono">{(Number(p.economy) || 0).toFixed(1)}</td>
                       <td
                         className={`font-mono font-bold text-right ${
-                          p.contribution > 0
+                          (p.contribution || 0) > 0
                             ? "text-emerald-600 dark:text-emerald-400"
-                            : p.contribution < 0
+                            : (p.contribution || 0) < 0
                             ? "text-rose-600 dark:text-rose-400"
                             : "text-slate-500"
                         }`}
                       >
-                        {p.contribution > 0 ? `+${p.contribution}` : p.contribution}
+                        {(p.contribution || 0) > 0 ? `+${p.contribution}` : (p.contribution ?? 0)}
                       </td>
                     </tr>
                   ))}
@@ -645,17 +756,20 @@ export default function MakerCheckerReviewPage() {
                   </p>
                 </div>
                 <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20 self-start sm:self-auto">
-                  {resolvedPlayerRows.filter(r => r.method !== "New Player (Pending)").length} / {resolvedPlayerRows.length} Reconciled
+                  {resolvedPlayerRows.filter((r) => r.method !== "New Player (Pending)").length} / {resolvedPlayerRows.length} Reconciled
                 </span>
               </div>
 
-              {resolvedPlayerRows.some(r => r.highlight) && (
+              {resolvedPlayerRows.some((r) => r.highlight) && (
                 <div className="p-3 bg-emerald-50/50 dark:bg-emerald-950/20 rounded-xl border border-emerald-500/20 text-xs text-emerald-900 dark:text-emerald-200 flex items-start gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                   <div className="space-y-0.5">
                     <span className="font-bold">Automated Typos & Variant Matching Verified:</span>
                     <p className="text-[11px] text-emerald-800 dark:text-emerald-300">
-                      {resolvedPlayerRows.filter(r => r.highlight).map(r => `"${r.token}" → ${r.canonical} (${r.conf})`).join(" • ")}
+                      {resolvedPlayerRows
+                        .filter((r) => r.highlight)
+                        .map((r) => `"${r.token}" → ${r.canonical} (${r.conf})`)
+                        .join(" • ")}
                     </p>
                   </div>
                 </div>
