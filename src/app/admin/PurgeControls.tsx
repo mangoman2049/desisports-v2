@@ -1,15 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { Trash2, RotateCcw, AlertTriangle, Check, RefreshCw } from "lucide-react";
+import { Trash2, RotateCcw, AlertTriangle, Check, RefreshCw, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function PurgeControls() {
   const router = useRouter();
   const [purging, setPurging] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [adminKey, setAdminKey] = useState("");
 
   const handlePurge = async (mode: "uploads" | "reset") => {
+    if (!adminKey.trim()) {
+      setStatusMessage("Enter your admin key to perform this action.");
+      return;
+    }
+
     const confirmMsg =
       mode === "uploads"
         ? "Are you sure you want to purge all test scorecard uploads?"
@@ -25,7 +31,7 @@ export default function PurgeControls() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-admin-key": "desi-cricket-admin-2026",
+          "x-admin-key": adminKey.trim(),
         },
         body: JSON.stringify({ mode }),
       });
@@ -36,6 +42,8 @@ export default function PurgeControls() {
         setTimeout(() => {
           router.refresh();
         }, 1200);
+      } else if (res.status === 401) {
+        setStatusMessage("Error: Invalid admin key. Access denied.");
       } else {
         setStatusMessage(`Error: ${data.error || "Purge failed"}`);
       }
@@ -61,6 +69,19 @@ export default function PurgeControls() {
       <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
         Testing scorecard intake? You can purge your recent uploads or cleanly reset the database back to the demo baseline anytime.
       </p>
+
+      {/* Secure admin key input — no hardcoded secrets */}
+      <div className="flex items-center gap-2">
+        <Lock className="h-3.5 w-3.5 text-slate-400" />
+        <input
+          type="password"
+          placeholder="Enter admin key"
+          value={adminKey}
+          onChange={(e) => setAdminKey(e.target.value)}
+          className="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-800 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+          autoComplete="off"
+        />
+      </div>
 
       <div className="flex flex-wrap items-center gap-2.5 pt-1">
         <button
@@ -95,3 +116,4 @@ export default function PurgeControls() {
     </div>
   );
 }
+

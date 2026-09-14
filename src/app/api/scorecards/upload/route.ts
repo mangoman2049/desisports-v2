@@ -16,6 +16,7 @@ import {
   sanitizeTeamName,
   sanitizeScorecardPayload,
   checkRateLimit,
+  verifyAdminKey,
 } from "@/lib/security";
 
 export async function POST(req: NextRequest) {
@@ -42,7 +43,9 @@ export async function POST(req: NextRequest) {
     const forceSample = formData.get("forceSample") === "true";
     const forceDuplicate = formData.get("forceDuplicate") === "true";
     const forceMismatch = formData.get("forceMismatch") === "true";
-    const autoApprove = formData.get("autoApprove") === "true";
+    // SEC-02: autoApprove requires admin authentication — unauthenticated uploads always go through maker-checker
+    const rawAutoApprove = formData.get("autoApprove") === "true";
+    const autoApprove = rawAutoApprove && verifyAdminKey(req);
     const rawMatchTitle = (formData.get("matchTitle") as string) || undefined;
     const tournamentIdRaw = formData.get("tournamentId") as string | null;
     const tournamentId = tournamentIdRaw ? parseInt(tournamentIdRaw, 10) : 0;

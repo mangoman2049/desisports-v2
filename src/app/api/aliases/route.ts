@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { sanitizePlayerName, checkRateLimit } from "@/lib/security";
+import { sanitizePlayerName, checkRateLimit, verifyAdminKey } from "@/lib/security";
 
 export async function GET(req: NextRequest) {
   try {
@@ -34,6 +34,14 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    // SEC-03: Admin authorization required for alias mutations
+    if (!verifyAdminKey(req)) {
+      return NextResponse.json(
+        { error: "Admin authorization required to modify player aliases.", code: "ADMIN_KEY_REQUIRED" },
+        { status: 401 }
+      );
+    }
+
     const ip =
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
       req.headers.get("x-real-ip") ||

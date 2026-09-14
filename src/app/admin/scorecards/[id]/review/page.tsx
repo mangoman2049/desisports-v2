@@ -389,9 +389,15 @@ function MakerCheckerReviewContent() {
     setSubmitting(true);
     setApprovalError(null);
     try {
+      // Read admin key from cookie (set during admin login)
+      const adminKeyMatch = document.cookie.match(/(?:^|;\s*)admin-key=([^;]*)/);
+      const adminKey = adminKeyMatch ? decodeURIComponent(adminKeyMatch[1]) : "";
       const res = await fetch(`/api/scorecards/${uploadId}/approve`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-key": adminKey,
+        },
         body: JSON.stringify({ parsedScorecard: scorecard }),
       });
       const data = await res.json().catch(() => ({}));

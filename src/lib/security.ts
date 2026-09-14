@@ -1,4 +1,5 @@
 import { ParsedScorecard } from "@/types/cricket";
+import crypto from "crypto";
 
 /**
  * Security & Anti-Abuse Defense Module
@@ -8,6 +9,8 @@ import { ParsedScorecard } from "@/types/cricket";
  * 2. Strict Input Sanitization & Bounds Checking (Player names, team names, match titles, ball tokens)
  * 3. In-Memory Sliding-Window Rate Limiting ($0 Cost & Denial of Wallet Protection)
  * 4. Administrative Authorization Guard (x-admin-key verification for destructive operations)
+ * 5. SSRF Domain Allowlist (Blocks internal IP fetches from image route)
+ * 6. Path Traversal Sanitizer (Prevents directory escape in file-serving routes)
  */
 
 // Known prompt injection and LLM boundary attack markers
@@ -245,29 +248,124 @@ export function checkRateLimit(
 }
 
 // -------------------------------------------------------------
-// Admin Key Verification
-// Protects destructive administrative routes (/api/admin/purge, alias edits)
+// Admin Key Verification (Hardened)
+// Protects destructive administrative routes (/api/admin/purge, alias edits, match approval)
+// SECURITY: No hardcoded fallback — fails closed if ADMIN_SECRET_KEY env is unset.
+// SECURITY: Uses crypto.timingSafeEqual to prevent timing side-channel attacks.
+// SECURITY: Query parameter authentication removed (leaks secrets in logs/history).
 // -------------------------------------------------------------
 
-const DEFAULT_ADMIN_SECRET = "desi-cricket-admin-2026";
-
 export function verifyAdminKey(req: Request): boolean {
-  const secretKey = process.env.ADMIN_SECRET_KEY || DEFAULT_ADMIN_SECRET;
+  const secretKey = process.env.ADMIN_SECRET_KEY;
 
-  // Check x-admin-key header
-  const headerKey = req.headers.get("x-admin-key") || req.headers.get("authorization")?.replace("Bearer ", "");
-  if (headerKey && headerKey === secretKey) {
-    return true;
+  // Fail-closed: if no secret is configured, deny all admin operations
+  if (!secretKey) {
+    console.error("[SECURITY] ADMIN_SECRET_KEY environment variable is not set. All admin operations denied.");
+    return false;
   }
 
-  // Check URL query param ?adminKey=...
-  try {
-    const url = new URL(req.url);
-    const queryKey = url.searchParams.get("adminKey");
-    if (queryKey && queryKey === secretKey) {
-      return true;
-    }
-  } catch {}
+  // Check x-admin-key header or Authorization: Bearer <key>
+  const headerKey = req.headers.get("x-admin-key") || req.headers.get("authorization")?.replace("Bearer ", "");
 
-  return false;
+  if (!headerKey) {
+    return false;
+  }
+
+  // Timing-safe comparison to prevent timing side-channel attacks
+  try {
+    const keyBuffer = Buffer.from(headerKey, "utf-8");
+    const secretBuffer = Buffer.from(secretKey, "utf-8");
+
+    // timingSafeEqual requires equal-length buffers; pad shorter one
+    if (keyBuffer.length !== secretBuffer.length) {
+      // Hash both to fixed length for constant-time comparison
+      const keyHash = crypto.createHash("sha256").update(keyBuffer).digest();
+      const secretHash = crypto.createHash("sha256").update(secretBuffer).digest();
+      return crypto.timingSafeEqual(keyHash, secretHash);
+    }
+
+    return crypto.timingSafeEqual(keyBuffer, secretBuffer);
+  } catch {
+    return false;
+  }
 }
+
+// -------------------------------------------------------------
+// SSRF Domain Allowlist
+// Prevents server-side request forgery when fetching remote scorecard images
+// -------------------------------------------------------------
+
+const ALLOWED_REMOTE_DOMAINS = [
+  "desisports.milanchheda.com",
+  "desisports.onrender.com",
+];
+
+const PRIVATE_IP_PATTERNS = [
+  /^(10\.\d{1,3}\.\d{1,3}\.\d{1,3})/,         // 10.0.0.0/8
+  /^(172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})/, // 172.16.0.0/12
+  /^(192\.168\.\d{1,3}\.\d{1,3})/,             // 192.168.0.0/16
+  /^(127\.\d{1,3}\.\d{1,3}\.\d{1,3})/,         // 127.0.0.0/8 (loopback)
+  /^(169\.254\.\d{1,3}\.\d{1,3})/,             // 169.254.0.0/16 (link-local / cloud metadata)
+  /^(0\.0\.0\.0)/,                              // 0.0.0.0
+  /^\[?::1\]?/,                                 // IPv6 loopback
+  /^\[?fe80:/i,                                 // IPv6 link-local
+  /^\[?fc00:/i,                                 // IPv6 unique-local
+  /^\[?fd/i,                                    // IPv6 unique-local
+  /^localhost/i,                                 // localhost
+];
+
+/**
+ * Validates that a URL is safe for server-side fetching (not an SSRF vector).
+ * Only allows HTTPS URLs to explicitly allowlisted domains.
+ */
+export function isAllowedRemoteUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+
+    // Only allow HTTPS (block HTTP for MITM protection)
+    if (parsed.protocol !== "https:") {
+      return false;
+    }
+
+    // Block private/internal IP addresses
+    const hostname = parsed.hostname;
+    for (const pattern of PRIVATE_IP_PATTERNS) {
+      if (pattern.test(hostname)) {
+        return false;
+      }
+    }
+
+    // Only allow explicitly allowlisted domains
+    return ALLOWED_REMOTE_DOMAINS.includes(hostname.toLowerCase());
+  } catch {
+    return false;
+  }
+}
+
+// -------------------------------------------------------------
+// Path Traversal Sanitizer
+// Prevents directory escape in file-serving API routes
+// -------------------------------------------------------------
+
+/**
+ * Sanitizes an ID parameter for use in filesystem paths.
+ * Strips all characters except alphanumeric, hyphens, underscores, and dots.
+ * Blocks path traversal sequences (../, ..\, etc.)
+ */
+export function sanitizePathId(id: string): string {
+  if (!id || typeof id !== "string") return "";
+
+  // Strip everything except safe filesystem characters
+  let cleaned = id.replace(/[^a-zA-Z0-9_\-\.]/g, "");
+
+  // Block any remaining traversal patterns
+  cleaned = cleaned.replace(/\.\./g, "");
+
+  // Prevent hidden files
+  if (cleaned.startsWith(".")) {
+    cleaned = cleaned.replace(/^\.+/, "");
+  }
+
+  return cleaned;
+}
+

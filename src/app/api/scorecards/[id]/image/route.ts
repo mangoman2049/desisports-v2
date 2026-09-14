@@ -4,6 +4,7 @@ import path from "path";
 import sharp from "sharp";
 import { prisma } from "@/lib/prisma";
 import { preprocessScorecardImage } from "@/lib/image-preprocessor";
+import { isAllowedRemoteUrl } from "@/lib/security";
 
 const STATIC_MATCH_SCORECARDS: Record<string, string> = {
   "1": "https://desisports.milanchheda.com/storage/scorecards/iVA2RZBZK6iu9zaGBGZKItLdkqaL4D7uGPGTpKUg.jpg",
@@ -117,6 +118,11 @@ export async function GET(
         return new NextResponse(new Uint8Array(rawBuffer), { status: 200, headers });
       }
     } else if (sourceUrlOrPath.startsWith("http://") || sourceUrlOrPath.startsWith("https://")) {
+      // SEC-07: SSRF Protection — only fetch from allowlisted domains
+      if (!isAllowedRemoteUrl(sourceUrlOrPath)) {
+        console.warn(`[SECURITY] Blocked SSRF attempt to fetch: ${sourceUrlOrPath}`);
+        throw new Error("Remote URL is not in the allowed domain list");
+      }
       const resp = await fetch(sourceUrlOrPath);
       if (!resp.ok) {
         throw new Error(`Failed to fetch remote scorecard image: ${resp.statusText}`);

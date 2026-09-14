@@ -104,9 +104,31 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
+  // SEC-06: Protect admin and prompts pages from unauthenticated access
+  // These are internal dashboards that should not be publicly browsable.
+  // We check for the admin key in a cookie or x-admin-key header.
+  if (pathname.startsWith("/admin") || pathname.startsWith("/prompts")) {
+    const adminKey = request.cookies.get("admin-key")?.value ||
+      request.headers.get("x-admin-key");
+    const secretKey = process.env.ADMIN_SECRET_KEY;
+
+    // If ADMIN_SECRET_KEY is configured, enforce it
+    if (secretKey) {
+      if (!adminKey || adminKey !== secretKey) {
+        // Redirect to a simple auth challenge page
+        const url = request.nextUrl.clone();
+        url.pathname = "/admin-login";
+        url.searchParams.set("redirect", pathname);
+        return NextResponse.redirect(url);
+      }
+    }
+    // If ADMIN_SECRET_KEY is not set, allow access (dev mode / initial setup)
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/api/:path*"],
+  matcher: ["/api/:path*", "/admin/:path*", "/prompts/:path*"],
 };
+

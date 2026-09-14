@@ -5,6 +5,7 @@ import {
   sanitizeScorecardPayload,
   sanitizeString,
   checkRateLimit,
+  verifyAdminKey,
 } from "@/lib/security";
 
 export async function POST(
@@ -12,6 +13,14 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> | { id: string } }
 ) {
   try {
+    // 0. Admin Authorization Required (SEC-02 Hardening)
+    if (!verifyAdminKey(req)) {
+      return NextResponse.json(
+        { success: false, error: "Admin authorization required to approve scorecards.", code: "ADMIN_KEY_REQUIRED" },
+        { status: 401 }
+      );
+    }
+
     const ip =
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
       req.headers.get("x-real-ip") ||

@@ -54,9 +54,15 @@ export default function NameResolverPage() {
     if (!newAlias || !selectedPlayerId) return;
 
     try {
+      // Read admin key from cookie (set during admin login)
+      const adminKeyMatch = document.cookie.match(/(?:^|;\s*)admin-key=([^;]*)/);
+      const adminKey = adminKeyMatch ? decodeURIComponent(adminKeyMatch[1]) : "";
       const res = await fetch("/api/aliases", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-admin-key": adminKey,
+        },
         body: JSON.stringify({ alias: newAlias, playerId: selectedPlayerId }),
       });
       if (res.ok) {

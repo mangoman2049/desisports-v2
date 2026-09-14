@@ -2,19 +2,27 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import fs from "fs/promises";
 import path from "path";
+import { sanitizePathId } from "@/lib/security";
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
+    const { id: rawId } = await params;
+    const id = sanitizePathId(rawId);
     const downloadParam = req.nextUrl.searchParams.get("download") === "true";
 
     // 1. Check if direct JSON file exists in public/uploads/scorecards
-    const jsonPath = path.join(process.cwd(), "public", "uploads", "scorecards", `${id}.json`);
+    // SEC-04: Verify resolved path stays within allowed directory
+    const uploadsDir = path.join(process.cwd(), "public", "uploads", "scorecards");
+    const jsonPath = path.join(uploadsDir, `${id}.json`);
+    const resolvedPath = path.resolve(jsonPath);
+    if (!resolvedPath.startsWith(path.resolve(uploadsDir))) {
+      return NextResponse.json({ error: "Invalid scorecard ID" }, { status: 400 });
+    }
     try {
-      const fileData = await fs.readFile(jsonPath, "utf-8");
+      const fileData = await fs.readFile(resolvedPath, "utf-8");
 
       const headers: Record<string, string> = {
         "Content-Type": "application/json",

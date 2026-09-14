@@ -37,9 +37,11 @@ export async function POST(req: NextRequest) {
     const { mode } = await req.json();
 
     if (mode === "uploads") {
-      // Purge only pending / test uploads
-      const deletedRevisions = await prisma.extractionRevision.deleteMany({});
-      const deletedUploads = await prisma.scorecardUpload.deleteMany({});
+      // Purge only pending / test uploads (ACID transaction for atomicity)
+      const [deletedRevisions, deletedUploads] = await prisma.$transaction([
+        prisma.extractionRevision.deleteMany({}),
+        prisma.scorecardUpload.deleteMany({}),
+      ]);
       revalidateCricketCache();
 
       return NextResponse.json({

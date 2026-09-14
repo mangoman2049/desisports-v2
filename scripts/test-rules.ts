@@ -1338,15 +1338,28 @@ async function runTestSuite() {
     console.log(`- Sliding Window Rate Limiter (Throttles after limit exceeded): ${rateLimitWorking ? "PASS" : "FAIL"}`);
 
     // 5. Admin Key Authorization Guard
+    // Temporarily set ADMIN_SECRET_KEY for test validation (production requires env var)
+    const testAdminSecret = "test-admin-key-" + Date.now();
+    process.env.ADMIN_SECRET_KEY = testAdminSecret;
     const authReqValid = verifyAdminKey({
-      headers: new Headers({ "x-admin-key": "desi-cricket-admin-2026" }),
+      headers: new Headers({ "x-admin-key": testAdminSecret }),
       url: "http://localhost:3000/api/admin/purge",
     } as any);
     const authReqInvalid = verifyAdminKey({
       headers: new Headers({}),
       url: "http://localhost:3000/api/admin/purge",
     } as any);
-    const adminAuthWorking = authReqValid && !authReqInvalid;
+    const authReqWrongKey = verifyAdminKey({
+      headers: new Headers({ "x-admin-key": "wrong-key" }),
+      url: "http://localhost:3000/api/admin/purge",
+    } as any);
+    // Verify fail-closed behavior when env var is unset
+    delete process.env.ADMIN_SECRET_KEY;
+    const authReqNoEnv = verifyAdminKey({
+      headers: new Headers({ "x-admin-key": testAdminSecret }),
+      url: "http://localhost:3000/api/admin/purge",
+    } as any);
+    const adminAuthWorking = authReqValid && !authReqInvalid && !authReqWrongKey && !authReqNoEnv;
     console.log(`- Admin Key Guard for Purge Endpoint: ${adminAuthWorking ? "PASS" : "FAIL"}`);
 
     // 6. Anti-Scraping Robots.txt & Security Headers
@@ -1395,6 +1408,167 @@ async function runTestSuite() {
     passedAll = false;
   }
 
+  // =====================================================
+  // Tests 31-38: Production Hardening Security Regression
+  // =====================================================
+
+  // Test 31: verifyAdminKey fails-closed when ADMIN_SECRET_KEY is unset
+  console.log("\n[Test 31] Admin Key Fail-Closed Behavior:");
+  try {
+    const securityContent = fs.readFileSync(path.join(__dirname, "../src/lib/security.ts"), "utf-8");
+    // Verify no hardcoded default admin secret
+    const noDefaultSecret = !securityContent.includes('"desi-cricket-admin-2026"');
+    const failsClosed = securityContent.includes("process.env.ADMIN_SECRET_KEY") && 
+                         !securityContent.includes("|| DEFAULT_ADMIN_SECRET") &&
+                         !securityContent.includes('|| "desi-cricket');
+    console.log(`- No Hardcoded Default Secret: ${noDefaultSecret ? "PASS" : "FAIL"}`);
+    console.log(`- Fails Closed Without Env Var: ${failsClosed ? "PASS" : "FAIL"}`);
+    if (!noDefaultSecret || !failsClosed) { passedAll = false; console.error("FAIL: Admin key still has hardcoded fallback!"); }
+    else { console.log("PASS: Admin key verification fails-closed."); }
+  } catch (err) { console.error("FAIL: Test 31 error:", err); passedAll = false; }
+
+  // Test 32: sanitizePathId blocks path traversal
+  console.log("\n[Test 32] Path Traversal Sanitization:");
+  try {
+    const { sanitizePathId } = await import("../src/lib/security");
+    const traversalTests = [
+      { input: "../../../../etc/passwd", expected: "etcpasswd" },
+      { input: "../../../package", expected: "package" },
+      { input: "..\\..\\..\\package", expected: "package" },
+      { input: "normal-id-123", expected: "normal-id-123" },
+      { input: "sc-1234567890-abc", expected: "sc-1234567890-abc" },
+      { input: ".hidden", expected: "hidden" },
+      { input: "../../.env", expected: "env" },
+    ];
+    let allPathsPass = true;
+    for (const tc of traversalTests) {
+      const result = sanitizePathId(tc.input);
+      const pass = result === tc.expected;
+      if (!pass) {
+        console.error(`  FAIL: sanitizePathId("${tc.input}") = "${result}", expected "${tc.expected}"`);
+        allPathsPass = false;
+      }
+    }
+    console.log(`- Path Traversal Blocked: ${allPathsPass ? "PASS" : "FAIL"}`);
+    if (!allPathsPass) { passedAll = false; } else { console.log("PASS: All path traversal vectors neutralized."); }
+  } catch (err) { console.error("FAIL: Test 32 error:", err); passedAll = false; }
+
+  // Test 33: isAllowedRemoteUrl blocks SSRF to private IPs
+  console.log("\n[Test 33] SSRF Domain Allowlist:");
+  try {
+    const { isAllowedRemoteUrl } = await import("../src/lib/security");
+    const ssrfTests = [
+      { url: "https://desisports.milanchheda.com/storage/img.jpg", expected: true },
+      { url: "https://desisports.onrender.com/image.webp", expected: true },
+      { url: "http://desisports.milanchheda.com/img.jpg", expected: false },  // HTTP blocked
+      { url: "https://169.254.169.254/latest/meta-data/", expected: false },  // Cloud metadata
+      { url: "https://10.0.0.1/internal", expected: false },                  // Private RFC1918
+      { url: "https://127.0.0.1/localhost", expected: false },                // Loopback
+      { url: "https://192.168.1.1/home", expected: false },                   // Private
+      { url: "https://localhost/admin", expected: false },                     // Localhost
+      { url: "https://evil-site.com/phish", expected: false },                // Non-allowlisted
+      { url: "not-a-url", expected: false },                                  // Invalid URL
+    ];
+    let allSsrfPass = true;
+    for (const tc of ssrfTests) {
+      const result = isAllowedRemoteUrl(tc.url);
+      if (result !== tc.expected) {
+        console.error(`  FAIL: isAllowedRemoteUrl("${tc.url}") = ${result}, expected ${tc.expected}`);
+        allSsrfPass = false;
+      }
+    }
+    console.log(`- SSRF Vectors Blocked: ${allSsrfPass ? "PASS" : "FAIL"}`);
+    if (!allSsrfPass) { passedAll = false; } else { console.log("PASS: All SSRF vectors blocked, allowlisted domains pass."); }
+  } catch (err) { console.error("FAIL: Test 33 error:", err); passedAll = false; }
+
+  // Test 34: No hardcoded secrets in client-side components
+  console.log("\n[Test 34] No Client-Side Secret Leakage:");
+  try {
+    const purgeControlsContent = fs.readFileSync(
+      path.join(__dirname, "../src/app/admin/PurgeControls.tsx"), "utf-8"
+    );
+    const noHardcodedSecret = !purgeControlsContent.includes("desi-cricket-admin-2026");
+    const hasPasswordInput = purgeControlsContent.includes('type="password"');
+    const usesStateKey = purgeControlsContent.includes("adminKey");
+    console.log(`- No Hardcoded Secret in Client Bundle: ${noHardcodedSecret ? "PASS" : "FAIL"}`);
+    console.log(`- Password Input for Admin Key: ${hasPasswordInput ? "PASS" : "FAIL"}`);
+    console.log(`- Admin Key Via React State Only: ${usesStateKey ? "PASS" : "FAIL"}`);
+    if (!noHardcodedSecret || !hasPasswordInput || !usesStateKey) {
+      passedAll = false;
+      console.error("FAIL: Client component still leaks admin credentials!");
+    } else {
+      console.log("PASS: No secrets in client-side JavaScript bundles.");
+    }
+  } catch (err) { console.error("FAIL: Test 34 error:", err); passedAll = false; }
+
+  // Test 35: Approve route requires admin key
+  console.log("\n[Test 35] Approve Route Authorization:");
+  try {
+    const approveRouteContent = fs.readFileSync(
+      path.join(__dirname, "../src/app/api/scorecards/[id]/approve/route.ts"), "utf-8"
+    );
+    const hasAdminCheck = approveRouteContent.includes("verifyAdminKey(req)");
+    const returns401 = approveRouteContent.includes("401");
+    console.log(`- Approve Requires verifyAdminKey: ${hasAdminCheck ? "PASS" : "FAIL"}`);
+    console.log(`- Returns 401 on Unauthorized: ${returns401 ? "PASS" : "FAIL"}`);
+    if (!hasAdminCheck || !returns401) { passedAll = false; console.error("FAIL: Approve route lacks authorization!"); }
+    else { console.log("PASS: Match approval is admin-gated."); }
+  } catch (err) { console.error("FAIL: Test 35 error:", err); passedAll = false; }
+
+  // Test 36: Aliases POST requires admin key
+  console.log("\n[Test 36] Aliases Route Authorization:");
+  try {
+    const aliasRouteContent = fs.readFileSync(
+      path.join(__dirname, "../src/app/api/aliases/route.ts"), "utf-8"
+    );
+    const hasAdminCheck = aliasRouteContent.includes("verifyAdminKey(req)");
+    const returns401 = aliasRouteContent.includes("401");
+    console.log(`- Aliases POST Requires verifyAdminKey: ${hasAdminCheck ? "PASS" : "FAIL"}`);
+    console.log(`- Returns 401 on Unauthorized: ${returns401 ? "PASS" : "FAIL"}`);
+    if (!hasAdminCheck || !returns401) { passedAll = false; console.error("FAIL: Aliases route lacks authorization!"); }
+    else { console.log("PASS: Player alias mutations are admin-gated."); }
+  } catch (err) { console.error("FAIL: Test 36 error:", err); passedAll = false; }
+
+  // Test 37: CSP header is configured
+  console.log("\n[Test 37] Content Security Policy:");
+  try {
+    const nextConfigContent2 = fs.readFileSync(path.join(__dirname, "../next.config.mjs"), "utf-8");
+    const hasCsp = nextConfigContent2.includes("Content-Security-Policy");
+    const hasCspSelf = nextConfigContent2.includes("default-src 'self'");
+    const hasScriptSrc = nextConfigContent2.includes("script-src");
+    const noXssProtection = !nextConfigContent2.includes("X-XSS-Protection");
+    const hasCoop = nextConfigContent2.includes("Cross-Origin-Opener-Policy");
+    console.log(`- CSP Header Present: ${hasCsp ? "PASS" : "FAIL"}`);
+    console.log(`- CSP default-src self: ${hasCspSelf ? "PASS" : "FAIL"}`);
+    console.log(`- CSP script-src Configured: ${hasScriptSrc ? "PASS" : "FAIL"}`);
+    console.log(`- Deprecated X-XSS-Protection Removed: ${noXssProtection ? "PASS" : "FAIL"}`);
+    console.log(`- Cross-Origin-Opener-Policy Present: ${hasCoop ? "PASS" : "FAIL"}`);
+    if (!hasCsp || !hasCspSelf || !hasScriptSrc || !noXssProtection || !hasCoop) {
+      passedAll = false; console.error("FAIL: Security headers not properly configured!");
+    } else { console.log("PASS: CSP and modern security headers verified."); }
+  } catch (err) { console.error("FAIL: Test 37 error:", err); passedAll = false; }
+
+  // Test 38: Timing-safe comparison in verifyAdminKey
+  console.log("\n[Test 38] Timing-Safe Admin Key Comparison:");
+  try {
+    const securityContent2 = fs.readFileSync(path.join(__dirname, "../src/lib/security.ts"), "utf-8");
+    const usesTimingSafe = securityContent2.includes("crypto.timingSafeEqual");
+    const importsCrypto = securityContent2.includes('import crypto from "crypto"') || 
+                           securityContent2.includes("import crypto from 'crypto'");
+    const noQueryParam = !securityContent2.includes("searchParams.get(\"adminKey\")") && 
+                          !securityContent2.includes("searchParams.get('adminKey')");
+    const hasSsrfGuard = securityContent2.includes("isAllowedRemoteUrl");
+    const hasPathGuard = securityContent2.includes("sanitizePathId");
+    console.log(`- Uses crypto.timingSafeEqual: ${usesTimingSafe ? "PASS" : "FAIL"}`);
+    console.log(`- Imports Node crypto Module: ${importsCrypto ? "PASS" : "FAIL"}`);
+    console.log(`- Query Param Auth Removed: ${noQueryParam ? "PASS" : "FAIL"}`);
+    console.log(`- SSRF Guard Function Exported: ${hasSsrfGuard ? "PASS" : "FAIL"}`);
+    console.log(`- Path Traversal Guard Exported: ${hasPathGuard ? "PASS" : "FAIL"}`);
+    if (!usesTimingSafe || !importsCrypto || !noQueryParam || !hasSsrfGuard || !hasPathGuard) {
+      passedAll = false; console.error("FAIL: Security module hardening incomplete!");
+    } else { console.log("PASS: All security module hardening verified."); }
+  } catch (err) { console.error("FAIL: Test 38 error:", err); passedAll = false; }
+
   await prisma.$disconnect();
 
   if (!passedAll) {
@@ -1402,7 +1576,7 @@ async function runTestSuite() {
     process.exit(1);
   } else {
     console.log("\n==================================================");
-    console.log("✅ ALL 30 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
+    console.log("✅ ALL 38 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
     console.log("==================================================");
     process.exit(0);
   }
