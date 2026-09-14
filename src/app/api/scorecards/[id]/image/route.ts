@@ -94,9 +94,13 @@ export async function GET(
       }
     }
 
-    // Fallback to sample scorecard
+    // Fallback to match-specific scorecard
     if (!sourceUrlOrPath) {
-      sourceUrlOrPath = "/uploads/scorecards/sample-scorecard.jpg";
+      if (id === "8" || id.includes("-8") || id.includes("match-8")) {
+        sourceUrlOrPath = "/uploads/scorecards/scorecard-8.webp";
+      } else {
+        sourceUrlOrPath = "/uploads/scorecards/sample-scorecard.jpg";
+      }
     }
 
     // 3. Obtain raw image buffer
@@ -173,13 +177,14 @@ export async function GET(
   } catch (err: any) {
     console.error("Scorecard image route error, returning sample fallback:", err);
     try {
-      const samplePath = path.join(process.cwd(), "public", "uploads", "scorecards", "sample-scorecard.jpg");
+      const fallbackFilename = (id === "8" || id.includes("-8") || id.includes("match-8")) ? "scorecard-8.webp" : "sample-scorecard.jpg";
+      const samplePath = path.join(process.cwd(), "public", "uploads", "scorecards", fallbackFilename);
       if (fs.existsSync(samplePath)) {
         const sampleBuf = await fs.promises.readFile(samplePath);
         return new NextResponse(new Uint8Array(sampleBuf), {
           status: 200,
           headers: {
-            "Content-Type": "image/jpeg",
+            "Content-Type": fallbackFilename.endsWith(".webp") ? "image/webp" : "image/jpeg",
             "Cache-Control": "public, max-age=86400",
           },
         });

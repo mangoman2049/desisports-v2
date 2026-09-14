@@ -39,7 +39,7 @@ const nextConfig = {
           {
             // SEC-12: Content Security Policy
             key: "Content-Security-Policy",
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://desisports.milanchheda.com; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self'; frame-ancestors 'self'",
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://desisports.milanchheda.com https://desisports.onrender.com; connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self'; frame-ancestors 'self'",
           },
         ],
       },

@@ -1569,6 +1569,55 @@ async function runTestSuite() {
     } else { console.log("PASS: All security module hardening verified."); }
   } catch (err) { console.error("FAIL: Test 38 error:", err); passedAll = false; }
 
+  // Test 39: Match 8 Maker-Checker & Scorecard Preview Integrity
+  console.log("\n[Test 39] Match 8 Maker-Checker & Scorecard Preview Integrity:");
+  try {
+    const { GET: getScorecardById } = await import("../src/app/api/scorecards/[id]/route");
+    const req8 = new Request("http://localhost:3000/api/scorecards/8");
+    const res8 = await getScorecardById(req8 as any, { params: Promise.resolve({ id: "8" }) });
+    const data8 = await res8.json();
+
+    const hasMatch = data8.success && !!data8.match;
+    const hasParsedScorecard = !!data8.upload?.parsedScorecard;
+    const isMatch8Date = data8.upload?.parsedScorecard?.matchInfo?.dateTime?.includes("10 September");
+    const isScorecard8Image = data8.upload?.imageUrl?.includes("scorecard-8.webp");
+
+    console.log(`- Match 8 DB record resolved: ${hasMatch ? "PASS" : "FAIL"}`);
+    console.log(`- Parsed scorecard provided for Maker-Checker: ${hasParsedScorecard ? "PASS" : "FAIL"}`);
+    console.log(`- Scorecard data matches 10 September (Match #8, not #7): ${isMatch8Date ? "PASS" : "FAIL"}`);
+    console.log(`- Image URL points to scorecard-8.webp: ${isScorecard8Image ? "PASS" : "FAIL"}`);
+
+    if (!hasMatch || !hasParsedScorecard || !isMatch8Date || !isScorecard8Image) {
+      passedAll = false;
+      console.error("FAIL: Match 8 scorecard retrieval or image link broken!");
+    } else {
+      console.log("PASS: Match 8 Maker-Checker and score preview integrity verified.");
+    }
+  } catch (err) {
+    console.error("FAIL: Test 39 error:", err);
+    passedAll = false;
+  }
+
+  // Test 40: Content Security Policy blob: directive & Preview Integrity
+  console.log("\n[Test 40] CSP blob: Directive for Scorecard Preview:");
+  try {
+    const nextConfigContent3 = fs.readFileSync(path.join(__dirname, "../next.config.mjs"), "utf-8");
+    const hasBlobInImgSrc = nextConfigContent3.includes("img-src") && nextConfigContent3.includes("blob:");
+    const hasDataInImgSrc = nextConfigContent3.includes("img-src") && nextConfigContent3.includes("data:");
+    console.log(`- CSP allows blob: in img-src for local previews: ${hasBlobInImgSrc ? "PASS" : "FAIL"}`);
+    console.log(`- CSP allows data: in img-src for optimized previews: ${hasDataInImgSrc ? "PASS" : "FAIL"}`);
+
+    if (!hasBlobInImgSrc || !hasDataInImgSrc) {
+      passedAll = false;
+      console.error("FAIL: CSP does not allow blob: or data: for image previews!");
+    } else {
+      console.log("PASS: CSP permits client-side scorecard previews.");
+    }
+  } catch (err) {
+    console.error("FAIL: Test 40 error:", err);
+    passedAll = false;
+  }
+
   await prisma.$disconnect();
 
   if (!passedAll) {
@@ -1576,7 +1625,7 @@ async function runTestSuite() {
     process.exit(1);
   } else {
     console.log("\n==================================================");
-    console.log("✅ ALL 38 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
+    console.log("✅ ALL 40 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
     console.log("==================================================");
     process.exit(0);
   }
