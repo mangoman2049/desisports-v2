@@ -81,7 +81,7 @@ export default async function PromptsPage() {
       badge: "Tournament / Team Scope",
       author: TEAM_DNA_AUTHOR,
       lastUpdated: TEAM_DNA_LAST_UPDATED,
-      version: "v1.2 (Pre-Tournament Hypothesis Mode)",
+      version: "v1.1 (Three-Window Evidence Model)",
       llmModel: "gemini-1.5-pro",
       temperature: "0.3 (Hypothesis Generation)",
       triggerEvent: "Squad Registration & Tournament Match Completion",
@@ -91,7 +91,7 @@ export default async function PromptsPage() {
       tokensSavedPct: 100,
       promptText: TEAM_DNA_TOURNAMENT_BEGIN_PROMPT,
       description:
-        "Living team identity analysing pair combinations, style complementarity, Bazooka suitability, bowling core, and captain's hypotheses as the tournament unfolds.",
+        "Living team identity with a three-window evidence model (Historical ~30%, Tournament ~50%, Recent Form ~20%) to eliminate recency bias while tracking pair combinations, bowling core, and captain hypotheses.",
       sourceFile: "src/lib/team-dna-prompt.ts",
     },
     {
