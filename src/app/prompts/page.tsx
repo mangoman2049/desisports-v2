@@ -100,7 +100,7 @@ export default async function PromptsPage() {
       badge: "Career-Wide Scope",
       author: PLAYER_TACTICAL_AUTHOR,
       lastUpdated: PLAYER_TACTICAL_LAST_UPDATED,
-      version: "v1.0 (Observable Playing DNA & Performance Synergy)",
+      version: "v1.1 (Three-Window Evidence Model)",
       llmModel: "gemini-1.5-pro",
       temperature: "0.2 (Anti-Hallucination)",
       triggerEvent: "Match Completion (Selective for 16 Participating Players)",
@@ -110,7 +110,7 @@ export default async function PromptsPage() {
       tokensSavedPct: 100,
       promptText: PLAYER_TACTICAL_INTELLIGENCE_PROMPT,
       description:
-        "Career-wide observable playing DNA evaluating repeatable scoring, dismissal vulnerability, bowling discipline trade-offs, and 0–100 Performance Synergy.",
+        "Career-wide observable playing DNA with a three-window evidence model (Career ~50%, Tournament ~30%, Recent Form ~20%) evaluating repeatable scoring, dismissal vulnerability, bowling discipline trade-offs, and 0–100 Performance Synergy.",
       sourceFile: "src/lib/player-dna-prompt.ts",
     },
   ];
