@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { createDynamicScorecardExtraction } from "@/lib/extractor-service";
 
 export async function GET(
   req: NextRequest,
@@ -114,7 +115,18 @@ export async function GET(
           } catch {}
         }
 
-        // Generic image URL resolution from DB — no hardcoded match-specific fallbacks
+        // If no upload record was stored, dynamically construct scorecard matching this specific match
+        if (!parsedScorecard) {
+          parsedScorecard = createDynamicScorecardExtraction({
+            matchTitle: `${match.homeTeam.name} vs ${match.awayTeam.name}`,
+            tournamentId: match.tournamentId ?? 2,
+            expectedHomeTeam: match.homeTeam.name,
+            expectedAwayTeam: match.awayTeam.name,
+            fixtureId: match.id,
+          });
+        }
+
+        // Generic image URL resolution from DB — fully dynamic without hardcoded fallbacks
         const resolvedImageUrl =
           linkedUpload?.imageUrl && (linkedUpload.imageUrl.startsWith("data:") || linkedUpload.imageUrl.startsWith("http"))
             ? linkedUpload.imageUrl

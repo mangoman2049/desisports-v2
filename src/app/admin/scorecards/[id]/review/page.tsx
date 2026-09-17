@@ -18,7 +18,10 @@ import {
 } from "lucide-react";
 import { ParsedScorecard, BallExtraction } from "@/types/cricket";
 import { validateIndoorCricketScorecard } from "@/lib/rules-engine";
-import { getSampleScorecardExtraction } from "@/lib/extractor-service";
+import {
+  getSampleScorecardExtraction,
+  createDynamicScorecardExtraction,
+} from "@/lib/extractor-service";
 import { trackCTA, trackPersonaEvent } from "@/lib/analytics";
 
 interface ErrorBoundaryProps {
@@ -207,9 +210,9 @@ function MakerCheckerReviewContent() {
       }
     }
 
-    const sample = getSampleScorecardExtraction();
-    setScorecard(sample);
-    setScorecardImage("/uploads/scorecards/sample-scorecard.jpg");
+    const dynamic = createDynamicScorecardExtraction({ fixtureId: uploadId });
+    setScorecard(dynamic);
+    setScorecardImage(`/api/scorecards/${uploadId}/image`);
     setLoading(false);
   }, [uploadId]);
 

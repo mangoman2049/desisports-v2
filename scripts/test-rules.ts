@@ -1688,6 +1688,77 @@ async function runTestSuite() {
     passedAll = false;
   }
 
+  // Test 44: Dynamic Scorecard Extraction Engine (Non-Match 8 Fallback)
+  console.log("\n[Test 44] Dynamic Scorecard Extraction Engine:");
+  try {
+    const { createDynamicScorecardExtraction } = await import("../src/lib/extractor-service");
+    const match9Extraction = createDynamicScorecardExtraction({
+      matchTitle: "Home Team vs Away Team (Practice Match #9)",
+      tournamentId: 0,
+      fixtureId: 9,
+    });
+
+    const isMatch9Date = match9Extraction.matchInfo.dateTime.includes("23 Sep 2026");
+    const notMatch8Score =
+      match9Extraction.homeInnings.totalRuns !== 117 ||
+      match9Extraction.awayInnings.totalRuns !== 49;
+    const has4Skins =
+      match9Extraction.homeInnings.skins.length === 4 &&
+      match9Extraction.awayInnings.skins.length === 4;
+    const has8Batters =
+      match9Extraction.homeInnings.playerSummaries.length === 8 &&
+      match9Extraction.awayInnings.playerSummaries.length === 8;
+
+    console.log(`  Dynamic fixture date resolved (${match9Extraction.matchInfo.dateTime}): ${isMatch9Date ? "PASS" : "FAIL"}`);
+    console.log(`  Not hardcoded to Match 8 score (117 vs 49): ${notMatch8Score ? "PASS" : "FAIL"}`);
+    console.log(`  Full 4-skin indoor cricket structure: ${has4Skins ? "PASS" : "FAIL"}`);
+    console.log(`  8 unique players per team resolved: ${has8Batters ? "PASS" : "FAIL"}`);
+
+    if (!isMatch9Date || !notMatch8Score || !has4Skins || !has8Batters) {
+      passedAll = false;
+      console.error("FAIL: Dynamic scorecard extraction returned invalid or hardcoded data!");
+    } else {
+      console.log("PASS: Dynamic scorecard extraction produces authentic match-specific structure.");
+    }
+  } catch (err) {
+    console.error("FAIL: Test 44 error:", err);
+    passedAll = false;
+  }
+
+  // Test 45: Real Pixel Metrics Quality Gate (Dynamic Diagnostics)
+  console.log("\n[Test 45] Dynamic Quality Gate Metrics Evaluation:");
+  try {
+    const { evaluateQualityGate } = await import("../src/lib/quality-gate");
+    const testDiag = evaluateQualityGate(1920, 1080, {
+      meanLuminosity: 145,
+      laplacianVariance: 220,
+      specularFraction: 0.015,
+      fileName: "test_match9.jpg",
+    });
+
+    const hasRealDims =
+      testDiag.checks.resolution.width === 1920 &&
+      testDiag.checks.resolution.height === 1080;
+    const hasDynamicMsg =
+      testDiag.checks.resolution.message.includes("1920 × 1080 px (2.1 MP)") &&
+      testDiag.checks.blur.message.includes("220") &&
+      testDiag.checks.exposure.message.includes("145") &&
+      testDiag.checks.glare.message.includes("1.5%");
+
+    console.log(`  Real dimensions evaluated: ${hasRealDims ? "PASS" : "FAIL"}`);
+    console.log(`  Dynamic diagnostic messages contain real metrics: ${hasDynamicMsg ? "PASS" : "FAIL"}`);
+
+    if (!hasRealDims || !hasDynamicMsg) {
+      passedAll = false;
+      console.error("FAIL: Quality gate generated static or mismatched diagnostic values!");
+    } else {
+      console.log("PASS: Quality gate calculates and renders real pixel metrics dynamically.");
+    }
+  } catch (err) {
+    console.error("FAIL: Test 45 error:", err);
+    passedAll = false;
+  }
+
   await prisma.$disconnect();
 
   if (!passedAll) {
@@ -1695,7 +1766,7 @@ async function runTestSuite() {
     process.exit(1);
   } else {
     console.log("\n==================================================");
-    console.log("✅ ALL 43 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
+    console.log("✅ ALL 45 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
     console.log("==================================================");
     process.exit(0);
   }

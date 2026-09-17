@@ -32,9 +32,9 @@ export const PRACTICE_FIXTURES: FixtureOption[] = [
     stage: "Practice Match #8",
     team1: "Home Team",
     team2: "Away Team",
-    date: "16 Sep 2026, 8:00 PM",
+    date: "10 Sep 2026, 8:12 PM",
     venue: "Insportz Club, Dubai (Court 1)",
-    hasScorecard: false,
+    hasScorecard: true,
   },
   {
     id: 9,

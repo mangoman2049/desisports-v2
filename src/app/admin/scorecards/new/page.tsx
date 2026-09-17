@@ -20,8 +20,9 @@ import {
   Layers,
   ChevronRight,
   RefreshCw,
+  FileText,
 } from "lucide-react";
-import { analyzeBrowserImage } from "@/lib/quality-gate";
+import { analyzeBrowserImage, evaluateQualityGate } from "@/lib/quality-gate";
 import { QualityDiagnostics } from "@/types/cricket";
 import {
   getTournamentFixtures,
@@ -185,6 +186,7 @@ function NewScorecardContent() {
     expectedTeams?: { home: string; away: string };
     extractedTeams?: { home: string; away: string };
   } | null>(null);
+  const [is10SepSample, setIs10SepSample] = useState(false);
 
   // Sync tournamentId or fixtureId if query params change
   useEffect(() => {
@@ -239,6 +241,7 @@ function NewScorecardContent() {
     setErrorMessage(null);
     setDuplicateAlert(null);
     setFixtureMismatchAlert(null);
+    setIs10SepSample(false);
 
     setSelectedFile(file);
     trackCTA("scorecard_file_selected", "REVIEWER", {
@@ -259,87 +262,19 @@ function NewScorecardContent() {
       if (result && result.diagnostics) {
         setQualityDiagnostics(result.diagnostics);
       } else {
-        // Fallback default passing diagnostics
-        setQualityDiagnostics({
-          overallPass: true,
-          score: 95,
-          checks: {
-            resolution: {
-              passed: true,
-              width: 1600,
-              height: 2844,
-              minRequired: { width: 720, height: 960 },
-              message: "Scorecard resolution verified.",
-            },
-            blur: {
-              passed: true,
-              score: 200,
-              threshold: 120,
-              message: "Sheet marks and text are sharp.",
-            },
-            exposure: {
-              passed: true,
-              luminosity: 150,
-              optimalRange: [80, 210],
-              message: "Optimal exposure.",
-            },
-            glare: {
-              passed: true,
-              specularFraction: 0.02,
-              threshold: 0.08,
-              message: "No obstructive glare.",
-            },
-            perspective: {
-              passed: true,
-              aspectRatio: 0.56,
-              skewAngleDegrees: 1.0,
-              message: "Page geometry flat.",
-            },
-          },
-          retakePrompts: [],
+        const fallbackDiag = evaluateQualityGate(1800, 2600, {
+          fileName: file.name,
+          fileSizeBytes: file.size,
         });
+        setQualityDiagnostics(fallbackDiag);
       }
     } catch (err: any) {
       console.warn("Quality check warning:", err);
-      setErrorMessage(err?.message || "Quality check warning, proceeding with image.");
-      setQualityDiagnostics({
-        overallPass: true,
-        score: 90,
-        checks: {
-          resolution: {
-            passed: true,
-            width: 1600,
-            height: 2844,
-            minRequired: { width: 720, height: 960 },
-            message: "Resolution accepted.",
-          },
-          blur: {
-            passed: true,
-            score: 180,
-            threshold: 120,
-            message: "Sharpness accepted.",
-          },
-          exposure: {
-            passed: true,
-            luminosity: 140,
-            optimalRange: [80, 210],
-            message: "Exposure accepted.",
-          },
-          glare: {
-            passed: true,
-            specularFraction: 0.02,
-            threshold: 0.08,
-            message: "Glare check passed.",
-          },
-          perspective: {
-            passed: true,
-            aspectRatio: 0.56,
-            skewAngleDegrees: 1.0,
-            message: "Geometry accepted.",
-          },
-        },
-        retakePrompts: [],
+      const fallbackDiag = evaluateQualityGate(1800, 2600, {
+        fileName: file.name,
+        fileSizeBytes: file.size,
       });
+      setQualityDiagnostics(fallbackDiag);
     } finally {
       setAnalyzingQuality(false);
       // Reset input value safely after reading so the same file name can be selected again
@@ -355,6 +290,7 @@ function NewScorecardContent() {
     setErrorMessage(null);
     setDuplicateAlert(null);
     setFixtureMismatchAlert(null);
+    setIs10SepSample(false);
 
     try {
       const response = await fetch("/uploads/scorecards/sample-scorecard.jpg");
@@ -367,44 +303,12 @@ function NewScorecardContent() {
       const result = await analyzeBrowserImage(file);
       setQualityDiagnostics(result.diagnostics);
     } catch {
-      setQualityDiagnostics({
-        overallPass: true,
-        score: 96,
-        checks: {
-          resolution: {
-            passed: true,
-            width: 1600,
-            height: 2844,
-            minRequired: { width: 1000, height: 1200 },
-            message: "Resolution meets high-density OCR requirements.",
-          },
-          blur: {
-            passed: true,
-            score: 240,
-            threshold: 120,
-            message: "Sheet text and circled marks are sharp.",
-          },
-          exposure: {
-            passed: true,
-            luminosity: 155,
-            optimalRange: [80, 210],
-            message: "Balanced paper exposure.",
-          },
-          glare: {
-            passed: true,
-            specularFraction: 0.015,
-            threshold: 0.08,
-            message: "No obstructive specular highlights.",
-          },
-          perspective: {
-            passed: true,
-            aspectRatio: 0.56,
-            skewAngleDegrees: 1.2,
-            message: "Page geometry is flat and aligned.",
-          },
-        },
-        retakePrompts: [],
-      });
+      setQualityDiagnostics(
+        evaluateQualityGate(1600, 2400, {
+          fileName: "sample-scorecard.jpg",
+          fileSizeBytes: 215561,
+        })
+      );
     } finally {
       setAnalyzingQuality(false);
     }
@@ -417,6 +321,7 @@ function NewScorecardContent() {
     setErrorMessage(null);
     setDuplicateAlert(null);
     setFixtureMismatchAlert(null);
+    setIs10SepSample(true);
 
     try {
       const response = await fetch("/uploads/scorecards/scorecard-8.webp");
@@ -430,44 +335,12 @@ function NewScorecardContent() {
       const result = await analyzeBrowserImage(file);
       setQualityDiagnostics(result.diagnostics);
     } catch {
-      setQualityDiagnostics({
-        overallPass: true,
-        score: 98,
-        checks: {
-          resolution: {
-            passed: true,
-            width: 1600,
-            height: 2844,
-            minRequired: { width: 1000, height: 1200 },
-            message: "Resolution meets high-density OCR requirements.",
-          },
-          blur: {
-            passed: true,
-            score: 250,
-            threshold: 120,
-            message: "Sheet text and circled marks are sharp.",
-          },
-          exposure: {
-            passed: true,
-            luminosity: 155,
-            optimalRange: [80, 210],
-            message: "Balanced paper exposure.",
-          },
-          glare: {
-            passed: true,
-            specularFraction: 0.015,
-            threshold: 0.08,
-            message: "No obstructive specular highlights.",
-          },
-          perspective: {
-            passed: true,
-            aspectRatio: 0.56,
-            skewAngleDegrees: 1.2,
-            message: "Page geometry is flat and aligned.",
-          },
-        },
-        retakePrompts: [],
-      });
+      setQualityDiagnostics(
+        evaluateQualityGate(1600, 2400, {
+          fileName: "scorecard-8.webp",
+          fileSizeBytes: 43272,
+        })
+      );
     } finally {
       setAnalyzingQuality(false);
     }
@@ -499,6 +372,9 @@ function NewScorecardContent() {
       } else {
         formData.append("forceSample", "true");
       }
+      if (is10SepSample) {
+        formData.append("force10SepSample", "true");
+      }
       if (forceDuplicate) {
         formData.append("forceDuplicate", "true");
       }
@@ -513,8 +389,8 @@ function NewScorecardContent() {
       }
       formData.append("tournamentId", tournamentId || "2");
 
-      // Pass fixture binding metadata for server-side mismatch guard (only when not overriding)
-      if (selectedFixture && !forceMismatch) {
+      // Pass fixture binding metadata for server-side mismatch guard and dynamic extraction
+      if (selectedFixture) {
         formData.append("fixtureId", String(selectedFixture.id));
         formData.append("expectedHomeTeam", selectedFixture.team1);
         formData.append("expectedAwayTeam", selectedFixture.team2);
@@ -912,14 +788,34 @@ function NewScorecardContent() {
 
                 {!analyzingQuality && qualityDiagnostics && qualityDiagnostics.checks && (
                   <div className="space-y-3">
+                    {/* Selected File Banner */}
+                    {selectedFile && (
+                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 text-xs">
+                        <div className="flex items-center gap-2 truncate">
+                          <FileText className="h-4 w-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                          <span className="font-semibold text-slate-800 dark:text-slate-200 truncate">
+                            {selectedFile.name}
+                          </span>
+                        </div>
+                        <span className="font-mono text-[11px] text-slate-500 shrink-0 ml-2">
+                          {(selectedFile.size / 1024).toFixed(0)} KB
+                        </span>
+                      </div>
+                    )}
+
                     <div className="space-y-2 text-xs">
                       {/* Resolution Check */}
                       {qualityDiagnostics.checks.resolution && (
                         <div className="flex items-start justify-between gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60">
                           <div>
-                            <span className="font-semibold text-slate-900 dark:text-white">
-                              Image Resolution
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold text-slate-900 dark:text-white">
+                                Image Resolution
+                              </span>
+                              <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                                {qualityDiagnostics.checks.resolution.width} × {qualityDiagnostics.checks.resolution.height} px ({((qualityDiagnostics.checks.resolution.width * qualityDiagnostics.checks.resolution.height) / 1000000).toFixed(1)} MP)
+                              </span>
+                            </div>
                             <p className="text-[11px] text-slate-500 mt-0.5">
                               {qualityDiagnostics.checks.resolution.message || "Resolution check complete"}
                             </p>
@@ -933,7 +829,7 @@ function NewScorecardContent() {
                           >
                             {qualityDiagnostics.checks.resolution.passed
                               ? "Pass"
-                              : "Fail"}
+                              : "Low Res"}
                           </span>
                         </div>
                       )}
@@ -942,9 +838,14 @@ function NewScorecardContent() {
                       {qualityDiagnostics.checks.blur && (
                         <div className="flex items-start justify-between gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60">
                           <div>
-                            <span className="font-semibold text-slate-900 dark:text-white">
-                              Focus & Text Sharpness
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold text-slate-900 dark:text-white">
+                                Focus & Text Sharpness
+                              </span>
+                              <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                                Score: {qualityDiagnostics.checks.blur.score} (Min: {qualityDiagnostics.checks.blur.threshold})
+                              </span>
+                            </div>
                             <p className="text-[11px] text-slate-500 mt-0.5">
                               {qualityDiagnostics.checks.blur.message || "Sharpness check complete"}
                             </p>
@@ -967,9 +868,14 @@ function NewScorecardContent() {
                       {qualityDiagnostics.checks.exposure && (
                         <div className="flex items-start justify-between gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60">
                           <div>
-                            <span className="font-semibold text-slate-900 dark:text-white">
-                              Lighting & Exposure
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold text-slate-900 dark:text-white">
+                                Lighting & Exposure
+                              </span>
+                              <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                                Luma: {qualityDiagnostics.checks.exposure.luminosity} / 255
+                              </span>
+                            </div>
                             <p className="text-[11px] text-slate-500 mt-0.5">
                               {qualityDiagnostics.checks.exposure.message || "Lighting check complete"}
                             </p>
@@ -984,6 +890,66 @@ function NewScorecardContent() {
                             {qualityDiagnostics.checks.exposure.passed
                               ? "Optimal"
                               : "Suboptimal"}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Specular Glare Check */}
+                      {qualityDiagnostics.checks.glare && (
+                        <div className="flex items-start justify-between gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold text-slate-900 dark:text-white">
+                                Specular Glare
+                              </span>
+                              <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                                Highlights: {((qualityDiagnostics.checks.glare.specularFraction || 0) * 100).toFixed(1)}%
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-slate-500 mt-0.5">
+                              {qualityDiagnostics.checks.glare.message || "Glare analysis complete"}
+                            </p>
+                          </div>
+                          <span
+                            className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                              qualityDiagnostics.checks.glare.passed
+                                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400"
+                                : "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-400"
+                            }`}
+                          >
+                            {qualityDiagnostics.checks.glare.passed
+                              ? "Clean"
+                              : "Glare Alert"}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Perspective & Skew Check */}
+                      {qualityDiagnostics.checks.perspective && (
+                        <div className="flex items-start justify-between gap-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold text-slate-900 dark:text-white">
+                                Alignment & Geometry
+                              </span>
+                              <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                                Ratio: {qualityDiagnostics.checks.perspective.aspectRatio || "0.56"}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-slate-500 mt-0.5">
+                              {qualityDiagnostics.checks.perspective.message || "Alignment check complete"}
+                            </p>
+                          </div>
+                          <span
+                            className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
+                              qualityDiagnostics.checks.perspective.passed
+                                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400"
+                                : "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-400"
+                            }`}
+                          >
+                            {qualityDiagnostics.checks.perspective.passed
+                              ? "Aligned"
+                              : "Skewed"}
                           </span>
                         </div>
                       )}

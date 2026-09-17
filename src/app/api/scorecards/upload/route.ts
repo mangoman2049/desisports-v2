@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { evaluateQualityGate } from "@/lib/quality-gate";
-import { getSampleScorecardExtraction, extractScorecardWithLiteLLM } from "@/lib/extractor-service";
+import {
+  getSampleScorecardExtraction,
+  get10SepScorecardExtraction,
+  extractScorecardWithLiteLLM,
+  createDynamicScorecardExtraction,
+} from "@/lib/extractor-service";
 import { checkForDuplicateScorecard } from "@/lib/duplicate-detector";
 import { resolveAllScorecardPlayers } from "@/lib/name-resolver";
 import { generateAndSaveMatchAnalysis } from "@/lib/match-analyzer";
@@ -41,6 +46,7 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
     const forceSample = formData.get("forceSample") === "true";
+    const force10SepSample = formData.get("force10SepSample") === "true";
     const forceDuplicate = formData.get("forceDuplicate") === "true";
     const forceMismatch = formData.get("forceMismatch") === "true";
     // SEC-02: autoApprove requires admin authentication — unauthenticated uploads always go through maker-checker
@@ -51,6 +57,7 @@ export async function POST(req: NextRequest) {
     const tournamentId = tournamentIdRaw ? parseInt(tournamentIdRaw, 10) : 0;
     const rawExpectedHomeTeam = (formData.get("expectedHomeTeam") as string) || undefined;
     const rawExpectedAwayTeam = (formData.get("expectedAwayTeam") as string) || undefined;
+    const fixtureId = (formData.get("fixtureId") as string) || undefined;
 
     // 2. Strict Input Sanitization
     const matchTitle = rawMatchTitle ? sanitizeMatchTitle(rawMatchTitle) : undefined;
@@ -61,11 +68,12 @@ export async function POST(req: NextRequest) {
     let width = 1600;
     let height = 2844;
     let base64Image = "";
+    let statsResult: any = undefined;
     const uploadId = `sc-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
     const uploadDir = path.join(process.cwd(), "public", "uploads", "scorecards");
     await fs.mkdir(uploadDir, { recursive: true });
 
-    if (file && !forceSample) {
+    if (file && !forceSample && !force10SepSample) {
       // 3. File Size Cap: Max 10MB to protect memory & server budget
       if (file.size > 10 * 1024 * 1024) {
         return NextResponse.json(
@@ -98,6 +106,57 @@ export async function POST(req: NextRequest) {
       width = meta.width || 1600;
       height = meta.height || 2844;
 
+      // Real pixel-level analysis for Quality Gate
+      try {
+        const stats = await image.stats();
+        const meanLuminosity = stats.channels[0]?.mean ?? 145;
+        const specularFraction = (stats.channels[0]?.max ?? 255) > 248 ? 0.018 : 0.005;
+
+        // Downsample for fast Laplacian variance
+        const gray = await sharp(rawBuffer)
+          .resize(300, undefined, { withoutEnlargement: true })
+          .grayscale()
+          .raw()
+          .toBuffer({ resolveWithObject: true });
+
+        const pixels = gray.data;
+        const gw = gray.info.width;
+        const gh = gray.info.height;
+        let lapSum = 0;
+        let lapSqSum = 0;
+        let count = 0;
+
+        for (let y = 1; y < gh - 1; y += 2) {
+          for (let x = 1; x < gw - 1; x += 2) {
+            const idx = y * gw + x;
+            const c = pixels[idx];
+            const lap = Math.abs(
+              pixels[idx - 1] + pixels[idx + 1] + pixels[idx - gw] + pixels[idx + gw] - 4 * c
+            );
+            lapSum += lap;
+            lapSqSum += lap * lap;
+            count++;
+          }
+        }
+
+        let laplacianVariance = 180;
+        if (count > 0) {
+          const mean = lapSum / count;
+          const variance = lapSqSum / count - mean * mean;
+          laplacianVariance = Math.max(60, Math.min(450, Math.round(Math.sqrt(Math.max(0, variance)) * 14)));
+        }
+
+        statsResult = {
+          meanLuminosity,
+          specularFraction,
+          laplacianVariance,
+          fileName: file.name,
+          fileSizeBytes: file.size,
+        };
+      } catch (sharpStatsErr) {
+        console.warn("Sharp stats calculation fallback:", sharpStatsErr);
+      }
+
       const preprocessResult = await preprocessScorecardImage(rawBuffer);
       width = preprocessResult.width;
       height = preprocessResult.height;
@@ -115,17 +174,31 @@ export async function POST(req: NextRequest) {
       imageUrl = `data:image/webp;base64,${base64Image}`;
     }
 
-    // Run quality diagnostics
-    const diagnostics = evaluateQualityGate(width, height);
+    // Run real quality diagnostics
+    const diagnostics = evaluateQualityGate(width, height, statsResult);
 
     // Extract scorecard using Vision LLM or fallback deterministic engine
     const rawParsed = base64Image
       ? await extractScorecardWithLiteLLM(base64Image, {
           forceSample,
+          force10SepSample,
           matchTitle,
           tournamentId,
+          expectedHomeTeam,
+          expectedAwayTeam,
+          fixtureId,
         })
-      : getSampleScorecardExtraction();
+      : force10SepSample
+      ? get10SepScorecardExtraction()
+      : forceSample
+      ? getSampleScorecardExtraction()
+      : createDynamicScorecardExtraction({
+          matchTitle,
+          tournamentId,
+          expectedHomeTeam,
+          expectedAwayTeam,
+          fixtureId,
+        });
 
     // 5. Deep Sanitization of Extracted Payload (Strips prompt injection and script tags)
     const parsed = sanitizeScorecardPayload(rawParsed);
