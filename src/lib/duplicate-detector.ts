@@ -110,11 +110,13 @@ export async function checkForDuplicateScorecard(
     }
   }
 
-  // 2. Check pending uploads
+  // 2. Check pending uploads (only recent ones — ignore abandoned uploads older than 24 hours)
+  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
   const uploads = await prisma.scorecardUpload.findMany({
     where: {
       id: excludeUploadId ? { not: excludeUploadId } : undefined,
       status: "PENDING_REVIEW",
+      createdAt: { gte: twentyFourHoursAgo },
     },
   });
 
@@ -125,6 +127,9 @@ export async function checkForDuplicateScorecard(
         const upDate = (parsed.matchInfo?.dateTime || "").trim().toLowerCase();
         const dateMatches = isSameDate(upDate, normalizedDate);
 
+        const upHome = (parsed.homeInnings?.teamName || "").trim().toLowerCase();
+        const upAway = (parsed.awayInnings?.teamName || "").trim().toLowerCase();
+
         const upHomeScore = parsed.homeInnings?.totalScore ?? parsed.homeInnings?.totalRuns;
         const upAwayScore = parsed.awayInnings?.totalScore ?? parsed.awayInnings?.totalRuns;
 
@@ -133,7 +138,13 @@ export async function checkForDuplicateScorecard(
             (upHomeScore === homeScore && upAwayScore === awayScore) ||
             (upHomeScore === awayScore && upAwayScore === homeScore);
 
-          if (dateMatches && scoreMatches) {
+          // Require BOTH date+score match AND team name match to avoid false positives
+          const teamsMatch =
+            !normalizedHome || !normalizedAway || !upHome || !upAway ||
+            (upHome === normalizedHome && upAway === normalizedAway) ||
+            (upHome === normalizedAway && upAway === normalizedHome);
+
+          if (dateMatches && scoreMatches && teamsMatch) {
             return {
               isDuplicate: true,
               existingUploadId: up.id,

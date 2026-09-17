@@ -496,15 +496,6 @@ function NewScorecardContent() {
       const formData = new FormData();
       if (selectedFile) {
         formData.append("file", selectedFile);
-      } else if (duplicateAlert?.existingMatchId === 8 || matchTitle.includes("10 Sep")) {
-        // Fetch Match 8 scorecard file so re-extraction preserves Match 8 instead of defaulting to Match 7
-        try {
-          const resp = await fetch("/uploads/scorecards/scorecard-8.webp");
-          const blob = await resp.blob();
-          formData.append("file", blob, "scorecard-8.webp");
-        } catch {
-          formData.append("forceSample", "true");
-        }
       } else {
         formData.append("forceSample", "true");
       }

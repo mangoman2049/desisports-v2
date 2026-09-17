@@ -6,17 +6,6 @@ import { prisma } from "@/lib/prisma";
 import { preprocessScorecardImage } from "@/lib/image-preprocessor";
 import { isAllowedRemoteUrl } from "@/lib/security";
 
-const STATIC_MATCH_SCORECARDS: Record<string, string> = {
-  "1": "https://desisports.milanchheda.com/storage/scorecards/iVA2RZBZK6iu9zaGBGZKItLdkqaL4D7uGPGTpKUg.jpg",
-  "2": "https://desisports.milanchheda.com/storage/scorecards/ahMNeOGe8h6R3xV5sq5P0Xv7OwneTh1iEySuZ4QG.jpg",
-  "3": "https://desisports.milanchheda.com/storage/scorecards/OSxCBhl68FJzczLG5nBPIxsPMKNouscmLC936huM.jpg",
-  "4": "https://desisports.milanchheda.com/storage/scorecards/wzkviHxARCTmAmyOnHxyBj86n866Nw2u2wjM7DMT.jpg",
-  "5": "https://desisports.milanchheda.com/storage/scorecards/JJ4WJyjlzrzj4wUxrNPRifw8lnqx9RHVFIHOqZh1.jpg",
-  "6": "https://desisports.milanchheda.com/storage/scorecards/S9vHrbIiDufP0ER2db9P9KNMAA0KELPojHx15lot.jpg",
-  "7": "/uploads/scorecards/sample-scorecard.jpg",
-  "8": "/uploads/scorecards/scorecard-8.webp",
-};
-
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> | { id: string } }
@@ -44,8 +33,8 @@ export async function GET(
       return new NextResponse(fileBuffer, { status: 200, headers });
     }
 
-    // 2. Resolve image source URL or local path
-    let sourceUrlOrPath = STATIC_MATCH_SCORECARDS[id];
+    // 2. Resolve image source URL or local path (DB-driven, no hardcoded map)
+    let sourceUrlOrPath: string | undefined = undefined;
 
     // Check Prisma Match if numeric
     const matchNum = parseInt(id, 10);
@@ -94,13 +83,9 @@ export async function GET(
       }
     }
 
-    // Fallback to match-specific scorecard
+    // Generic fallback — no match-specific hardcoding
     if (!sourceUrlOrPath) {
-      if (id === "8" || id.includes("-8") || id.includes("match-8")) {
-        sourceUrlOrPath = "/uploads/scorecards/scorecard-8.webp";
-      } else {
-        sourceUrlOrPath = "/uploads/scorecards/sample-scorecard.jpg";
-      }
+      sourceUrlOrPath = "/uploads/scorecards/sample-scorecard.jpg";
     }
 
     // 3. Obtain raw image buffer
@@ -177,7 +162,7 @@ export async function GET(
   } catch (err: any) {
     console.error("Scorecard image route error, returning sample fallback:", err);
     try {
-      const fallbackFilename = (id === "8" || id.includes("-8") || id.includes("match-8")) ? "scorecard-8.webp" : "sample-scorecard.jpg";
+      const fallbackFilename = "sample-scorecard.jpg";
       const samplePath = path.join(process.cwd(), "public", "uploads", "scorecards", fallbackFilename);
       if (fs.existsSync(samplePath)) {
         const sampleBuf = await fs.promises.readFile(samplePath);

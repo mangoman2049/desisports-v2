@@ -1569,8 +1569,8 @@ async function runTestSuite() {
     } else { console.log("PASS: All security module hardening verified."); }
   } catch (err) { console.error("FAIL: Test 38 error:", err); passedAll = false; }
 
-  // Test 39: Match 8 Maker-Checker & Scorecard Preview Integrity
-  console.log("\n[Test 39] Match 8 Maker-Checker & Scorecard Preview Integrity:");
+  // Test 39: Match 8 DB-Driven Resolution & Scorecard Preview Integrity (No Hardcoded Fallback)
+  console.log("\n[Test 39] Match 8 DB-Driven Resolution & Scorecard Preview Integrity:");
   try {
     const { GET: getScorecardById } = await import("../src/app/api/scorecards/[id]/route");
     const req8 = new Request("http://localhost:3000/api/scorecards/8");
@@ -1578,20 +1578,20 @@ async function runTestSuite() {
     const data8 = await res8.json();
 
     const hasMatch = data8.success && !!data8.match;
-    const hasParsedScorecard = !!data8.upload?.parsedScorecard;
-    const isMatch8Date = data8.upload?.parsedScorecard?.matchInfo?.dateTime?.includes("10 September");
+    const isMatch8Date = data8.match?.matchDate?.includes("10 September");
     const isScorecard8Image = data8.upload?.imageUrl?.includes("scorecard-8.webp");
+    const isApprovedStatus = data8.upload?.status === "APPROVED";
 
     console.log(`- Match 8 DB record resolved: ${hasMatch ? "PASS" : "FAIL"}`);
-    console.log(`- Parsed scorecard provided for Maker-Checker: ${hasParsedScorecard ? "PASS" : "FAIL"}`);
-    console.log(`- Scorecard data matches 10 September (Match #8, not #7): ${isMatch8Date ? "PASS" : "FAIL"}`);
-    console.log(`- Image URL points to scorecard-8.webp: ${isScorecard8Image ? "PASS" : "FAIL"}`);
+    console.log(`- Match 8 date matches 10 September from DB: ${isMatch8Date ? "PASS" : "FAIL"}`);
+    console.log(`- Image URL resolved dynamically from DB: ${isScorecard8Image ? "PASS" : "FAIL"}`);
+    console.log(`- Match 8 upload status is APPROVED: ${isApprovedStatus ? "PASS" : "FAIL"}`);
 
-    if (!hasMatch || !hasParsedScorecard || !isMatch8Date || !isScorecard8Image) {
+    if (!hasMatch || !isMatch8Date || !isScorecard8Image || !isApprovedStatus) {
       passedAll = false;
       console.error("FAIL: Match 8 scorecard retrieval or image link broken!");
     } else {
-      console.log("PASS: Match 8 Maker-Checker and score preview integrity verified.");
+      console.log("PASS: Match 8 DB-driven resolution and score preview integrity verified.");
     }
   } catch (err) {
     console.error("FAIL: Test 39 error:", err);
@@ -1618,6 +1618,76 @@ async function runTestSuite() {
     passedAll = false;
   }
 
+  // Test 41: No Hardcoded Match 7/8 Fallbacks in Critical Upload/Review Files
+  console.log("\n[Test 41] No Hardcoded Match 7/8 Fallbacks (Anti-Pattern Guard):");
+  try {
+    const criticalFiles = [
+      { name: "scorecards/[id]/route.ts", path: path.join(__dirname, "../src/app/api/scorecards/[id]/route.ts") },
+      { name: "review/page.tsx", path: path.join(__dirname, "../src/app/admin/scorecards/[id]/review/page.tsx") },
+      { name: "image/route.ts", path: path.join(__dirname, "../src/app/api/scorecards/[id]/image/route.ts") },
+    ];
+    let test41Pass = true;
+    for (const f of criticalFiles) {
+      const content = fs.readFileSync(f.path, "utf-8");
+      // Check for hardcoded match ID conditions (not string literals in comments/logs)
+      const hasHardcodedMatch8 = /(?:match\.id\s*===\s*8|uploadId\s*===\s*["']8["']|id\s*===\s*["']8["'])/.test(content);
+      const hasHardcoded10Sep = /get10SepScorecardExtraction/.test(content);
+      const hasStaticMap = /STATIC_MATCH_SCORECARDS/.test(content);
+      if (hasHardcodedMatch8) { console.error(`  FAIL: ${f.name} has hardcoded match.id === 8 check`); test41Pass = false; }
+      if (hasHardcoded10Sep) { console.error(`  FAIL: ${f.name} imports get10SepScorecardExtraction`); test41Pass = false; }
+      if (hasStaticMap) { console.error(`  FAIL: ${f.name} has STATIC_MATCH_SCORECARDS map`); test41Pass = false; }
+      if (!hasHardcodedMatch8 && !hasHardcoded10Sep && !hasStaticMap) {
+        console.log(`  PASS: ${f.name} — no hardcoded match fallbacks`);
+      }
+    }
+    if (!test41Pass) { passedAll = false; } else { console.log("PASS: No hardcoded Match 7/8 anti-patterns in critical files."); }
+  } catch (err) {
+    console.error("FAIL: Test 41 error:", err);
+    passedAll = false;
+  }
+
+  // Test 42: Duplicate Detector Rejects Different Teams on Same Date
+  console.log("\n[Test 42] Duplicate Detector: Different Teams on Same Date Are NOT Duplicates:");
+  try {
+    const { checkForDuplicateScorecard } = await import("../src/lib/duplicate-detector");
+    // Match 8 is in the DB with specific teams/scores. A new match on the same date with different teams should NOT be flagged.
+    const result = await checkForDuplicateScorecard(
+      "10 September 2026, 8:12 PM",     // Same date as Match 8
+      "Totally Different Team A",         // Different teams
+      "Totally Different Team B",
+      100,                                // Different scores
+      50
+    );
+    if (result.isDuplicate) {
+      console.error("FAIL: Different teams on same date incorrectly flagged as duplicate:", result.reason);
+      passedAll = false;
+    } else {
+      console.log("PASS: Different teams on same date correctly NOT flagged as duplicate.");
+    }
+  } catch (err) {
+    console.error("FAIL: Test 42 error:", err);
+    passedAll = false;
+  }
+
+  // Test 43: Duplicate Detector Ignores Stale Pending Uploads (>24h)
+  console.log("\n[Test 43] Duplicate Detector: Stale Pending Uploads Are Ignored:");
+  try {
+    const duplicateDetectorSrc = fs.readFileSync(path.join(__dirname, "../src/lib/duplicate-detector.ts"), "utf-8");
+    const hasStalenessGuard = duplicateDetectorSrc.includes("24 * 60 * 60 * 1000") || duplicateDetectorSrc.includes("twentyFourHoursAgo");
+    const hasTeamCheck = duplicateDetectorSrc.includes("teamsMatch");
+    console.log(`  Staleness guard (24h TTL on pending uploads): ${hasStalenessGuard ? "PASS" : "FAIL"}`);
+    console.log(`  Team name comparison in pending uploads: ${hasTeamCheck ? "PASS" : "FAIL"}`);
+    if (!hasStalenessGuard || !hasTeamCheck) {
+      passedAll = false;
+      console.error("FAIL: Duplicate detector missing staleness guard or team name check for pending uploads!");
+    } else {
+      console.log("PASS: Duplicate detector has staleness and team name protection.");
+    }
+  } catch (err) {
+    console.error("FAIL: Test 43 error:", err);
+    passedAll = false;
+  }
+
   await prisma.$disconnect();
 
   if (!passedAll) {
@@ -1625,7 +1695,7 @@ async function runTestSuite() {
     process.exit(1);
   } else {
     console.log("\n==================================================");
-    console.log("✅ ALL 40 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
+    console.log("✅ ALL 43 TESTS PASSED! READY FOR PRODUCTION DEPLOY");
     console.log("==================================================");
     process.exit(0);
   }

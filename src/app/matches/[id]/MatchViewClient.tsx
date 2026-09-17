@@ -639,8 +639,8 @@ export default function MatchViewClient({
                   className="rounded-lg shadow-2xl max-h-[75vh] w-auto max-w-full object-contain mx-auto border border-slate-800"
                   onError={(e) => {
                     const target = e.currentTarget as HTMLImageElement;
-                    if (!target.src.includes("scorecard-8.webp") && !target.src.includes("sample-scorecard.jpg")) {
-                      target.src = "/uploads/scorecards/scorecard-8.webp";
+                    if (!target.src.includes("sample-scorecard.jpg")) {
+                      target.src = "/uploads/scorecards/sample-scorecard.jpg";
                     }
                   }}
                 />

@@ -114,21 +114,10 @@ export async function GET(
           } catch {}
         }
 
-        // Authoritative ground-truth fallbacks for Match 8 and Match 7
-        if (!parsedScorecard && match.id === 8) {
-          const { get10SepScorecardExtraction } = await import("@/lib/extractor-service");
-          parsedScorecard = get10SepScorecardExtraction();
-        }
-        if (!parsedScorecard && match.id === 7) {
-          const { getSampleScorecardExtraction } = await import("@/lib/extractor-service");
-          parsedScorecard = getSampleScorecardExtraction();
-        }
-
+        // Generic image URL resolution from DB — no hardcoded match-specific fallbacks
         const resolvedImageUrl =
-          match.id === 8
-            ? "/uploads/scorecards/scorecard-8.webp"
-            : match.id === 7
-            ? "/uploads/scorecards/sample-scorecard.jpg"
+          linkedUpload?.imageUrl && (linkedUpload.imageUrl.startsWith("data:") || linkedUpload.imageUrl.startsWith("http"))
+            ? linkedUpload.imageUrl
             : match.scorecardUrl && !match.scorecardUrl.startsWith("/matches/") && !match.scorecardUrl.includes("/review")
             ? match.scorecardUrl
             : `/api/scorecards/${match.id}/image`;
@@ -138,7 +127,7 @@ export async function GET(
           match,
           upload: {
             id: String(match.id),
-            filename: match.id === 8 ? "scorecard-8.webp" : `match-${match.id}.jpg`,
+            filename: linkedUpload?.filename || `match-${match.id}.jpg`,
             imageUrl: resolvedImageUrl,
             status: "APPROVED",
             validationScore: 100,
