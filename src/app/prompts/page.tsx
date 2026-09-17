@@ -100,7 +100,7 @@ export default async function PromptsPage() {
       badge: "Career-Wide Scope",
       author: PLAYER_TACTICAL_AUTHOR,
       lastUpdated: PLAYER_TACTICAL_LAST_UPDATED,
-      version: "v1.1 (Three-Window Evidence Model)",
+      version: "v1.2 (Spawtz Extras Attribution & Partnership Enablement)",
       llmModel: "gemini-1.5-pro",
       temperature: "0.2 (Anti-Hallucination)",
       triggerEvent: "Match Completion (Selective for 16 Participating Players)",
@@ -110,7 +110,7 @@ export default async function PromptsPage() {
       tokensSavedPct: 100,
       promptText: PLAYER_TACTICAL_INTELLIGENCE_PROMPT,
       description:
-        "Career-wide observable playing DNA with a three-window evidence model (Career ~50%, Tournament ~30%, Recent Form ~20%) evaluating repeatable scoring, dismissal vulnerability, bowling discipline trade-offs, and 0–100 Performance Synergy.",
+        "Career-wide observable playing DNA with a three-window evidence model (Career ~50%, Tournament ~30%, Recent Form ~20%), Spawtz extra-run attribution rules, partnership enablement, and 4-dimension bowling discipline.",
       sourceFile: "src/lib/player-dna-prompt.ts",
     },
   ];
